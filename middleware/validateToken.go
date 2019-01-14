@@ -42,15 +42,15 @@ func ValidateToken(conf structs.Config) gin.HandlerFunc {
 		}
 		req.Header.Add("Authorization", strings.Join([]string{"Bearer", token}, " "))
 
-		resp, err := client.Do(req)
+		res, err := client.Do(req)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "error authenticating request"})
 			c.Abort()
 			return
 		}
-		defer resp.Body.Close()
+		defer res.Body.Close()
 
-		rawBody, err := ioutil.ReadAll(resp.Body)
+		rawBody, err := ioutil.ReadAll(res.Body)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "error authenticating request"})
 			c.Abort()
@@ -65,7 +65,7 @@ func ValidateToken(conf structs.Config) gin.HandlerFunc {
 
 		errValue, errExists := body["error"]
 		if errExists {
-			c.JSON(resp.StatusCode, gin.H{"error": errValue})
+			c.JSON(res.StatusCode, gin.H{"error": errValue})
 			c.Abort()
 			return
 		}
