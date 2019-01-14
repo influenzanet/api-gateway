@@ -1,13 +1,13 @@
 package endpoints
 
 import (
+	"github.com/Influenzanet/api-gateway/config"
 	"github.com/Influenzanet/api-gateway/middleware"
-	"github.com/Influenzanet/api-gateway/structs"
 	"github.com/gin-gonic/gin"
 )
 
 // InitEndpoints creates all API routes on the supplied RouterGroup
-func InitEndpoints(rg *gin.RouterGroup, conf structs.Config) {
+func InitEndpoints(rg *gin.RouterGroup) {
 	user := rg.Group("/user")
 	user.Use(middleware.RequirePayload())
 	{
@@ -15,7 +15,7 @@ func InitEndpoints(rg *gin.RouterGroup, conf structs.Config) {
 		user.POST("/signup", userSignupHandl)
 	}
 	userToken := rg.Group("/user")
-	userToken.Use(middleware.ValidateToken(conf))
+	userToken.Use(middleware.ValidateToken(config.Conf))
 	userToken.Use(middleware.RequirePayload())
 	{
 		user.POST("/change-password", userPasswordChangeHandl)
