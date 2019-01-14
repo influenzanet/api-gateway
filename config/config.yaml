@@ -1,0 +1,6 @@
+authentication: "authentication:3100"
+authentication_login: "/v1/user/login"
+authentication_signup: "/v1/user/signup"
+user_management: "user-management:3200"
+user_management_login: "/v1/login"
+user_management_signup: "/v1/signup"
