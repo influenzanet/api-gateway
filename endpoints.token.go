@@ -1,7 +1,9 @@
 package main
 
 import (
+	"io/ioutil"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -9,11 +11,36 @@ import (
 // InitTokenEndpoints creates all API routes on the supplied RouterGroup
 func InitTokenEndpoints(rg *gin.RouterGroup) {
 	token := rg.Group("/token")
+	token.Use(ExtractToken())
 	{
 		token.GET("/renew", tokenRenewHandl)
 	}
 }
 
 func tokenRenewHandl(c *gin.Context) {
-	c.JSON(http.StatusNotImplemented, gin.H{})
+	token := c.MustGet("encodedToken").(string)
+
+	var client = &http.Client{}
+
+	req, err := http.NewRequest("Get", Conf.URLAuthenticationService+Conf.AuthenticationRenew, nil)
+	if err != nil {
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+	req.Header.Add("Authorization", strings.Join([]string{"Bearer", token}, " "))
+
+	res, err := client.Do(req)
+	if err != nil {
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+	defer res.Body.Close()
+
+	rawBody, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	c.JSON(res.StatusCode, rawBody)
 }
