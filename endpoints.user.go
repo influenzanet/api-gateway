@@ -7,8 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var client = &http.Client{}
-
 // InitUserEndpoints creates all API routes on the supplied RouterGroup
 func InitUserEndpoints(rg *gin.RouterGroup) {
 	user := rg.Group("/user")
@@ -18,19 +16,21 @@ func InitUserEndpoints(rg *gin.RouterGroup) {
 		user.POST("/signup", userSignupHandl)
 	}
 	userToken := rg.Group("/user")
+	userToken.Use(ExtractToken())
 	userToken.Use(ValidateToken(Conf))
 	userToken.Use(RequirePayload())
 	{
 		user.POST("/change-password", userPasswordChangeHandl)
 	}
 	userGet := rg.Group("/user")
-	// TODO url encoded middleware
+	userGet.Use(ExtractURLToken())
 	{
 		userGet.GET("/verify-email", userEmailVerifyHandl)
 	}
 }
 
 func userLoginHandl(c *gin.Context) {
+	var client = &http.Client{}
 	req, err := http.NewRequest("POST", Conf.URLAuthenticationService+Conf.AuthenticationLogin, c.Request.Body)
 	if err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
@@ -54,6 +54,7 @@ func userLoginHandl(c *gin.Context) {
 }
 
 func userSignupHandl(c *gin.Context) {
+	var client = &http.Client{}
 	req, err := http.NewRequest("POST", Conf.URLUserManagementService+Conf.AuthenticationSignup, c.Request.Body)
 	if err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
