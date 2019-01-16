@@ -1,4 +1,4 @@
-package middleware
+package main
 
 import (
 	"encoding/json"
@@ -6,13 +6,11 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/Influenzanet/api-gateway/structs"
-
 	"github.com/gin-gonic/gin"
 )
 
 // ValidateToken reads the token from the request and validates it by contacting the authentication service
-func ValidateToken(conf structs.Config) gin.HandlerFunc {
+func ValidateToken(conf Config) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		req := c.Request
 

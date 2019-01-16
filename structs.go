@@ -1,4 +1,4 @@
-package structs
+package main
 
 // Config is the structure corresponding to config.yaml that holds all static configuration data
 type Config struct {

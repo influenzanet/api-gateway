@@ -1,17 +1,37 @@
-package endpoints
+package main
 
 import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/Influenzanet/api-gateway/config"
 	"github.com/gin-gonic/gin"
 )
 
 var client = &http.Client{}
 
+// InitUserEndpoints creates all API routes on the supplied RouterGroup
+func InitUserEndpoints(rg *gin.RouterGroup) {
+	user := rg.Group("/user")
+	user.Use(RequirePayload())
+	{
+		user.POST("/login", userLoginHandl)
+		user.POST("/signup", userSignupHandl)
+	}
+	userToken := rg.Group("/user")
+	userToken.Use(ValidateToken(Conf))
+	userToken.Use(RequirePayload())
+	{
+		user.POST("/change-password", userPasswordChangeHandl)
+	}
+	userGet := rg.Group("/user")
+	// TODO url encoded middleware
+	{
+		userGet.GET("/verify-email", userEmailVerifyHandl)
+	}
+}
+
 func userLoginHandl(c *gin.Context) {
-	req, err := http.NewRequest("POST", config.Conf.URLAuthenticationService+config.Conf.AuthenticationLogin, c.Request.Body)
+	req, err := http.NewRequest("POST", Conf.URLAuthenticationService+Conf.AuthenticationLogin, c.Request.Body)
 	if err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
@@ -34,7 +54,7 @@ func userLoginHandl(c *gin.Context) {
 }
 
 func userSignupHandl(c *gin.Context) {
-	req, err := http.NewRequest("POST", config.Conf.URLUserManagementService+config.Conf.AuthenticationSignup, c.Request.Body)
+	req, err := http.NewRequest("POST", Conf.URLUserManagementService+Conf.AuthenticationSignup, c.Request.Body)
 	if err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
