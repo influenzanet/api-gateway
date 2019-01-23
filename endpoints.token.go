@@ -20,8 +20,6 @@ func InitTokenEndpoints(rg *gin.RouterGroup) {
 func tokenRenewHandl(c *gin.Context) {
 	token := c.MustGet("encodedToken").(string)
 
-	var client = &http.Client{}
-
 	req, err := http.NewRequest("Get", Conf.URLAuthenticationService+Conf.AuthenticationRenew, nil)
 	if err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)

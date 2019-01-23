@@ -30,7 +30,6 @@ func InitUserEndpoints(rg *gin.RouterGroup) {
 }
 
 func userLoginHandl(c *gin.Context) {
-	var client = &http.Client{}
 	req, err := http.NewRequest("POST", Conf.URLAuthenticationService+Conf.AuthenticationLogin, c.Request.Body)
 	if err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
@@ -54,7 +53,6 @@ func userLoginHandl(c *gin.Context) {
 }
 
 func userSignupHandl(c *gin.Context) {
-	var client = &http.Client{}
 	req, err := http.NewRequest("POST", Conf.URLUserManagementService+Conf.AuthenticationSignup, c.Request.Body)
 	if err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)

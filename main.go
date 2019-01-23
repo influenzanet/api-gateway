@@ -2,9 +2,12 @@ package main
 
 import (
 	"log"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
+
+var client = &http.Client{}
 
 func main() {
 	ReadConfig()
