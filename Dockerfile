@@ -8,5 +8,5 @@ FROM scratch
 COPY --from=builder /go/src/github.com/influenzanet/api-gateway/api-gateway /app/
 COPY ./config.yaml /app/
 WORKDIR /app
-EXPOSE 3100:3100
+EXPOSE 3000:3000
 CMD ["./api-gateway"]
