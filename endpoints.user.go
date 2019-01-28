@@ -18,7 +18,7 @@ func InitUserEndpoints(rg *gin.RouterGroup) {
 	}
 	userToken := rg.Group("/user")
 	userToken.Use(middlewares.ExtractToken())
-	userToken.Use(middlewares.ValidateToken(Conf.URLAuthenticationService + "/v1/token/validate"))
+	userToken.Use(middlewares.ValidateToken(Conf.ServiceURL.Authentication + "/v1/token/validate"))
 	userToken.Use(middlewares.RequirePayload())
 	{
 		user.POST("/change-password", userPasswordChangeHandl)
@@ -31,7 +31,7 @@ func InitUserEndpoints(rg *gin.RouterGroup) {
 }
 
 func userLoginHandl(c *gin.Context) {
-	req, err := http.NewRequest("POST", Conf.URLAuthenticationService+Conf.AuthenticationLogin, c.Request.Body)
+	req, err := http.NewRequest("POST", Conf.ServiceURL.Authentication+"/v1/user/login", c.Request.Body)
 	if err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
@@ -54,7 +54,7 @@ func userLoginHandl(c *gin.Context) {
 }
 
 func userSignupHandl(c *gin.Context) {
-	req, err := http.NewRequest("POST", Conf.URLUserManagementService+Conf.AuthenticationSignup, c.Request.Body)
+	req, err := http.NewRequest("POST", Conf.ServiceURL.Authentication+"/v1/user/signup", c.Request.Body)
 	if err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return

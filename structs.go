@@ -2,11 +2,8 @@ package main
 
 // Config is the structure corresponding to config.yaml that holds all static configuration data
 type Config struct {
-	URLAuthenticationService string `yaml:"authentication"`
-	AuthenticationLogin      string `yaml:"authentication_login"`
-	AuthenticationSignup     string `yaml:"authentication_signup"`
-	AuthenticationRenew      string `yaml:"authentication_renew"`
-	URLUserManagementService string `yaml:"user_management"`
-	UserManagementLogin      string `yaml:"user_management_login"`
-	UserManagementSignup     string `yaml:"user_management_signup"`
+	ServiceURL struct {
+		Authentication string `yaml:"authentication"`
+		UserManagement string `yaml:"user_management"`
+	} `yaml:"service_url"`
 }
