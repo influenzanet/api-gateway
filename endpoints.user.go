@@ -4,26 +4,27 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	middlewares "github.com/Influenzanet/middlewares"
 	"github.com/gin-gonic/gin"
 )
 
 // InitUserEndpoints creates all API routes on the supplied RouterGroup
 func InitUserEndpoints(rg *gin.RouterGroup) {
 	user := rg.Group("/user")
-	user.Use(RequirePayload())
+	user.Use(middlewares.RequirePayload())
 	{
 		user.POST("/login", userLoginHandl)
 		user.POST("/signup", userSignupHandl)
 	}
 	userToken := rg.Group("/user")
-	userToken.Use(ExtractToken())
-	userToken.Use(ValidateToken(Conf))
-	userToken.Use(RequirePayload())
+	userToken.Use(middlewares.ExtractToken())
+	userToken.Use(middlewares.ValidateToken(Conf.URLAuthenticationService + "/v1/token/validate"))
+	userToken.Use(middlewares.RequirePayload())
 	{
 		user.POST("/change-password", userPasswordChangeHandl)
 	}
 	userGet := rg.Group("/user")
-	userGet.Use(ExtractURLToken())
+	userGet.Use(middlewares.ExtractURLToken())
 	{
 		userGet.GET("/verify-email", userEmailVerifyHandl)
 	}

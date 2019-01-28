@@ -5,13 +5,14 @@ import (
 	"net/http"
 	"strings"
 
+	middlewares "github.com/Influenzanet/middlewares"
 	"github.com/gin-gonic/gin"
 )
 
 // InitTokenEndpoints creates all API routes on the supplied RouterGroup
 func InitTokenEndpoints(rg *gin.RouterGroup) {
 	token := rg.Group("/token")
-	token.Use(ExtractToken())
+	token.Use(middlewares.ExtractToken())
 	{
 		token.GET("/renew", tokenRenewHandl)
 	}
