@@ -11,6 +11,14 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:afcbb5413bdf8a7f8340b67006dfa034ab53bbe37b2b09ec94e6ad2ffc06eba6"
+  name = "github.com/Influenzanet/utils"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "0bea3ddcd3062123d1771d6b7818f5bee9a8d53b"
+
+[[projects]]
+  branch = "master"
   digest = "1:36fe9527deed01d2a317617e59304eb2c4ce9f8a24115bcc5c2e37b3aee5bae4"
   name = "github.com/gin-contrib/sse"
   packages = ["."]
@@ -88,6 +96,7 @@
   analyzer-version = 1
   input-imports = [
     "github.com/Influenzanet/middlewares",
+    "github.com/Influenzanet/utils",
     "github.com/gin-gonic/gin",
     "gopkg.in/yaml.v2",
   ]
