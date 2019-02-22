@@ -1,3 +1,3 @@
-service_url:
-  authentication: "authentication:3100"
-  user_management: "user-management:3200"
+service_urls:
+  authentication: "localhost:3201"
+  user_management: "localhost:3200"

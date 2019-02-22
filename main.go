@@ -2,15 +2,35 @@ package main
 
 import (
 	"log"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
+
+	auth_api "github.com/Influenzanet/api/dist/go/auth-service"
+	user_api "github.com/Influenzanet/api/dist/go/user-management"
 )
 
-var client = &http.Client{}
+// APIClients holds the service clients to the internal services
+type APIClients struct {
+	userManagement user_api.UserManagementApiClient
+	authService    auth_api.AuthServiceApiClient
+}
+
+var clients = APIClients{}
 
 func main() {
 	ReadConfig()
+
+	// Connect to user management service
+	userManagementServerConn := connectToUserManagementServer()
+	defer userManagementServerConn.Close()
+	clients.userManagement = user_api.NewUserManagementApiClient(userManagementServerConn)
+
+	// Connect to authentication service
+	authenticationServerConn := connectToAuthServiceServer()
+	defer authenticationServerConn.Close()
+	clients.authService = auth_api.NewAuthServiceApiClient(authenticationServerConn)
+
+	// Start webserver
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
 

@@ -8,7 +8,7 @@ import (
 )
 
 // Conf holds all static configuration information
-var Conf Config
+var conf Config
 
 // ReadConfig reads the config.yaml file and creates the config structure for all other packages to access
 func ReadConfig() {
@@ -16,7 +16,7 @@ func ReadConfig() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = yaml.Unmarshal([]byte(data), &Conf)
+	err = yaml.Unmarshal([]byte(data), &conf)
 	if err != nil {
 		log.Fatal(err)
 	}
