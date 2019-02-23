@@ -1,65 +1,31 @@
 package middlewares
 
 import (
-	"encoding/json"
-	"io/ioutil"
+	"context"
+	"log"
 	"net/http"
-	"strings"
 
+	auth_api "github.com/Influenzanet/api/dist/go/auth-service"
 	"github.com/gin-gonic/gin"
+	"google.golang.org/grpc/status"
 )
 
 // ValidateToken reads the token from the request and validates it by contacting the authentication service
-func ValidateToken(validationURL string) gin.HandlerFunc {
+func ValidateToken(authServiceClient auth_api.AuthServiceApiClient) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.MustGet("encodedToken").(string)
-
-		client := &http.Client{}
-
-		req, err := http.NewRequest("GET", validationURL, nil)
+		req := auth_api.EncodedToken{
+			Token: token,
+		}
+		parsedToken, err := authServiceClient.ValidateJWT(context.Background(), &req)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "error creating reuest"})
+			st := status.Convert(err)
+			log.Println(st.Message())
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "error during token validation"})
 			c.Abort()
 			return
 		}
-		req.Header.Add("Authorization", strings.Join([]string{"Bearer", token}, " "))
-
-		res, err := client.Do(req)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "error authenticating request"})
-			c.Abort()
-			return
-		}
-		defer res.Body.Close()
-
-		rawBody, err := ioutil.ReadAll(res.Body)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "error authenticating request"})
-			c.Abort()
-			return
-		}
-		var body map[string]string
-		if err := json.Unmarshal(rawBody, &body); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "error authenticating request"})
-			c.Abort()
-			return
-		}
-
-		errValue, errExists := body["error"]
-		if errExists {
-			c.JSON(res.StatusCode, gin.H{"error": errValue})
-			c.Abort()
-			return
-		}
-
-		tokenValue, tokenExists := body["token"]
-		if !tokenExists {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "error authenticating request"})
-			c.Abort()
-			return
-		}
-
-		c.Set("token", tokenValue)
+		c.Set("parsedToken", *parsedToken)
 
 		c.Next()
 	}

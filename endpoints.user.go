@@ -10,6 +10,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	mw "github.com/Influenzanet/api-gateway/middlewares"
+	infl_api "github.com/Influenzanet/api/dist/go"
 	user_api "github.com/Influenzanet/api/dist/go/user-management"
 )
 
@@ -26,17 +27,18 @@ func InitUserEndpoints(rg *gin.RouterGroup) {
 	user := rg.Group("/user")
 	user.Use(mw.RequirePayload())
 	{
-		user.POST("/login", userLoginHandl)
-		user.POST("/signup", userSignupHandl)
+		user.POST("/loginWithEmail", userLoginHandl)
+		user.POST("/signupWithEmail", userSignupHandl)
+
+	}
+	userToken := rg.Group("/user")
+	userToken.Use(mw.ExtractToken())
+	userToken.Use(mw.RequirePayload())
+	userToken.Use(mw.ValidateToken(clients.authService))
+	{
+		userToken.POST("/changePassword", userPasswordChangeHandl)
 	}
 	/*
-		userToken := rg.Group("/user")
-		userToken.Use(mw.ExtractToken())
-		userToken.Use(mw.ValidateToken(Conf.ServiceURL.Authentication + "/v1/token/validate"))
-		userToken.Use(mw.RequirePayload())
-		{
-			user.POST("/change-password", userPasswordChangeHandl)
-		}
 		userGet := rg.Group("/user")
 		userGet.Use(mw.ExtractURLToken())
 		{
@@ -45,7 +47,18 @@ func InitUserEndpoints(rg *gin.RouterGroup) {
 }
 
 func userLoginHandl(c *gin.Context) {
-	c.JSON(http.StatusNotImplemented, gin.H{})
+	var req infl_api.UserCredentials
+	if err := c.BindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	token, err := clients.authService.LoginWithEmail(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": st.Message()})
+		return
+	}
+	c.JSON(http.StatusOK, token)
 }
 
 func userSignupHandl(c *gin.Context) {
@@ -64,14 +77,20 @@ func userSignupHandl(c *gin.Context) {
 }
 
 func userPasswordChangeHandl(c *gin.Context) {
-	// TODO: validate token
-	pwReq := &user_api.PasswordChangeMsg{}
-	status, err := clients.userManagement.ChangePassword(context.Background(), pwReq)
+	// TODO: get infos from request
+	parsedToken := c.MustGet("parsedToken").(infl_api.ParsedToken)
+	pwReq := &user_api.PasswordChangeMsg{
+		Auth: &parsedToken,
+	}
+
+	log.Println(pwReq)
+	res, err := clients.userManagement.ChangePassword(context.Background(), pwReq)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		st := status.Convert(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": st.Message()})
 		return
 	}
-	log.Println(status)
+	log.Println(res)
 	c.JSON(http.StatusNotImplemented, gin.H{})
 }
 
