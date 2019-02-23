@@ -43,7 +43,8 @@ func InitUserEndpoints(rg *gin.RouterGroup) {
 		userGet.Use(mw.ExtractURLToken())
 		{
 			userGet.GET("/verify-email", userEmailVerifyHandl)
-		}*/
+		}
+	*/
 }
 
 func userLoginHandl(c *gin.Context) {
@@ -77,13 +78,25 @@ func userSignupHandl(c *gin.Context) {
 }
 
 func userPasswordChangeHandl(c *gin.Context) {
-	// TODO: get infos from request
 	parsedToken := c.MustGet("parsedToken").(infl_api.ParsedToken)
-	pwReq := &user_api.PasswordChangeMsg{
-		Auth: &parsedToken,
+
+	type PwChangeReq struct {
+		OldPassword string `json:"old_password"`
+		NewPassword string `json:"new_password"`
 	}
 
-	log.Println(pwReq)
+	var req PwChangeReq
+	if err := c.BindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	pwReq := &user_api.PasswordChangeMsg{
+		Auth:        &parsedToken,
+		OldPassword: req.OldPassword,
+		NewPassword: req.NewPassword,
+	}
+
 	res, err := clients.userManagement.ChangePassword(context.Background(), pwReq)
 	if err != nil {
 		st := status.Convert(err)
@@ -91,7 +104,7 @@ func userPasswordChangeHandl(c *gin.Context) {
 		return
 	}
 	log.Println(res)
-	c.JSON(http.StatusNotImplemented, gin.H{})
+	c.JSON(http.StatusOK, res)
 }
 
 func userEmailVerifyHandl(c *gin.Context) {
