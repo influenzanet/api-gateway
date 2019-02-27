@@ -5,8 +5,8 @@ import (
 	"log"
 	"net/http"
 
-	auth_api "github.com/Influenzanet/api/dist/go/auth-service"
 	"github.com/gin-gonic/gin"
+	auth_api "github.com/influenzanet/api/dist/go/auth-service"
 	"google.golang.org/grpc/status"
 )
 

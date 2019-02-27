@@ -5,8 +5,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	auth_api "github.com/Influenzanet/api/dist/go/auth-service"
-	user_api "github.com/Influenzanet/api/dist/go/user-management"
+	auth_api "github.com/influenzanet/api/dist/go/auth-service"
+	user_api "github.com/influenzanet/api/dist/go/user-management"
 )
 
 // APIClients holds the service clients to the internal services

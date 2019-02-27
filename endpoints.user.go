@@ -9,9 +9,9 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/status"
 
-	mw "github.com/Influenzanet/api-gateway/middlewares"
-	infl_api "github.com/Influenzanet/api/dist/go"
-	user_api "github.com/Influenzanet/api/dist/go/user-management"
+	mw "github.com/influenzanet/api-gateway/middlewares"
+	infl_api "github.com/influenzanet/api/dist/go"
+	user_api "github.com/influenzanet/api/dist/go/user-management"
 )
 
 func connectToUserManagementServer() *grpc.ClientConn {

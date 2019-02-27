@@ -5,9 +5,9 @@ import (
 	"log"
 	"net/http"
 
-	mw "github.com/Influenzanet/api-gateway/middlewares"
-	auth_api "github.com/Influenzanet/api/dist/go/auth-service"
 	"github.com/gin-gonic/gin"
+	mw "github.com/influenzanet/api-gateway/middlewares"
+	auth_api "github.com/influenzanet/api/dist/go/auth-service"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/status"
 )
