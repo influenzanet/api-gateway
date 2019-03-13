@@ -63,7 +63,7 @@ func userLoginHandl(c *gin.Context) {
 }
 
 func userSignupHandl(c *gin.Context) {
-	var req user_api.NewUser
+	var req infl_api.UserCredentials
 	if err := c.BindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
