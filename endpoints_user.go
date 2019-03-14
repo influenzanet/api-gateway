@@ -43,6 +43,7 @@ func InitUserEndpoints(rg *gin.RouterGroup) {
 		{
 			userTokenWithPayload.POST("/changePassword", userPasswordChangeHandl)
 			userTokenWithPayload.PUT("/profile", updateProfileHandl)
+			userTokenWithPayload.POST("/subprofile", addSubProfileHandl)
 		}
 	}
 	/*
@@ -144,13 +145,35 @@ func updateProfileHandl(c *gin.Context) {
 		return
 	}
 
-	log.Println(profile)
 	req := &user_api.ProfileRequest{
 		Auth:    &parsedToken,
 		Profile: &profile,
 	}
 
 	res, err := clients.userManagement.UpdateProfile(context.Background(), req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": st.Message()})
+		return
+	}
+	c.JSON(http.StatusOK, res)
+}
+
+func addSubProfileHandl(c *gin.Context) {
+	parsedToken := c.MustGet("parsedToken").(infl_api.ParsedToken)
+
+	var subProfile user_api.SubProfile
+	if err := c.BindJSON(&subProfile); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	req := &user_api.SubProfileRequest{
+		Auth:       &parsedToken,
+		SubProfile: &subProfile,
+	}
+
+	res, err := clients.userManagement.AddSubprofile(context.Background(), req)
 	if err != nil {
 		st := status.Convert(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": st.Message()})
