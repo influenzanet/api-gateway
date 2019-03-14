@@ -42,6 +42,7 @@ func InitUserEndpoints(rg *gin.RouterGroup) {
 		userTokenWithPayload.Use(mw.RequirePayload())
 		{
 			userTokenWithPayload.POST("/changePassword", userPasswordChangeHandl)
+			userTokenWithPayload.PUT("/profile", updateProfileHandl)
 		}
 	}
 	/*
@@ -126,6 +127,30 @@ func getUserHandl(c *gin.Context) {
 	}
 
 	res, err := clients.userManagement.GetUser(context.Background(), userRefReq)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": st.Message()})
+		return
+	}
+	c.JSON(http.StatusOK, res)
+}
+
+func updateProfileHandl(c *gin.Context) {
+	parsedToken := c.MustGet("parsedToken").(infl_api.ParsedToken)
+
+	var profile user_api.Profile
+	if err := c.BindJSON(&profile); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	log.Println(profile)
+	req := &user_api.ProfileRequest{
+		Auth:    &parsedToken,
+		Profile: &profile,
+	}
+
+	res, err := clients.userManagement.UpdateProfile(context.Background(), req)
 	if err != nil {
 		st := status.Convert(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": st.Message()})
