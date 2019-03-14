@@ -33,10 +33,16 @@ func InitUserEndpoints(rg *gin.RouterGroup) {
 	}
 	userToken := rg.Group("/user")
 	userToken.Use(mw.ExtractToken())
-	userToken.Use(mw.RequirePayload())
 	userToken.Use(mw.ValidateToken(clients.authService))
 	{
-		userToken.POST("/changePassword", userPasswordChangeHandl)
+		userToken.GET("/", getUserHandl)
+		userToken.GET("/:id", getUserHandl)
+
+		userTokenWithPayload := userToken.Group("/")
+		userTokenWithPayload.Use(mw.RequirePayload())
+		{
+			userTokenWithPayload.POST("/changePassword", userPasswordChangeHandl)
+		}
 	}
 	/*
 		userGet := rg.Group("/user")
@@ -103,7 +109,28 @@ func userPasswordChangeHandl(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": st.Message()})
 		return
 	}
-	log.Println(res)
+	c.JSON(http.StatusOK, res)
+}
+
+func getUserHandl(c *gin.Context) {
+	parsedToken := c.MustGet("parsedToken").(infl_api.ParsedToken)
+
+	userID := c.Param("id")
+	if userID == "" {
+		userID = parsedToken.UserId
+	}
+
+	userRefReq := &user_api.UserReference{
+		Auth:   &parsedToken,
+		UserId: userID,
+	}
+
+	res, err := clients.userManagement.GetUser(context.Background(), userRefReq)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": st.Message()})
+		return
+	}
 	c.JSON(http.StatusOK, res)
 }
 
