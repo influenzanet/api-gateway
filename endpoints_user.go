@@ -45,6 +45,7 @@ func InitUserEndpoints(rg *gin.RouterGroup) {
 			// userTokenWithPayload.PUT("/profile", updateProfileHandl)
 			userTokenWithPayload.POST("/subprofile", addSubProfileHandl)
 			userTokenWithPayload.PUT("/subprofile", updateSubProfileHandl)
+			userTokenWithPayload.DELETE("/subprofile", removeSubProfileHandl)
 		}
 	}
 	/*
@@ -190,6 +191,17 @@ func addSubProfileHandl(c *gin.Context) {
 func updateSubProfileHandl(c *gin.Context) {
 	req := parseSubProfileRequest(c)
 	res, err := clients.userManagement.EditSubprofile(context.Background(), req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": st.Message()})
+		return
+	}
+	c.JSON(http.StatusOK, res)
+}
+
+func removeSubProfileHandl(c *gin.Context) {
+	req := parseSubProfileRequest(c)
+	res, err := clients.userManagement.RemoveSubprofile(context.Background(), req)
 	if err != nil {
 		st := status.Convert(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": st.Message()})
