@@ -42,8 +42,9 @@ func InitUserEndpoints(rg *gin.RouterGroup) {
 		userTokenWithPayload.Use(mw.RequirePayload())
 		{
 			userTokenWithPayload.POST("/changePassword", userPasswordChangeHandl)
-			userTokenWithPayload.PUT("/profile", updateProfileHandl)
+			// userTokenWithPayload.PUT("/profile", updateProfileHandl)
 			userTokenWithPayload.POST("/subprofile", addSubProfileHandl)
+			userTokenWithPayload.PUT("/subprofile", updateSubProfileHandl)
 		}
 	}
 	/*
@@ -136,6 +137,7 @@ func getUserHandl(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
+/* TODO: remove
 func updateProfileHandl(c *gin.Context) {
 	parsedToken := c.MustGet("parsedToken").(infl_api.ParsedToken)
 
@@ -157,23 +159,37 @@ func updateProfileHandl(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, res)
-}
+}*/
 
-func addSubProfileHandl(c *gin.Context) {
+func parseSubProfileRequest(c *gin.Context) *user_api.SubProfileRequest {
 	parsedToken := c.MustGet("parsedToken").(infl_api.ParsedToken)
 
 	var subProfile user_api.SubProfile
 	if err := c.BindJSON(&subProfile); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
+		return &user_api.SubProfileRequest{}
 	}
 
-	req := &user_api.SubProfileRequest{
+	return &user_api.SubProfileRequest{
 		Auth:       &parsedToken,
 		SubProfile: &subProfile,
 	}
+}
 
+func addSubProfileHandl(c *gin.Context) {
+	req := parseSubProfileRequest(c)
 	res, err := clients.userManagement.AddSubprofile(context.Background(), req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": st.Message()})
+		return
+	}
+	c.JSON(http.StatusOK, res)
+}
+
+func updateSubProfileHandl(c *gin.Context) {
+	req := parseSubProfileRequest(c)
+	res, err := clients.userManagement.EditSubprofile(context.Background(), req)
 	if err != nil {
 		st := status.Convert(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": st.Message()})
