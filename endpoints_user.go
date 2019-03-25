@@ -42,10 +42,12 @@ func InitUserEndpoints(rg *gin.RouterGroup) {
 		userTokenWithPayload.Use(mw.RequirePayload())
 		{
 			userTokenWithPayload.POST("/changePassword", userPasswordChangeHandl)
+			userTokenWithPayload.DELETE("/", deleteAccountHandl)
 			// userTokenWithPayload.PUT("/profile", updateProfileHandl)
 			userTokenWithPayload.POST("/subprofile", addSubProfileHandl)
 			userTokenWithPayload.PUT("/subprofile", updateSubProfileHandl)
 			userTokenWithPayload.DELETE("/subprofile", removeSubProfileHandl)
+
 		}
 	}
 	/*
@@ -130,6 +132,27 @@ func getUserHandl(c *gin.Context) {
 	}
 
 	res, err := clients.userManagement.GetUser(context.Background(), userRefReq)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": st.Message()})
+		return
+	}
+	c.JSON(http.StatusOK, res)
+}
+
+func deleteAccountHandl(c *gin.Context) {
+	parsedToken := c.MustGet("parsedToken").(infl_api.ParsedToken)
+
+	var inReq user_api.UserReference
+	if err := c.BindJSON(&inReq); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	outReq := &user_api.UserReference{
+		Auth:   &parsedToken,
+		UserId: inReq.UserId,
+	}
+	res, err := clients.userManagement.DeleteAccount(context.Background(), outReq)
 	if err != nil {
 		st := status.Convert(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": st.Message()})
