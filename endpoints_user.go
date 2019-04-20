@@ -42,6 +42,7 @@ func InitUserEndpoints(rg *gin.RouterGroup) {
 		userTokenWithPayload.Use(mw.RequirePayload())
 		{
 			userTokenWithPayload.POST("/changePassword", userPasswordChangeHandl)
+			userTokenWithPayload.PUT("/account/name", updateNameHandl)
 			userTokenWithPayload.DELETE("/", deleteAccountHandl)
 			// userTokenWithPayload.PUT("/profile", updateProfileHandl)
 			userTokenWithPayload.POST("/subprofile", addSubProfileHandl)
@@ -110,6 +111,27 @@ func userPasswordChangeHandl(c *gin.Context) {
 	}
 
 	res, err := clients.userManagement.ChangePassword(context.Background(), pwReq)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": st.Message()})
+		return
+	}
+	c.JSON(http.StatusOK, res)
+}
+
+func updateNameHandl(c *gin.Context) {
+	parsedToken := c.MustGet("parsedToken").(infl_api.ParsedToken)
+
+	var req user_api.Name
+	if err := c.BindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	res, err := clients.userManagement.UpdateName(context.Background(), &user_api.NameUpdateRequest{
+		Auth: &parsedToken,
+		Name: &req,
+	})
 	if err != nil {
 		st := status.Convert(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": st.Message()})
