@@ -6,8 +6,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	api "github.com/influenzanet/api-gateway/api"
 	mw "github.com/influenzanet/api-gateway/middlewares"
-	auth_api "github.com/influenzanet/api/dist/go/auth-service"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/status"
 )
@@ -25,21 +25,23 @@ func InitTokenEndpoints(rg *gin.RouterGroup) {
 	token := rg.Group("/token")
 	token.Use(mw.ExtractToken())
 	{
-		token.GET("/renew", tokenRenewHandl)
+		token.POST("/renew", tokenRenewHandl)
 	}
 }
 
 func tokenRenewHandl(c *gin.Context) {
-	token := c.MustGet("encodedToken").(string)
-
-	req := auth_api.EncodedToken{
-		Token: token,
+	token := c.MustGet("token").(string)
+	var req api.RefreshJWTRequest
+	if err := c.BindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
+	req.AccessToken = token
 	newToken, err := clients.authService.RenewJWT(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
 		log.Println(st.Message())
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "error during token renewal"})
+		c.JSON(grpcStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
 		return
 	}
 	c.JSON(http.StatusOK, newToken)

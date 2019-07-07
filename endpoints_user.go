@@ -9,9 +9,8 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/status"
 
+	api "github.com/influenzanet/api-gateway/api"
 	mw "github.com/influenzanet/api-gateway/middlewares"
-	infl_api "github.com/influenzanet/api/dist/go"
-	user_api "github.com/influenzanet/api/dist/go/user-management"
 )
 
 func connectToUserManagementServer() *grpc.ClientConn {
@@ -33,7 +32,6 @@ func InitUserEndpoints(rg *gin.RouterGroup) {
 	}
 	userToken := rg.Group("/user")
 	userToken.Use(mw.ExtractToken())
-	userToken.Use(mw.ValidateToken(clients.authService))
 	{
 		userToken.GET("/", getUserHandl)
 		userToken.GET("/:id", getUserHandl)
@@ -61,7 +59,7 @@ func InitUserEndpoints(rg *gin.RouterGroup) {
 }
 
 func userLoginHandl(c *gin.Context) {
-	var req infl_api.UserCredentials
+	var req api.UserCredentials
 	if err := c.BindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -69,14 +67,15 @@ func userLoginHandl(c *gin.Context) {
 	token, err := clients.authService.LoginWithEmail(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": st.Message()})
+		log.Println(st.Message())
+		c.JSON(grpcStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
 		return
 	}
 	c.JSON(http.StatusOK, token)
 }
 
 func userSignupHandl(c *gin.Context) {
-	var req infl_api.UserCredentials
+	var req api.UserCredentials
 	if err := c.BindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -84,100 +83,87 @@ func userSignupHandl(c *gin.Context) {
 	token, err := clients.authService.SignupWithEmail(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": st.Message()})
+		log.Println(st.Message())
+		c.JSON(grpcStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
 		return
 	}
 	c.JSON(http.StatusCreated, token)
 }
 
 func userPasswordChangeHandl(c *gin.Context) {
-	parsedToken := c.MustGet("parsedToken").(infl_api.ParsedToken)
+	token := c.MustGet("token").(string)
 
-	type PwChangeReq struct {
-		OldPassword string `json:"old_password"`
-		NewPassword string `json:"new_password"`
-	}
-
-	var req PwChangeReq
+	var req api.PasswordChangeMsg
 	if err := c.BindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	req.Token = token
 
-	pwReq := &user_api.PasswordChangeMsg{
-		Auth:        &parsedToken,
-		OldPassword: req.OldPassword,
-		NewPassword: req.NewPassword,
-	}
-
-	res, err := clients.userManagement.ChangePassword(context.Background(), pwReq)
+	res, err := clients.userManagement.ChangePassword(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": st.Message()})
+		log.Println(st.Message())
+		c.JSON(grpcStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
 		return
 	}
 	c.JSON(http.StatusOK, res)
 }
 
 func updateNameHandl(c *gin.Context) {
-	parsedToken := c.MustGet("parsedToken").(infl_api.ParsedToken)
+	token := c.MustGet("token").(string)
 
-	var req user_api.Name
+	var req api.NameUpdateRequest
 	if err := c.BindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	req.Token = token
 
-	res, err := clients.userManagement.UpdateName(context.Background(), &user_api.NameUpdateRequest{
-		Auth: &parsedToken,
-		Name: &req,
-	})
+	res, err := clients.userManagement.UpdateName(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": st.Message()})
+		log.Println(st.Message())
+		c.JSON(grpcStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
 		return
 	}
 	c.JSON(http.StatusOK, res)
 }
 
 func getUserHandl(c *gin.Context) {
-	parsedToken := c.MustGet("parsedToken").(infl_api.ParsedToken)
+	token := c.MustGet("token").(string)
 
 	userID := c.Param("id")
-	if userID == "" {
-		userID = parsedToken.UserId
-	}
 
-	userRefReq := &user_api.UserReference{
-		Auth:   &parsedToken,
+	userRefReq := &api.UserReference{
+		Token:  token,
 		UserId: userID,
 	}
 
 	res, err := clients.userManagement.GetUser(context.Background(), userRefReq)
 	if err != nil {
 		st := status.Convert(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": st.Message()})
+		log.Println(st.Message())
+		c.JSON(grpcStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
 		return
 	}
 	c.JSON(http.StatusOK, res)
 }
 
 func deleteAccountHandl(c *gin.Context) {
-	parsedToken := c.MustGet("parsedToken").(infl_api.ParsedToken)
+	token := c.MustGet("token").(string)
 
-	var inReq user_api.UserReference
-	if err := c.BindJSON(&inReq); err != nil {
+	var req api.UserReference
+	if err := c.BindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	outReq := &user_api.UserReference{
-		Auth:   &parsedToken,
-		UserId: inReq.UserId,
-	}
-	res, err := clients.userManagement.DeleteAccount(context.Background(), outReq)
+	req.Token = token
+	res, err := clients.userManagement.DeleteAccount(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": st.Message()})
+		log.Println(st.Message())
+		c.JSON(grpcStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
 		return
 	}
 	c.JSON(http.StatusOK, res)
@@ -201,23 +187,24 @@ func updateProfileHandl(c *gin.Context) {
 	res, err := clients.userManagement.UpdateProfile(context.Background(), req)
 	if err != nil {
 		st := status.Convert(err)
+		log.Println(st.Message())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": st.Message()})
 		return
 	}
 	c.JSON(http.StatusOK, res)
 }*/
 
-func parseSubProfileRequest(c *gin.Context) *user_api.SubProfileRequest {
-	parsedToken := c.MustGet("parsedToken").(infl_api.ParsedToken)
+func parseSubProfileRequest(c *gin.Context) *api.SubProfileRequest {
+	token := c.MustGet("token").(string)
 
-	var subProfile user_api.SubProfile
+	var subProfile api.SubProfile
 	if err := c.BindJSON(&subProfile); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return &user_api.SubProfileRequest{}
+		return &api.SubProfileRequest{}
 	}
 
-	return &user_api.SubProfileRequest{
-		Auth:       &parsedToken,
+	return &api.SubProfileRequest{
+		Token:      token,
 		SubProfile: &subProfile,
 	}
 }
@@ -227,7 +214,8 @@ func addSubProfileHandl(c *gin.Context) {
 	res, err := clients.userManagement.AddSubprofile(context.Background(), req)
 	if err != nil {
 		st := status.Convert(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": st.Message()})
+		log.Println(st.Message())
+		c.JSON(grpcStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
 		return
 	}
 	c.JSON(http.StatusOK, res)
@@ -238,7 +226,8 @@ func updateSubProfileHandl(c *gin.Context) {
 	res, err := clients.userManagement.EditSubprofile(context.Background(), req)
 	if err != nil {
 		st := status.Convert(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": st.Message()})
+		log.Println(st.Message())
+		c.JSON(grpcStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
 		return
 	}
 	c.JSON(http.StatusOK, res)
@@ -249,7 +238,8 @@ func removeSubProfileHandl(c *gin.Context) {
 	res, err := clients.userManagement.RemoveSubprofile(context.Background(), req)
 	if err != nil {
 		st := status.Convert(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": st.Message()})
+		log.Println(st.Message())
+		c.JSON(grpcStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
 		return
 	}
 	c.JSON(http.StatusOK, res)
