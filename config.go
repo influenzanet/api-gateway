@@ -3,6 +3,7 @@ package main
 import (
 	"io/ioutil"
 	"log"
+	"os"
 
 	yaml "gopkg.in/yaml.v2"
 )
@@ -12,7 +13,11 @@ var conf Config
 
 // ReadConfig reads the config.yaml file and creates the config structure for all other packages to access
 func ReadConfig() {
-	data, err := ioutil.ReadFile("./config.yaml")
+	file := os.Getenv("CONFIG_FILE")
+	if file == "" {
+		file = "./config.yaml"
+	}
+	data, err := ioutil.ReadFile(file)
 	if err != nil {
 		log.Fatal(err)
 	}
