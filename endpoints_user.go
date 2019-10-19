@@ -32,10 +32,10 @@ func InitUserEndpoints(rg *gin.RouterGroup) {
 	}
 	userToken := rg.Group("/user")
 	userToken.Use(mw.ExtractToken())
+	userToken.Use(mw.ValidateToken(clients.authService))
 	{
 		userToken.GET("/", getUserHandl)
 		userToken.GET("/:id", getUserHandl)
-
 		userTokenWithPayload := userToken.Group("/")
 		userTokenWithPayload.Use(mw.RequirePayload())
 		{
@@ -91,14 +91,14 @@ func userSignupHandl(c *gin.Context) {
 }
 
 func userPasswordChangeHandl(c *gin.Context) {
-	token := c.MustGet("token").(string)
+	token := c.MustGet("parsedToken").(api.TokenInfos)
 
 	var req api.PasswordChangeMsg
 	if err := c.BindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	req.Token = token
+	req.Token = &token
 
 	res, err := clients.userManagement.ChangePassword(context.Background(), &req)
 	if err != nil {
@@ -111,14 +111,14 @@ func userPasswordChangeHandl(c *gin.Context) {
 }
 
 func updateNameHandl(c *gin.Context) {
-	token := c.MustGet("token").(string)
+	token := c.MustGet("parsedToken").(api.TokenInfos)
 
 	var req api.NameUpdateRequest
 	if err := c.BindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	req.Token = token
+	req.Token = &token
 
 	res, err := clients.userManagement.UpdateName(context.Background(), &req)
 	if err != nil {
@@ -131,12 +131,12 @@ func updateNameHandl(c *gin.Context) {
 }
 
 func getUserHandl(c *gin.Context) {
-	token := c.MustGet("token").(string)
+	token := c.MustGet("parsedToken").(api.TokenInfos)
 
 	userID := c.Param("id")
 
 	userRefReq := &api.UserReference{
-		Token:  token,
+		Token:  &token,
 		UserId: userID,
 	}
 
@@ -151,14 +151,14 @@ func getUserHandl(c *gin.Context) {
 }
 
 func deleteAccountHandl(c *gin.Context) {
-	token := c.MustGet("token").(string)
+	token := c.MustGet("parsedToken").(api.TokenInfos)
 
 	var req api.UserReference
 	if err := c.BindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	req.Token = token
+	req.Token = &token
 	res, err := clients.userManagement.DeleteAccount(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
@@ -195,7 +195,7 @@ func updateProfileHandl(c *gin.Context) {
 }*/
 
 func parseSubProfileRequest(c *gin.Context) *api.SubProfileRequest {
-	token := c.MustGet("token").(string)
+	token := c.MustGet("parsedToken").(api.TokenInfos)
 
 	var subProfile api.SubProfile
 	if err := c.BindJSON(&subProfile); err != nil {
@@ -204,7 +204,7 @@ func parseSubProfileRequest(c *gin.Context) *api.SubProfileRequest {
 	}
 
 	return &api.SubProfileRequest{
-		Token:      token,
+		Token:      &token,
 		SubProfile: &subProfile,
 	}
 }
