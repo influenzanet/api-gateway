@@ -28,8 +28,7 @@ func ExtractToken() gin.HandlerFunc {
 			return
 		}
 
-		c.Set("token", token)
-
+		c.Set("encodedToken", token)
 		c.Next()
 	}
 }

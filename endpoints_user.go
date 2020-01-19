@@ -23,13 +23,10 @@ func connectToUserManagementServer() *grpc.ClientConn {
 
 // InitUserEndpoints creates all API routes on the supplied RouterGroup
 func InitUserEndpoints(rg *gin.RouterGroup) {
-	user := rg.Group("/user")
-	user.Use(mw.RequirePayload())
-	{
-		user.POST("/loginWithEmail", userLoginHandl)
-		user.POST("/signupWithEmail", userSignupHandl)
+	userRoutes := rg.Group("/user")
+	userRoutes.GET("/status", statusUserMangementServiceHandl)
 
-	}
+
 	userToken := rg.Group("/user")
 	userToken.Use(mw.ExtractToken())
 	userToken.Use(mw.ValidateToken(clients.authService))

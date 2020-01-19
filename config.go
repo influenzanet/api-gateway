@@ -1,28 +1,10 @@
 package main
 
-import (
-	"io/ioutil"
-	"log"
-	"os"
+import "os"
 
-	yaml "gopkg.in/yaml.v2"
-)
-
-// Conf holds all static configuration information
-var conf Config
-
-// ReadConfig reads the config.yaml file and creates the config structure for all other packages to access
-func ReadConfig() {
-	file := os.Getenv("CONFIG_FILE")
-	if file == "" {
-		file = "./config.yaml"
-	}
-	data, err := ioutil.ReadFile(file)
-	if err != nil {
-		log.Fatal(err)
-	}
-	err = yaml.Unmarshal([]byte(data), &conf)
-	if err != nil {
-		log.Fatal(err)
-	}
+func initConfig() {
+	conf.DebugMode = os.Getenv("DEBUG_MODE") == "true"
+	conf.Port = os.Getenv("GATEWAY_LISTEN_PORT")
+	conf.ServiceURLs.Authentication = os.Getenv("ADDR_AUTH_SERVICE")
+	conf.ServiceURLs.UserManagement = os.Getenv("ADDR_USER_MANAGEMENT_SERVICE")
 }

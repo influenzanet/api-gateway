@@ -2,23 +2,37 @@ package main
 
 import (
 	"log"
+	"net/http"
+	"time"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 
-	api "github.com/influenzanet/api-gateway/api"
+	"github.com/golang/protobuf/jsonpb"
+	"github.com/influenzanet/api-gateway/api"
+	gjpb "github.com/phev8/gin-protobuf-json-converter"
 )
 
-// APIClients holds the service clients to the internal services
-type APIClients struct {
-	userManagement api.UserManagementApiClient
-	authService    api.AuthServiceApiClient
-}
-
+// Conf holds all static configuration information
+var conf Config
 var clients = APIClients{}
 
-func main() {
-	ReadConfig()
+func init() {
+	initConfig()
+	if !conf.DebugMode {
+		gin.SetMode(gin.ReleaseMode)
+	}
 
+	gjpb.SetMarshaler(jsonpb.Marshaler{
+		EmitDefaults: true,
+	})
+}
+
+func healthCheckHandle(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"status": "ok"})
+}
+
+func main() {
 	// Connect to user management service
 	userManagementServerConn := connectToUserManagementServer()
 	defer userManagementServerConn.Close()
@@ -30,14 +44,22 @@ func main() {
 	clients.authService = api.NewAuthServiceApiClient(authenticationServerConn)
 
 	// Start webserver
-	gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
-
+	router.Use(cors.New(cors.Config{
+		AllowAllOrigins: true,
+		// AllowOrigins:     []string{"https://inxp.de", "http://localhost:4200", "https://-1539512783514.firebaseapp.com"},
+		AllowMethods:     []string{"POST", "GET", "PUT"},
+		AllowHeaders:     []string{"Origin", "Authorization", "Content-Type", "Content-Length"},
+		ExposeHeaders:    []string{"Authorization", "Content-Type", "Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
+	router.GET("/", healthCheckHandle)
 	v1 := router.Group("/v1")
 
 	InitUserEndpoints(v1)
 	InitTokenEndpoints(v1)
 	InitSurveyEndpoints(v1)
 
-	log.Fatal(router.Run(":3000"))
+	log.Fatal(router.Run(":" + conf.Port))
 }
