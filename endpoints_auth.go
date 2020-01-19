@@ -5,10 +5,11 @@ import (
 	"log"
 	"net/http"
 
-	"coneno.de/rechnungstool/api-gateway/utils"
 	"github.com/gin-gonic/gin"
 	api "github.com/influenzanet/api-gateway/api"
 	mw "github.com/influenzanet/api-gateway/middlewares"
+	"github.com/influenzanet/api-gateway/utils"
+	gjpb "github.com/phev8/gin-protobuf-json-converter"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/status"
 )

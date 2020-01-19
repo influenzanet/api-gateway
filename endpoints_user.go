@@ -6,11 +6,14 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/golang/protobuf/ptypes/empty"
+	gjpb "github.com/phev8/gin-protobuf-json-converter"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/status"
 
 	api "github.com/influenzanet/api-gateway/api"
 	mw "github.com/influenzanet/api-gateway/middlewares"
+	"github.com/influenzanet/api-gateway/utils"
 )
 
 func connectToUserManagementServer() *grpc.ClientConn {
@@ -26,13 +29,12 @@ func InitUserEndpoints(rg *gin.RouterGroup) {
 	userRoutes := rg.Group("/user")
 	userRoutes.GET("/status", statusUserMangementServiceHandl)
 
-
 	userToken := rg.Group("/user")
 	userToken.Use(mw.ExtractToken())
 	userToken.Use(mw.ValidateToken(clients.authService))
 	{
 		userToken.GET("/", getUserHandl)
-		userToken.GET("/:id", getUserHandl)
+		// userToken.GET("/:id", getUserHandl)
 		userTokenWithPayload := userToken.Group("/")
 		userTokenWithPayload.Use(mw.RequirePayload())
 		{
@@ -55,36 +57,14 @@ func InitUserEndpoints(rg *gin.RouterGroup) {
 	*/
 }
 
-func userLoginHandl(c *gin.Context) {
-	var req api.UserCredentials
-	if err := c.BindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	token, err := clients.authService.LoginWithEmail(context.Background(), &req)
+func statusUserMangementServiceHandl(c *gin.Context) {
+	resp, err := clients.userManagement.Status(context.Background(), &empty.Empty{})
 	if err != nil {
 		st := status.Convert(err)
-		log.Println(st.Message())
-		c.JSON(grpcStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
 		return
 	}
-	c.JSON(http.StatusOK, token)
-}
-
-func userSignupHandl(c *gin.Context) {
-	var req api.UserCredentials
-	if err := c.BindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	token, err := clients.authService.SignupWithEmail(context.Background(), &req)
-	if err != nil {
-		st := status.Convert(err)
-		log.Println(st.Message())
-		c.JSON(grpcStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
-		return
-	}
-	c.JSON(http.StatusCreated, token)
+	gjpb.SendPBAsJSON(c, http.StatusOK, resp)
 }
 
 func userPasswordChangeHandl(c *gin.Context) {
@@ -101,7 +81,7 @@ func userPasswordChangeHandl(c *gin.Context) {
 	if err != nil {
 		st := status.Convert(err)
 		log.Println(st.Message())
-		c.JSON(grpcStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
 		return
 	}
 	c.JSON(http.StatusOK, res)
@@ -121,7 +101,7 @@ func updateNameHandl(c *gin.Context) {
 	if err != nil {
 		st := status.Convert(err)
 		log.Println(st.Message())
-		c.JSON(grpcStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
 		return
 	}
 	c.JSON(http.StatusOK, res)
@@ -141,7 +121,7 @@ func getUserHandl(c *gin.Context) {
 	if err != nil {
 		st := status.Convert(err)
 		log.Println(st.Message())
-		c.JSON(grpcStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
 		return
 	}
 	c.JSON(http.StatusOK, res)
@@ -160,7 +140,7 @@ func deleteAccountHandl(c *gin.Context) {
 	if err != nil {
 		st := status.Convert(err)
 		log.Println(st.Message())
-		c.JSON(grpcStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
 		return
 	}
 	c.JSON(http.StatusOK, res)
@@ -212,7 +192,7 @@ func addSubProfileHandl(c *gin.Context) {
 	if err != nil {
 		st := status.Convert(err)
 		log.Println(st.Message())
-		c.JSON(grpcStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
 		return
 	}
 	c.JSON(http.StatusOK, res)
@@ -224,7 +204,7 @@ func updateSubProfileHandl(c *gin.Context) {
 	if err != nil {
 		st := status.Convert(err)
 		log.Println(st.Message())
-		c.JSON(grpcStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
 		return
 	}
 	c.JSON(http.StatusOK, res)
@@ -236,7 +216,7 @@ func removeSubProfileHandl(c *gin.Context) {
 	if err != nil {
 		st := status.Convert(err)
 		log.Println(st.Message())
-		c.JSON(grpcStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
 		return
 	}
 	c.JSON(http.StatusOK, res)

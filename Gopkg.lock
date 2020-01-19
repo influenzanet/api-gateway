@@ -2,6 +2,14 @@
 
 
 [[projects]]
+  digest = "1:cc93dd54278f6c0dd4b43588b3cf2c07b09b2a6dd4e2617edf81aa8946054c1e"
+  name = "github.com/gin-contrib/cors"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "5f50d4fb4e0306dcacc6f8e9bea2dcee784dbbdf"
+  version = "v1.3.0"
+
+[[projects]]
   digest = "1:3ee1d175a75b911a659fbd860060874c4f503e793c5870d13e5a0ede529a63cf"
   name = "github.com/gin-contrib/sse"
   packages = ["."]
@@ -10,7 +18,7 @@
   version = "v0.1.0"
 
 [[projects]]
-  digest = "1:d8bd2a337f6ff2188e08f72c614f2f3f0fd48e6a7b37a071b197e427d77d3a47"
+  digest = "1:249eec71412b5d3bb94374292ccbc81a1e8314cd2c6b2c830add3357e6c4b842"
   name = "github.com/gin-gonic/gin"
   packages = [
     ".",
@@ -19,18 +27,39 @@
     "render",
   ]
   pruneopts = "UT"
-  revision = "b75d67cd51eb53c3c3a2fc406524c940021ffbda"
-  version = "v1.4.0"
+  revision = "15ced05c5316609bce5b43389f8e3f06102a8b18"
+  version = "v1.5.0"
 
 [[projects]]
-  digest = "1:fe8273f3c5693e536bbe05d92ab8d05a70fa5806d2d90510bb0d5106c140cc2c"
+  digest = "1:e1cbe9ce835f515ce57500b8db6b94f399650bea2ddfac59f9b05d98db77a96d"
+  name = "github.com/go-playground/locales"
+  packages = [
+    ".",
+    "currency",
+  ]
+  pruneopts = "UT"
+  revision = "9f105231d3a5f6877a2bf8321dfa15ea6f844b1b"
+  version = "v0.13.0"
+
+[[projects]]
+  digest = "1:0d18fff5db6983e912eb2ac15038ed3eabb8ec03c9bd9129b10cd0213f50ec6d"
+  name = "github.com/go-playground/universal-translator"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "f87b1403479a348651dbf5f07f5cc6e5fcf07008"
+  version = "v0.17.0"
+
+[[projects]]
+  digest = "1:446087426544b2470148ef69a5b5e497255f327cadfb3632c161706a2db0bd63"
   name = "github.com/golang/protobuf"
   packages = [
+    "jsonpb",
     "proto",
     "ptypes",
     "ptypes/any",
     "ptypes/duration",
     "ptypes/empty",
+    "ptypes/struct",
     "ptypes/timestamp",
   ]
   pruneopts = "UT"
@@ -38,20 +67,28 @@
   version = "v1.3.2"
 
 [[projects]]
-  digest = "1:beb5b4f42a25056f0aa291b5eadd21e2f2903a05d15dfe7caf7eaee7e12fa972"
+  digest = "1:f5a2051c55d05548d2d4fd23d244027b59fbd943217df8aa3b5e170ac2fd6e1b"
   name = "github.com/json-iterator/go"
   packages = ["."]
   pruneopts = "UT"
-  revision = "03217c3e97663914aec3faafde50d081f197a0a2"
-  version = "1.1.8"
+  revision = "0ff49de124c6f76f8494e194af75bde0f1a49a29"
+  version = "v1.1.6"
 
 [[projects]]
-  digest = "1:d62282425ffb75047679d7e2c3b980eea7f82c05ef5fb9142ee617ebac6e7432"
+  digest = "1:803b281410ec195645c782ddb9cb029d43c2855d4b7824ea31104985b507a458"
+  name = "github.com/leodido/go-urn"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "a0f5013415294bb94553821ace21a1a74c0298cc"
+  version = "v1.2.0"
+
+[[projects]]
+  digest = "1:e150b5fafbd7607e2d638e4e5cf43aa4100124e5593385147b0a74e2733d8b0d"
   name = "github.com/mattn/go-isatty"
   packages = ["."]
   pruneopts = "UT"
-  revision = "88ba11cfdc67c7588b30042edf244b2875f892b6"
-  version = "v0.0.10"
+  revision = "c2a7a6ca930a4cd0bc33a3f298eb71960732a3a7"
+  version = "v0.0.7"
 
 [[projects]]
   digest = "1:33422d238f147d247752996a26574ac48dcf472976eda7f5134015f06bf16563"
@@ -70,16 +107,24 @@
   version = "1.0.1"
 
 [[projects]]
-  digest = "1:5a1cf4e370bc86137b58da2ae065e76526d32b11f62a7665f36dbd5f41fa95ff"
+  digest = "1:a84c9d70abea991a63259f090c0f892303f2df834cd44a8a2984ea6ffd3d80ed"
+  name = "github.com/phev8/gin-protobuf-json-converter"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "fc52dbdfcdbf361edc5970233ddfa90f46fd97a3"
+  version = "0.1.0"
+
+[[projects]]
+  digest = "1:58582db700776596d743a53a27e3588dd41c2615f82082f55fb99f22e30bbb66"
   name = "github.com/ugorji/go"
   packages = ["codec"]
   pruneopts = "UT"
-  revision = "23ab95ef5dc3b70286760af84ce2327a2b64ed62"
-  version = "v1.1.7"
+  revision = "82dbfaf494e3b01d2d481376f11f6a5c8cf9599f"
+  version = "v1.1.6"
 
 [[projects]]
   branch = "master"
-  digest = "1:c21f1f304711b9da16a0aabaa6a2dd697576e9ef5ac0bbd806fed6998cb6c6d6"
+  digest = "1:b1be25d431e33548fb8b3b26251e3cd05d5e50e2f9637931485a810e77760c0a"
   name = "golang.org/x/net"
   packages = [
     "http/httpguts",
@@ -90,15 +135,15 @@
     "trace",
   ]
   pruneopts = "UT"
-  revision = "da9a3fd4c5820e74b24a6cb7fb438dc9b0dd377c"
+  revision = "6afb5195e5aab057fda82e27171243402346b0ad"
 
 [[projects]]
   branch = "master"
-  digest = "1:1b4659321ce4f2c003bd052a71087f420a949690fe6b08772709099035c07eaa"
+  digest = "1:e13350b7207ecc34977340d53522e0335dd36ed86ca7c346a36d2e88eb0fadfc"
   name = "golang.org/x/sys"
   packages = ["unix"]
   pruneopts = "UT"
-  revision = "727590c5006e77ca5247972f47e877f4929fc985"
+  revision = "59e60aa80a0c64fa4b088976ee16ad7f04252c25"
 
 [[projects]]
   digest = "1:8d8faad6b12a3a4c819a3f9618cb6ee1fa1cfc33253abeeea8b55336721e3405"
@@ -131,13 +176,15 @@
   name = "google.golang.org/genproto"
   packages = ["googleapis/rpc/status"]
   pruneopts = "UT"
-  revision = "548a555dbc03994223efbaba0090152849259498"
+  revision = "32f20d992d240fbca6ef7dec6c05d1f024314e02"
 
 [[projects]]
-  digest = "1:6cd77d0b616d2dcebd363dfecba593f27b0151fc82cdb5fbfb96c5a7cfbc95b5"
+  digest = "1:3fe55026bb11519b45c0fc9d848fd779028b868dc62f5563c518cf850c7421d5"
   name = "google.golang.org/grpc"
   packages = [
     ".",
+    "attributes",
+    "backoff",
     "balancer",
     "balancer/base",
     "balancer/roundrobin",
@@ -153,10 +200,13 @@
     "internal/backoff",
     "internal/balancerload",
     "internal/binarylog",
+    "internal/buffer",
     "internal/channelz",
     "internal/envconfig",
     "internal/grpcrand",
     "internal/grpcsync",
+    "internal/resolver/dns",
+    "internal/resolver/passthrough",
     "internal/syscall",
     "internal/transport",
     "keepalive",
@@ -164,44 +214,44 @@
     "naming",
     "peer",
     "resolver",
-    "resolver/dns",
-    "resolver/passthrough",
     "serviceconfig",
     "stats",
     "status",
     "tap",
   ]
   pruneopts = "UT"
-  revision = "f6d0f9ee430895e87ef1ceb5ac8f39725bafceef"
-  version = "v1.24.0"
+  revision = "f5b0812e6fe574d90da76b205e9eb51f6ddb1919"
+  version = "v1.26.0"
 
 [[projects]]
-  digest = "1:cbc72c4c4886a918d6ab4b95e347ffe259846260f99ebdd8a198c2331cf2b2e9"
-  name = "gopkg.in/go-playground/validator.v8"
+  digest = "1:7bb1ad654b21fb8f44c77c07840007d6796f70d42d1b470600f943a508ff8a72"
+  name = "gopkg.in/go-playground/validator.v9"
   packages = ["."]
   pruneopts = "UT"
-  revision = "5f1438d3fca68893a817e4a66806cea46a9e4ebf"
-  version = "v8.18.2"
+  revision = "46b4b1e301c24cac870ffcb4ba5c8a703d1ef475"
+  version = "v9.28.0"
 
 [[projects]]
-  digest = "1:59f10c1537d2199d9115d946927fe31165959a95190849c82ff11e05803528b0"
+  digest = "1:4d2e5a73dc1500038e504a8d78b986630e3626dc027bc030ba5c75da257cdb96"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
   pruneopts = "UT"
-  revision = "f221b8435cfb71e54062f6c6e99e9ade30b124d5"
-  version = "v2.2.4"
+  revision = "51d6538a90f86fe93ac480b35f37b2be17fef232"
+  version = "v2.2.2"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/gin-contrib/cors",
     "github.com/gin-gonic/gin",
+    "github.com/golang/protobuf/jsonpb",
     "github.com/golang/protobuf/proto",
     "github.com/golang/protobuf/ptypes/empty",
+    "github.com/phev8/gin-protobuf-json-converter",
     "google.golang.org/grpc",
     "google.golang.org/grpc/codes",
     "google.golang.org/grpc/status",
-    "gopkg.in/yaml.v2",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1
