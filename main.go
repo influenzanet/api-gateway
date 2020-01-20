@@ -61,5 +61,6 @@ func main() {
 	InitTokenEndpoints(v1)
 	InitSurveyEndpoints(v1)
 
+	log.Printf("gateway listening on port %s", conf.Port)
 	log.Fatal(router.Run(":" + conf.Port))
 }
