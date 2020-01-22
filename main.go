@@ -24,7 +24,7 @@ func init() {
 	}
 
 	gjpb.SetMarshaler(jsonpb.Marshaler{
-		EmitDefaults: true,
+		//EmitDefaults: true,
 	})
 }
 
@@ -42,6 +42,11 @@ func main() {
 	authenticationServerConn := connectToAuthServiceServer()
 	defer authenticationServerConn.Close()
 	clients.authService = api.NewAuthServiceApiClient(authenticationServerConn)
+
+	// Connect to study service
+	studyServiceServerConn := connectToStudyServiceServer()
+	defer studyServiceServerConn.Close()
+	clients.studyService = api.NewStudyServiceApiClient(studyServiceServerConn)
 
 	// Start webserver
 	router := gin.Default()

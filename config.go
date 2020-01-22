@@ -7,4 +7,5 @@ func initConfig() {
 	conf.Port = os.Getenv("GATEWAY_LISTEN_PORT")
 	conf.ServiceURLs.Authentication = os.Getenv("ADDR_AUTH_SERVICE")
 	conf.ServiceURLs.UserManagement = os.Getenv("ADDR_USER_MANAGEMENT_SERVICE")
+	conf.ServiceURLs.StudyService = os.Getenv("ADDR_STUDY_SERVICE")
 }

@@ -9,6 +9,7 @@ type Config struct {
 	ServiceURLs struct {
 		Authentication string `yaml:"authentication"`
 		UserManagement string `yaml:"user_management"`
+		StudyService   string `yaml:"study_service"`
 	} `yaml:"service_urls"`
 }
 
@@ -16,4 +17,5 @@ type Config struct {
 type APIClients struct {
 	userManagement api.UserManagementApiClient
 	authService    api.AuthServiceApiClient
+	studyService   api.StudyServiceApiClient
 }
