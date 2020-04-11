@@ -33,6 +33,9 @@ func InitTokenEndpoints(rg *gin.RouterGroup) {
 	{
 		token.POST("/renew", tokenRenewHandl)
 	}
+
+	experimental := rg.Group("/exp")
+	experimental.POST("/generate-token", mw.RequirePayload(), generateTokenHandl)
 }
 
 func loginWithEmailHandl(c *gin.Context) {
@@ -73,6 +76,21 @@ func tokenRenewHandl(c *gin.Context) {
 	}
 	req.AccessToken = c.MustGet("encodedToken").(string)
 	token, err := clients.authService.RenewJWT(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+	gjpb.SendPBAsJSON(c, http.StatusOK, token)
+}
+
+func generateTokenHandl(c *gin.Context) {
+	var req api.TempTokenInfo
+	if err := gjpb.JsonToPb(c, &req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	token, err := clients.authService.GenerateTempToken(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
 		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})

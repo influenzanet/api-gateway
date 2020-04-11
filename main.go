@@ -24,7 +24,7 @@ func init() {
 	}
 
 	gjpb.SetMarshaler(jsonpb.Marshaler{
-		//EmitDefaults: true,
+		// EmitDefaults: true,
 	})
 }
 
@@ -47,7 +47,6 @@ func main() {
 	studyServiceServerConn := connectToStudyServiceServer()
 	defer studyServiceServerConn.Close()
 	clients.studyService = api.NewStudyServiceApiClient(studyServiceServerConn)
-
 	// Start webserver
 	router := gin.Default()
 	router.Use(cors.New(cors.Config{
@@ -64,7 +63,9 @@ func main() {
 
 	InitUserEndpoints(v1)
 	InitTokenEndpoints(v1)
-	InitSurveyEndpoints(v1)
+	InitStudyEndpoints(v1)
+
+	InitExperimentalEndpoints(router.Group(""))
 
 	log.Printf("gateway listening on port %s", conf.Port)
 	log.Fatal(router.Run(":" + conf.Port))
