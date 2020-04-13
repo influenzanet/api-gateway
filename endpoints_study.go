@@ -36,13 +36,10 @@ func InitStudyEndpoints(rg *gin.RouterGroup) {
 			{
 				studyRoutes.POST("/save-survey", mw.RequirePayload(), saveSurveyToStudyHandl)
 				studyRoutes.POST("/remove-survey", mw.RequirePayload(), removeSurveyFromStudyHandl)
+				studyRoutes.POST("/get-assigned-survey", mw.RequirePayload(), getAssignedSurveyHandl)
+				studyRoutes.POST("/submit-response", mw.RequirePayload(), submitSurveyResponseHandl)
 			}
 		}
-	}
-
-	survey := rg.Group("/survey") // TODO example endpoints
-	{
-		survey.POST("/submit", surveySubmitHandl)
 	}
 }
 
@@ -106,18 +103,16 @@ func removeSurveyFromStudyHandl(c *gin.Context) {
 	gjpb.SendPBAsJSON(c, http.StatusOK, resp)
 }
 
-func surveySubmitHandl(c *gin.Context) {
-	var req api.SubmitResponseReq
+func getAssignedSurveyHandl(c *gin.Context) {
+	token := c.MustGet("validatedToken").(api.TokenInfos)
+
+	var req api.SurveyReferenceRequest
 	if err := gjpb.JsonToPb(c, &req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	// TODO: token handling
-	req.Token = &api.TokenInfos{
-		InstanceId: "default",
-		Id:         "testuserid",
-	}
-	resp, err := clients.studyService.SubmitResponse(context.Background(), &req)
+	req.Token = &token
+	resp, err := clients.studyService.GetAssignedSurvey(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
 		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
@@ -126,14 +121,20 @@ func surveySubmitHandl(c *gin.Context) {
 	gjpb.SendPBAsJSON(c, http.StatusOK, resp)
 }
 
-func surveyUpdateHandl(c *gin.Context) {
-	c.JSON(http.StatusNotImplemented, gin.H{})
-}
+func submitSurveyResponseHandl(c *gin.Context) {
+	token := c.MustGet("validatedToken").(api.TokenInfos)
 
-func surveyGetHandl(c *gin.Context) {
-	c.JSON(http.StatusNotImplemented, gin.H{})
-}
-
-func surveyGetAllHandl(c *gin.Context) {
-	c.JSON(http.StatusNotImplemented, gin.H{})
+	var req api.SubmitResponseReq
+	if err := gjpb.JsonToPb(c, &req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	req.Token = &token
+	resp, err := clients.studyService.SubmitResponse(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+	gjpb.SendPBAsJSON(c, http.StatusOK, resp)
 }
