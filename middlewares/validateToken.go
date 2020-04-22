@@ -20,7 +20,7 @@ func ValidateToken(authClient api.AuthServiceApiClient) gin.HandlerFunc {
 		if err != nil {
 			st := status.Convert(err)
 			log.Println(st.Message())
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "error during token validation"})
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "error during token validation"})
 			c.Abort()
 			return
 		}
