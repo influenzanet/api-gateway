@@ -26,8 +26,8 @@ func initUserManagementEndpoints(rg *gin.RouterGroup) {
 		userToken.POST("/set-language", mw.RequirePayload(), userSetPreferredLanguageHandl)
 		userToken.POST("/delete", mw.RequirePayload(), deleteAccountHandl)
 
-		//userToken.POST("/profile/save", mw.RequirePayload(), todo)
-		//userToken.POST("/profile/remove", mw.RequirePayload(), todo)
+		userToken.POST("/profile/save", mw.RequirePayload(), saveProfileHandl)
+		userToken.POST("/profile/remove", mw.RequirePayload(), removeProfileHandl)
 
 		//userToken.POST("/contact-preferences", mw.RequirePayload(), todo)
 		// userToken.POST("/contact/add-email", mw.RequirePayload(), todo)
@@ -131,6 +131,42 @@ func deleteAccountHandl(c *gin.Context) {
 	if err != nil {
 		st := status.Convert(err)
 		log.Println(st.Message())
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+	gjpb.SendPBAsJSON(c, http.StatusOK, resp)
+}
+
+func saveProfileHandl(c *gin.Context) {
+	token := c.MustGet("validatedToken").(api.TokenInfos)
+
+	var req api.ProfileRequest
+	if err := gjpb.JsonToPb(c, &req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	req.Token = &token
+	resp, err := clients.UserManagement.SaveProfile(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+	gjpb.SendPBAsJSON(c, http.StatusOK, resp)
+}
+
+func removeProfileHandl(c *gin.Context) {
+	token := c.MustGet("validatedToken").(api.TokenInfos)
+
+	var req api.ProfileRequest
+	if err := gjpb.JsonToPb(c, &req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	req.Token = &token
+	resp, err := clients.UserManagement.RemoveProfile(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
 		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
 		return
 	}
