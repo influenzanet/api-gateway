@@ -10,14 +10,18 @@ import (
 
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/influenzanet/api-gateway/api"
+	"github.com/influenzanet/api-gateway/models"
+	v1 "github.com/influenzanet/api-gateway/v1"
 	gjpb "github.com/phev8/gin-protobuf-json-converter"
 )
 
 // Conf holds all static configuration information
-var conf Config
-var clients = APIClients{}
+var conf models.Config
+var clients *models.APIClients
 
 func init() {
+	clients = &models.APIClients{}
+
 	initConfig()
 	if !conf.DebugMode {
 		gin.SetMode(gin.ReleaseMode)
@@ -36,17 +40,18 @@ func main() {
 	// Connect to user management service
 	userManagementServerConn := connectToUserManagementServer()
 	defer userManagementServerConn.Close()
-	clients.userManagement = api.NewUserManagementApiClient(userManagementServerConn)
+	clients.UserManagement = api.NewUserManagementApiClient(userManagementServerConn)
 
 	// Connect to authentication service
 	authenticationServerConn := connectToAuthServiceServer()
 	defer authenticationServerConn.Close()
-	clients.authService = api.NewAuthServiceApiClient(authenticationServerConn)
+	clients.AuthService = api.NewAuthServiceApiClient(authenticationServerConn)
 
 	// Connect to study service
 	studyServiceServerConn := connectToStudyServiceServer()
 	defer studyServiceServerConn.Close()
-	clients.studyService = api.NewStudyServiceApiClient(studyServiceServerConn)
+	clients.StudyService = api.NewStudyServiceApiClient(studyServiceServerConn)
+
 	// Start webserver
 	router := gin.Default()
 	router.Use(cors.New(cors.Config{
@@ -59,13 +64,10 @@ func main() {
 		MaxAge:           12 * time.Hour,
 	}))
 	router.GET("/", healthCheckHandle)
-	v1 := router.Group("/v1")
+	rootV1 := router.Group("/v1")
 
-	InitUserEndpoints(v1)
-	InitTokenEndpoints(v1)
-	InitStudyEndpoints(v1)
-
-	InitExperimentalEndpoints(router.Group(""))
+	v1.InitAPI(clients, rootV1)
+	// InitExperimentalEndpoints(router.Group(""))
 
 	log.Printf("gateway listening on port %s", conf.Port)
 	log.Fatal(router.Run(":" + conf.Port))

@@ -1,8 +1,7 @@
-package main
+package v1
 
 import (
 	"context"
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -10,25 +9,16 @@ import (
 	mw "github.com/influenzanet/api-gateway/middlewares"
 	"github.com/influenzanet/api-gateway/utils"
 	gjpb "github.com/phev8/gin-protobuf-json-converter"
-	"google.golang.org/grpc"
 	"google.golang.org/grpc/status"
 )
 
-func connectToStudyServiceServer() *grpc.ClientConn {
-	conn, err := grpc.Dial(conf.ServiceURLs.StudyService, grpc.WithInsecure())
-	if err != nil {
-		log.Fatalf("failed to connect: %v", err)
-	}
-	return conn
-}
-
-// InitStudyEndpoints creates all API routes on the supplied RouterGroup
-func InitStudyEndpoints(rg *gin.RouterGroup) {
+// initStudyEndpoints creates all API routes on the supplied RouterGroup
+func initStudyEndpoints(rg *gin.RouterGroup) {
 	studySystem := rg.Group("/study-system")
 	{
 		studySystemWithAuth := studySystem.Group("")
 		studySystemWithAuth.Use(mw.ExtractToken())
-		studySystemWithAuth.Use(mw.ValidateToken(clients.authService))
+		studySystemWithAuth.Use(mw.ValidateToken(clients.AuthService))
 		{
 			studySystemWithAuth.POST("/create-study", mw.RequirePayload(), studySystemCreateStudyHandl)
 
@@ -53,7 +43,7 @@ func studySystemCreateStudyHandl(c *gin.Context) {
 	}
 	req.Token = &token
 
-	resp, err := clients.studyService.CreateNewStudy(context.Background(), &req)
+	resp, err := clients.StudyService.CreateNewStudy(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
 		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
@@ -73,7 +63,7 @@ func saveSurveyToStudyHandl(c *gin.Context) {
 	}
 	req.Token = &token
 
-	resp, err := clients.studyService.SaveSurveyToStudy(context.Background(), &req)
+	resp, err := clients.StudyService.SaveSurveyToStudy(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
 		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
@@ -93,7 +83,7 @@ func removeSurveyFromStudyHandl(c *gin.Context) {
 	}
 	req.Token = &token
 
-	resp, err := clients.studyService.RemoveSurveyFromStudy(context.Background(), &req)
+	resp, err := clients.StudyService.RemoveSurveyFromStudy(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
 		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
@@ -112,7 +102,7 @@ func getAssignedSurveyHandl(c *gin.Context) {
 		return
 	}
 	req.Token = &token
-	resp, err := clients.studyService.GetAssignedSurvey(context.Background(), &req)
+	resp, err := clients.StudyService.GetAssignedSurvey(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
 		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
@@ -130,7 +120,7 @@ func submitSurveyResponseHandl(c *gin.Context) {
 		return
 	}
 	req.Token = &token
-	resp, err := clients.studyService.SubmitResponse(context.Background(), &req)
+	resp, err := clients.StudyService.SubmitResponse(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
 		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})

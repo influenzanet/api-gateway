@@ -21,7 +21,7 @@ func InitExperimentalEndpoints(rg *gin.RouterGroup) {
 
 		covidAppStudyRoutes := covidAppRoutes.Group("/study")
 		covidAppStudyRoutes.Use(mw.ExtractToken())
-		covidAppStudyRoutes.Use(mw.ValidateToken(clients.authService))
+		covidAppStudyRoutes.Use(mw.ValidateToken(clients.AuthService))
 		{
 			covidAppStudyRoutes.POST("/enter", mw.RequirePayload(), covidAppEnterStudyHandl)
 			covidAppStudyRoutes.GET("/fetch-assigned-surveys", covidAppGetAssignedSurveysHandl)
@@ -55,7 +55,7 @@ func covidAppRegisterHandl(c *gin.Context) {
 	}
 
 	// Validate App token before continue with request
-	resp, err := clients.authService.ValidateAppToken(context.Background(), &api.AppTokenRequest{Token: req.AppToken})
+	resp, err := clients.AuthService.ValidateAppToken(context.Background(), &api.AppTokenRequest{Token: req.AppToken})
 	if err != nil {
 		st := status.Convert(err)
 		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
@@ -66,12 +66,12 @@ func covidAppRegisterHandl(c *gin.Context) {
 	}
 
 	// Register user
-	signUpReq := api.UserCredentials{
+	signUpReq := api.SignupWithEmailMsg{
 		InstanceId: req.InstanceID,
 		Email:      req.UserID + "@app-id.no-reply",
 		Password:   req.Password,
 	}
-	token, err := clients.authService.SignupWithEmail(context.Background(), &signUpReq)
+	token, err := clients.AuthService.SignupWithEmail(context.Background(), &signUpReq)
 	if err != nil {
 		st := status.Convert(err)
 		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
@@ -89,7 +89,7 @@ func covidAppLoginHandl(c *gin.Context) {
 	}
 
 	// Validate App token before continue with request
-	resp, err := clients.authService.ValidateAppToken(context.Background(), &api.AppTokenRequest{Token: req.AppToken})
+	resp, err := clients.AuthService.ValidateAppToken(context.Background(), &api.AppTokenRequest{Token: req.AppToken})
 	if err != nil {
 		st := status.Convert(err)
 		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
@@ -99,12 +99,12 @@ func covidAppLoginHandl(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "app token cannot be used for given instanceID"})
 	}
 
-	loginReq := api.UserCredentials{
+	loginReq := api.LoginWithEmailMsg{
 		InstanceId: req.InstanceID,
 		Email:      req.UserID + "@app-id.no-reply",
 		Password:   req.Password,
 	}
-	token, err := clients.authService.LoginWithEmail(context.Background(), &loginReq)
+	token, err := clients.AuthService.LoginWithEmail(context.Background(), &loginReq)
 	if err != nil {
 		st := status.Convert(err)
 		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
@@ -125,7 +125,7 @@ func covidAppEnterStudyHandl(c *gin.Context) {
 	req.Token = &token
 
 	// Enter study
-	resp, err := clients.studyService.EnterStudy(context.Background(), &req)
+	resp, err := clients.StudyService.EnterStudy(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
 		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
@@ -138,7 +138,7 @@ func covidAppEnterStudyHandl(c *gin.Context) {
 func covidAppGetAssignedSurveysHandl(c *gin.Context) {
 	token := c.MustGet("validatedToken").(api.TokenInfos)
 
-	resp, err := clients.studyService.GetAssignedSurveys(context.Background(), &token)
+	resp, err := clients.StudyService.GetAssignedSurveys(context.Background(), &token)
 	if err != nil {
 		st := status.Convert(err)
 		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
@@ -155,7 +155,7 @@ func covidAppGetSurveyInfosHandl(c *gin.Context) {
 		Token:    &token,
 		StudyKey: "covid-19",
 	}
-	resp, err := clients.studyService.GetStudySurveyInfos(context.Background(), &req)
+	resp, err := clients.StudyService.GetStudySurveyInfos(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
 		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
@@ -175,7 +175,7 @@ func covidAppSubmitStatusReportHandl(c *gin.Context) {
 	}
 	req.Token = &token
 
-	resp, err := clients.studyService.SubmitStatusReport(context.Background(), &req)
+	resp, err := clients.StudyService.SubmitStatusReport(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
 		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
