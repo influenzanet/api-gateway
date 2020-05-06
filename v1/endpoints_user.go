@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	gjpb "github.com/phev8/gin-protobuf-json-converter"
 	"google.golang.org/grpc/status"
 
 	api "github.com/influenzanet/api-gateway/api"
@@ -20,14 +21,17 @@ func initUserManagementEndpoints(rg *gin.RouterGroup) {
 	{
 		userToken.GET("/", getUserHandl)
 		// userToken.GET("/:id", getUserHandl)
+		userToken.POST("/change-password", mw.RequirePayload(), userPasswordChangeHandl)
+		userToken.POST("/change-account-email", mw.RequirePayload(), changeAccountEmailHandl)
+		userToken.POST("/set-language", mw.RequirePayload(), userSetPreferredLanguageHandl)
+		userToken.POST("/delete", mw.RequirePayload(), deleteAccountHandl)
 
-		userTokenWithPayload := userToken.Group("/")
-		userTokenWithPayload.Use(mw.RequirePayload())
-		{
-			userTokenWithPayload.POST("/changePassword", userPasswordChangeHandl)
-			userTokenWithPayload.DELETE("/", deleteAccountHandl)
+		//userToken.POST("/profile/save", mw.RequirePayload(), todo)
+		//userToken.POST("/profile/remove", mw.RequirePayload(), todo)
 
-		}
+		//userToken.POST("/contact-preferences", mw.RequirePayload(), todo)
+		// userToken.POST("/contact/add-email", mw.RequirePayload(), todo)
+		//userToken.POST("/contact/remove-email", mw.RequirePayload(), todo)
 	}
 	/*
 		userGet := rg.Group("/user")
@@ -42,20 +46,56 @@ func userPasswordChangeHandl(c *gin.Context) {
 	token := c.MustGet("validatedToken").(api.TokenInfos)
 
 	var req api.PasswordChangeMsg
-	if err := c.BindJSON(&req); err != nil {
+	if err := gjpb.JsonToPb(c, &req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	req.Token = &token
 
-	res, err := clients.UserManagement.ChangePassword(context.Background(), &req)
+	resp, err := clients.UserManagement.ChangePassword(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
 		log.Println(st.Message())
 		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
 		return
 	}
-	c.JSON(http.StatusOK, res)
+	gjpb.SendPBAsJSON(c, http.StatusOK, resp)
+}
+
+func changeAccountEmailHandl(c *gin.Context) {
+	token := c.MustGet("validatedToken").(api.TokenInfos)
+
+	var req api.EmailChangeMsg
+	if err := gjpb.JsonToPb(c, &req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	req.Token = &token
+	resp, err := clients.UserManagement.ChangeAccountIDEmail(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+	gjpb.SendPBAsJSON(c, http.StatusOK, resp)
+}
+
+func userSetPreferredLanguageHandl(c *gin.Context) {
+	token := c.MustGet("validatedToken").(api.TokenInfos)
+
+	var req api.LanguageChangeMsg
+	if err := gjpb.JsonToPb(c, &req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	req.Token = &token
+	resp, err := clients.UserManagement.ChangePreferredLanguage(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+	gjpb.SendPBAsJSON(c, http.StatusOK, resp)
 }
 
 func getUserHandl(c *gin.Context) {
@@ -68,33 +108,33 @@ func getUserHandl(c *gin.Context) {
 		UserId: userID,
 	}
 
-	res, err := clients.UserManagement.GetUser(context.Background(), userRefReq)
+	resp, err := clients.UserManagement.GetUser(context.Background(), userRefReq)
 	if err != nil {
 		st := status.Convert(err)
 		log.Println(st.Message())
 		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
 		return
 	}
-	c.JSON(http.StatusOK, res)
+	gjpb.SendPBAsJSON(c, http.StatusOK, resp)
 }
 
 func deleteAccountHandl(c *gin.Context) {
 	token := c.MustGet("validatedToken").(api.TokenInfos)
 
 	var req api.UserReference
-	if err := c.BindJSON(&req); err != nil {
+	if err := gjpb.JsonToPb(c, &req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	req.Token = &token
-	res, err := clients.UserManagement.DeleteAccount(context.Background(), &req)
+	resp, err := clients.UserManagement.DeleteAccount(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
 		log.Println(st.Message())
 		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
 		return
 	}
-	c.JSON(http.StatusOK, res)
+	gjpb.SendPBAsJSON(c, http.StatusOK, resp)
 }
 
 func userEmailVerifyHandl(c *gin.Context) {
