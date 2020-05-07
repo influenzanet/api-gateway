@@ -29,9 +29,9 @@ func initUserManagementEndpoints(rg *gin.RouterGroup) {
 		userToken.POST("/profile/save", mw.RequirePayload(), saveProfileHandl)
 		userToken.POST("/profile/remove", mw.RequirePayload(), removeProfileHandl)
 
-		//userToken.POST("/contact-preferences", mw.RequirePayload(), todo)
-		// userToken.POST("/contact/add-email", mw.RequirePayload(), todo)
-		//userToken.POST("/contact/remove-email", mw.RequirePayload(), todo)
+		userToken.POST("/contact-preferences", mw.RequirePayload(), userUpdateContactPreferencesHandl)
+		userToken.POST("/contact/add-email", mw.RequirePayload(), userAddEmailHandl)
+		userToken.POST("/contact/remove-email", mw.RequirePayload(), userRemoveEmailHandl)
 	}
 	/*
 		userGet := rg.Group("/user")
@@ -165,6 +165,60 @@ func removeProfileHandl(c *gin.Context) {
 	}
 	req.Token = &token
 	resp, err := clients.UserManagement.RemoveProfile(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+	gjpb.SendPBAsJSON(c, http.StatusOK, resp)
+}
+
+func userUpdateContactPreferencesHandl(c *gin.Context) {
+	token := c.MustGet("validatedToken").(api.TokenInfos)
+
+	var req api.ContactPreferencesMsg
+	if err := gjpb.JsonToPb(c, &req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	req.Token = &token
+	resp, err := clients.UserManagement.UpdateContactPreferences(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+	gjpb.SendPBAsJSON(c, http.StatusOK, resp)
+}
+
+func userAddEmailHandl(c *gin.Context) {
+	token := c.MustGet("validatedToken").(api.TokenInfos)
+
+	var req api.ContactInfoMsg
+	if err := gjpb.JsonToPb(c, &req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	req.Token = &token
+	resp, err := clients.UserManagement.AddEmail(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+	gjpb.SendPBAsJSON(c, http.StatusOK, resp)
+}
+
+func userRemoveEmailHandl(c *gin.Context) {
+	token := c.MustGet("validatedToken").(api.TokenInfos)
+
+	var req api.ContactInfoMsg
+	if err := gjpb.JsonToPb(c, &req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	req.Token = &token
+	resp, err := clients.UserManagement.RemoveEmail(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
 		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
