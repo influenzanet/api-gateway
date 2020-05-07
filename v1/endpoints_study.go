@@ -34,14 +34,14 @@ func initStudyEndpoints(rg *gin.RouterGroup) {
 }
 
 func studySystemCreateStudyHandl(c *gin.Context) {
-	token := c.MustGet("validatedToken").(api.TokenInfos)
+	token := c.MustGet("validatedToken").(*api.TokenInfos)
 
 	var req api.NewStudyRequest
 	if err := gjpb.JsonToPb(c, &req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	req.Token = &token
+	req.Token = token
 
 	resp, err := clients.StudyService.CreateNewStudy(context.Background(), &req)
 	if err != nil {
@@ -54,14 +54,14 @@ func studySystemCreateStudyHandl(c *gin.Context) {
 }
 
 func saveSurveyToStudyHandl(c *gin.Context) {
-	token := c.MustGet("validatedToken").(api.TokenInfos)
+	token := c.MustGet("validatedToken").(*api.TokenInfos)
 
 	var req api.AddSurveyReq
 	if err := gjpb.JsonToPb(c, &req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	req.Token = &token
+	req.Token = token
 
 	resp, err := clients.StudyService.SaveSurveyToStudy(context.Background(), &req)
 	if err != nil {
@@ -74,14 +74,14 @@ func saveSurveyToStudyHandl(c *gin.Context) {
 }
 
 func removeSurveyFromStudyHandl(c *gin.Context) {
-	token := c.MustGet("validatedToken").(api.TokenInfos)
+	token := c.MustGet("validatedToken").(*api.TokenInfos)
 
 	var req api.SurveyReferenceRequest
 	if err := gjpb.JsonToPb(c, &req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	req.Token = &token
+	req.Token = token
 
 	resp, err := clients.StudyService.RemoveSurveyFromStudy(context.Background(), &req)
 	if err != nil {
@@ -94,14 +94,14 @@ func removeSurveyFromStudyHandl(c *gin.Context) {
 }
 
 func getAssignedSurveyHandl(c *gin.Context) {
-	token := c.MustGet("validatedToken").(api.TokenInfos)
+	token := c.MustGet("validatedToken").(*api.TokenInfos)
 
 	var req api.SurveyReferenceRequest
 	if err := gjpb.JsonToPb(c, &req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	req.Token = &token
+	req.Token = token
 	resp, err := clients.StudyService.GetAssignedSurvey(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
@@ -112,14 +112,14 @@ func getAssignedSurveyHandl(c *gin.Context) {
 }
 
 func submitSurveyResponseHandl(c *gin.Context) {
-	token := c.MustGet("validatedToken").(api.TokenInfos)
+	token := c.MustGet("validatedToken").(*api.TokenInfos)
 
 	var req api.SubmitResponseReq
 	if err := gjpb.JsonToPb(c, &req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	req.Token = &token
+	req.Token = token
 	resp, err := clients.StudyService.SubmitResponse(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)

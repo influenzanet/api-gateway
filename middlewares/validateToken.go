@@ -24,7 +24,7 @@ func ValidateToken(authClient api.AuthServiceApiClient) gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		c.Set("validatedToken", *parsedToken)
+		c.Set("validatedToken", parsedToken)
 		c.Next()
 	}
 }

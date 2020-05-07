@@ -115,14 +115,14 @@ func covidAppLoginHandl(c *gin.Context) {
 }
 
 func covidAppEnterStudyHandl(c *gin.Context) {
-	token := c.MustGet("validatedToken").(api.TokenInfos)
+	token := c.MustGet("validatedToken").(*api.TokenInfos)
 
 	var req api.EnterStudyRequest
 	if err := gjpb.JsonToPb(c, &req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	req.Token = &token
+	req.Token = token
 
 	// Enter study
 	resp, err := clients.StudyService.EnterStudy(context.Background(), &req)
@@ -136,9 +136,9 @@ func covidAppEnterStudyHandl(c *gin.Context) {
 }
 
 func covidAppGetAssignedSurveysHandl(c *gin.Context) {
-	token := c.MustGet("validatedToken").(api.TokenInfos)
+	token := c.MustGet("validatedToken").(*api.TokenInfos)
 
-	resp, err := clients.StudyService.GetAssignedSurveys(context.Background(), &token)
+	resp, err := clients.StudyService.GetAssignedSurveys(context.Background(), token)
 	if err != nil {
 		st := status.Convert(err)
 		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
@@ -149,10 +149,10 @@ func covidAppGetAssignedSurveysHandl(c *gin.Context) {
 }
 
 func covidAppGetSurveyInfosHandl(c *gin.Context) {
-	token := c.MustGet("validatedToken").(api.TokenInfos)
+	token := c.MustGet("validatedToken").(*api.TokenInfos)
 
 	req := api.StudyReferenceReq{
-		Token:    &token,
+		Token:    token,
 		StudyKey: "covid-19",
 	}
 	resp, err := clients.StudyService.GetStudySurveyInfos(context.Background(), &req)
@@ -166,14 +166,14 @@ func covidAppGetSurveyInfosHandl(c *gin.Context) {
 }
 
 func covidAppSubmitStatusReportHandl(c *gin.Context) {
-	token := c.MustGet("validatedToken").(api.TokenInfos)
+	token := c.MustGet("validatedToken").(*api.TokenInfos)
 
 	var req api.StatusReportRequest
 	if err := gjpb.JsonToPb(c, &req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	req.Token = &token
+	req.Token = token
 
 	resp, err := clients.StudyService.SubmitStatusReport(context.Background(), &req)
 	if err != nil {

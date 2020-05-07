@@ -51,13 +51,13 @@ func signupWithEmailHandl(c *gin.Context) {
 }
 
 func switchProfileHandl(c *gin.Context) {
-	token := c.MustGet("validatedToken").(api.TokenInfos)
+	token := c.MustGet("validatedToken").(*api.TokenInfos)
 	var req api.ProfileRequest
 	if err := gjpb.JsonToPb(c, &req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	req.Token = &token
+	req.Token = token
 	resp, err := clients.AuthService.SwitchProfile(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)

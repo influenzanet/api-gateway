@@ -43,14 +43,14 @@ func initUserManagementEndpoints(rg *gin.RouterGroup) {
 }
 
 func userPasswordChangeHandl(c *gin.Context) {
-	token := c.MustGet("validatedToken").(api.TokenInfos)
+	token := c.MustGet("validatedToken").(*api.TokenInfos)
 
 	var req api.PasswordChangeMsg
 	if err := gjpb.JsonToPb(c, &req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	req.Token = &token
+	req.Token = token
 
 	resp, err := clients.UserManagement.ChangePassword(context.Background(), &req)
 	if err != nil {
@@ -63,14 +63,14 @@ func userPasswordChangeHandl(c *gin.Context) {
 }
 
 func changeAccountEmailHandl(c *gin.Context) {
-	token := c.MustGet("validatedToken").(api.TokenInfos)
+	token := c.MustGet("validatedToken").(*api.TokenInfos)
 
 	var req api.EmailChangeMsg
 	if err := gjpb.JsonToPb(c, &req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	req.Token = &token
+	req.Token = token
 	resp, err := clients.UserManagement.ChangeAccountIDEmail(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
@@ -81,14 +81,14 @@ func changeAccountEmailHandl(c *gin.Context) {
 }
 
 func userSetPreferredLanguageHandl(c *gin.Context) {
-	token := c.MustGet("validatedToken").(api.TokenInfos)
+	token := c.MustGet("validatedToken").(*api.TokenInfos)
 
 	var req api.LanguageChangeMsg
 	if err := gjpb.JsonToPb(c, &req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	req.Token = &token
+	req.Token = token
 	resp, err := clients.UserManagement.ChangePreferredLanguage(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
@@ -99,12 +99,12 @@ func userSetPreferredLanguageHandl(c *gin.Context) {
 }
 
 func getUserHandl(c *gin.Context) {
-	token := c.MustGet("validatedToken").(api.TokenInfos)
+	token := c.MustGet("validatedToken").(*api.TokenInfos)
 
 	userID := c.Param("id")
 
 	userRefReq := &api.UserReference{
-		Token:  &token,
+		Token:  token,
 		UserId: userID,
 	}
 
@@ -119,14 +119,14 @@ func getUserHandl(c *gin.Context) {
 }
 
 func deleteAccountHandl(c *gin.Context) {
-	token := c.MustGet("validatedToken").(api.TokenInfos)
+	token := c.MustGet("validatedToken").(*api.TokenInfos)
 
 	var req api.UserReference
 	if err := gjpb.JsonToPb(c, &req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	req.Token = &token
+	req.Token = token
 	resp, err := clients.UserManagement.DeleteAccount(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
@@ -138,14 +138,14 @@ func deleteAccountHandl(c *gin.Context) {
 }
 
 func saveProfileHandl(c *gin.Context) {
-	token := c.MustGet("validatedToken").(api.TokenInfos)
+	token := c.MustGet("validatedToken").(*api.TokenInfos)
 
 	var req api.ProfileRequest
 	if err := gjpb.JsonToPb(c, &req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	req.Token = &token
+	req.Token = token
 	resp, err := clients.UserManagement.SaveProfile(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
@@ -156,14 +156,14 @@ func saveProfileHandl(c *gin.Context) {
 }
 
 func removeProfileHandl(c *gin.Context) {
-	token := c.MustGet("validatedToken").(api.TokenInfos)
+	token := c.MustGet("validatedToken").(*api.TokenInfos)
 
 	var req api.ProfileRequest
 	if err := gjpb.JsonToPb(c, &req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	req.Token = &token
+	req.Token = token
 	resp, err := clients.UserManagement.RemoveProfile(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
@@ -174,14 +174,14 @@ func removeProfileHandl(c *gin.Context) {
 }
 
 func userUpdateContactPreferencesHandl(c *gin.Context) {
-	token := c.MustGet("validatedToken").(api.TokenInfos)
+	token := c.MustGet("validatedToken").(*api.TokenInfos)
 
 	var req api.ContactPreferencesMsg
 	if err := gjpb.JsonToPb(c, &req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	req.Token = &token
+	req.Token = token
 	resp, err := clients.UserManagement.UpdateContactPreferences(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
@@ -192,14 +192,14 @@ func userUpdateContactPreferencesHandl(c *gin.Context) {
 }
 
 func userAddEmailHandl(c *gin.Context) {
-	token := c.MustGet("validatedToken").(api.TokenInfos)
+	token := c.MustGet("validatedToken").(*api.TokenInfos)
 
 	var req api.ContactInfoMsg
 	if err := gjpb.JsonToPb(c, &req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	req.Token = &token
+	req.Token = token
 	resp, err := clients.UserManagement.AddEmail(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
@@ -210,14 +210,14 @@ func userAddEmailHandl(c *gin.Context) {
 }
 
 func userRemoveEmailHandl(c *gin.Context) {
-	token := c.MustGet("validatedToken").(api.TokenInfos)
+	token := c.MustGet("validatedToken").(*api.TokenInfos)
 
 	var req api.ContactInfoMsg
 	if err := gjpb.JsonToPb(c, &req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	req.Token = &token
+	req.Token = token
 	resp, err := clients.UserManagement.RemoveEmail(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
