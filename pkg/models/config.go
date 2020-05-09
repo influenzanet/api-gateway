@@ -5,7 +5,6 @@ type Config struct {
 	DebugMode   bool
 	Port        string
 	ServiceURLs struct {
-		Authentication string `yaml:"authentication"`
 		UserManagement string `yaml:"user_management"`
 		StudyService   string `yaml:"study_service"`
 	} `yaml:"service_urls"`

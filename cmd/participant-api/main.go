@@ -3,24 +3,33 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 
 	"github.com/golang/protobuf/jsonpb"
-	"github.com/influenzanet/api-gateway/api"
-	"github.com/influenzanet/api-gateway/models"
-	v1 "github.com/influenzanet/api-gateway/v1"
+
+	"github.com/influenzanet/api-gateway/pkg/models"
+	gc "github.com/influenzanet/api-gateway/pkg/protocols/grpc/clients"
+	v1 "github.com/influenzanet/api-gateway/pkg/protocols/http/v1"
 	gjpb "github.com/phev8/gin-protobuf-json-converter"
 )
 
 // Conf holds all static configuration information
 var conf models.Config
-var clients *models.APIClients
+var grpcClients *models.APIClients
+
+func initConfig() {
+	conf.DebugMode = os.Getenv("DEBUG_MODE") == "true"
+	conf.Port = os.Getenv("GATEWAY_LISTEN_PORT")
+	conf.ServiceURLs.UserManagement = os.Getenv("ADDR_USER_MANAGEMENT_SERVICE")
+	conf.ServiceURLs.StudyService = os.Getenv("ADDR_STUDY_SERVICE")
+}
 
 func init() {
-	clients = &models.APIClients{}
+	grpcClients = &models.APIClients{}
 
 	initConfig()
 	if !conf.DebugMode {
@@ -37,20 +46,13 @@ func healthCheckHandle(c *gin.Context) {
 }
 
 func main() {
-	// Connect to user management service
-	userManagementServerConn := connectToUserManagementServer()
-	defer userManagementServerConn.Close()
-	clients.UserManagement = api.NewUserManagementApiClient(userManagementServerConn)
-
-	// Connect to authentication service
-	authenticationServerConn := connectToAuthServiceServer()
-	defer authenticationServerConn.Close()
-	clients.AuthService = api.NewAuthServiceApiClient(authenticationServerConn)
-
+	umClient, close := gc.ConnectToUserManagement(conf.ServiceURLs.UserManagement)
+	defer close()
 	// Connect to study service
-	studyServiceServerConn := connectToStudyServiceServer()
+	/*studyServiceServerConn := connectToStudyServiceServer()
 	defer studyServiceServerConn.Close()
-	clients.StudyService = api.NewStudyServiceApiClient(studyServiceServerConn)
+	clients.StudyService = api.NewStudyServiceApiClient(studyServiceServerConn)*/
+	grpcClients.UserManagement = umClient
 
 	// Start webserver
 	router := gin.Default()
@@ -64,11 +66,15 @@ func main() {
 		MaxAge:           12 * time.Hour,
 	}))
 	router.GET("/", healthCheckHandle)
-	rootV1 := router.Group("/v1")
+	v1Root := router.Group("/v1")
 
-	v1.InitAPI(clients, rootV1)
-	// InitExperimentalEndpoints(router.Group(""))
+	v1APIHandlers := v1.NewHTTPHandler(grpcClients)
+	v1APIHandlers.AddServiceStatusAPI(v1Root)
+	v1APIHandlers.AddUserManagementParticipantAPI(v1Root)
+	// v1APIHandlers.AddStudyServiceParticipantAPI(v1Root)
 
 	log.Printf("gateway listening on port %s", conf.Port)
 	log.Fatal(router.Run(":" + conf.Port))
 }
+
+// InitExperimentalEndpoints(router.Group(""))

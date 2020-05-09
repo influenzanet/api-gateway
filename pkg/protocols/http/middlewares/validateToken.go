@@ -6,15 +6,15 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	api "github.com/influenzanet/api-gateway/api"
+	umAPI "github.com/influenzanet/user-management-service/pkg/api"
 	"google.golang.org/grpc/status"
 )
 
 // ValidateToken reads the token from the request and validates it by contacting the authentication service
-func ValidateToken(authClient api.AuthServiceApiClient) gin.HandlerFunc {
+func ValidateToken(authClient umAPI.UserManagementApiClient) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.MustGet("encodedToken").(string)
-		parsedToken, err := authClient.ValidateJWT(context.Background(), &api.JWTRequest{
+		parsedToken, err := authClient.ValidateJWT(context.Background(), &umAPI.JWTRequest{
 			Token: token,
 		})
 		if err != nil {

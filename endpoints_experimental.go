@@ -1,20 +1,12 @@
 package main
 
 import (
-	"context"
-	"net/http"
-
 	"github.com/gin-gonic/gin"
-	api "github.com/influenzanet/api-gateway/api"
-	mw "github.com/influenzanet/api-gateway/middlewares"
-	"github.com/influenzanet/api-gateway/utils"
-	gjpb "github.com/phev8/gin-protobuf-json-converter"
-	"google.golang.org/grpc/status"
 )
 
 // InitUserEndpoints creates all API routes on the supplied RouterGroup
 func InitExperimentalEndpoints(rg *gin.RouterGroup) {
-	covidAppRoutes := rg.Group("/covidapp")
+	/*covidAppRoutes := rg.Group("/covidapp")
 	{
 		covidAppRoutes.POST("/register-app-user", covidAppRegisterHandl)
 		covidAppRoutes.POST("/login-app-user", covidAppLoginHandl)
@@ -28,9 +20,10 @@ func InitExperimentalEndpoints(rg *gin.RouterGroup) {
 			covidAppStudyRoutes.GET("/fetch-survey-infos", covidAppGetSurveyInfosHandl)
 			covidAppStudyRoutes.POST("/status-report", mw.RequirePayload(), covidAppSubmitStatusReportHandl)
 		}
-	}
+	}*/
 }
 
+/*
 type appCredentials struct {
 	AppToken   string `json:"appToken"`
 	InstanceID string `json:"instanceID"`
@@ -184,3 +177,4 @@ func covidAppSubmitStatusReportHandl(c *gin.Context) {
 
 	gjpb.SendPBAsJSON(c, http.StatusOK, resp)
 }
+*/
