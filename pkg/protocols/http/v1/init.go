@@ -42,7 +42,7 @@ func (h *HttpEndpoints) SendProtoAsJSON(c *gin.Context, statusCode int, pbMsg pr
 	c.Data(statusCode, "application/json; charset=utf-8", b)
 }
 
-func (h *HttpEndpoints) JsonToPb(c *gin.Context, pbObj interface{}) error {
+func (h *HttpEndpoints) JsonToProto(c *gin.Context, pbObj interface{}) error {
 	body, err := ioutil.ReadAll(c.Request.Body)
 	if err != nil {
 		return err

@@ -1,8 +1,24 @@
 package v1
 
+import (
+	"github.com/gin-gonic/gin"
+	mw "github.com/influenzanet/api-gateway/pkg/protocols/http/middlewares"
+)
+
+func (h *HttpEndpoints) AddStudyServiceParticipantAPI(rg *gin.RouterGroup) {
+	studiesGroup := rg.Group("/studies")
+	studiesGroup.Use(mw.ExtractToken())
+	studiesGroup.Use(mw.ValidateToken(h.clients.UserManagement))
+	{
+		studiesGroup.POST("/study/enter", mw.RequirePayload(), h.enterStudyHandl)
+	}
+}
+
 /*
-// initStudyEndpoints creates all API routes on the supplied RouterGroup
-func (h *HttpEndpoints) initStudyEndpoints(rg *gin.RouterGroup) {
+
+	user := rg.Group("/user")
+	user.Use(mw.ExtractToken())
+	user.Use(mw.ValidateToken(h.clients.UserManagement))
 
 		studySystem := rg.Group("/study-system")
 		{

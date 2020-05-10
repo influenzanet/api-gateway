@@ -14,10 +14,11 @@ import (
 
 func (h *HttpEndpoints) loginWithEmailHandl(c *gin.Context) {
 	var req umAPI.LoginWithEmailMsg
-	if err := h.JsonToPb(c, &req); err != nil {
+	if err := h.JsonToProto(c, &req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	req.AsParticipant = true
 
 	token, err := h.clients.UserManagement.LoginWithEmail(context.Background(), &req)
 	if err != nil {
@@ -30,7 +31,7 @@ func (h *HttpEndpoints) loginWithEmailHandl(c *gin.Context) {
 
 func (h *HttpEndpoints) signupWithEmailHandl(c *gin.Context) {
 	var req umAPI.SignupWithEmailMsg
-	if err := h.JsonToPb(c, &req); err != nil {
+	if err := h.JsonToProto(c, &req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -46,7 +47,7 @@ func (h *HttpEndpoints) signupWithEmailHandl(c *gin.Context) {
 func (h *HttpEndpoints) switchProfileHandl(c *gin.Context) {
 	token := c.MustGet("validatedToken").(*umAPI.TokenInfos)
 	var req umAPI.SwitchProfileRequest
-	if err := h.JsonToPb(c, &req); err != nil {
+	if err := h.JsonToProto(c, &req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -62,7 +63,7 @@ func (h *HttpEndpoints) switchProfileHandl(c *gin.Context) {
 
 func (h *HttpEndpoints) tokenRenewHandl(c *gin.Context) {
 	var req umAPI.RefreshJWTRequest
-	if err := h.JsonToPb(c, &req); err != nil {
+	if err := h.JsonToProto(c, &req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -80,7 +81,7 @@ func (h *HttpEndpoints) userPasswordChangeHandl(c *gin.Context) {
 	token := c.MustGet("validatedToken").(*umAPI.TokenInfos)
 
 	var req umAPI.PasswordChangeMsg
-	if err := h.JsonToPb(c, &req); err != nil {
+	if err := h.JsonToProto(c, &req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -100,7 +101,7 @@ func (h *HttpEndpoints) changeAccountEmailHandl(c *gin.Context) {
 	token := c.MustGet("validatedToken").(*umAPI.TokenInfos)
 
 	var req umAPI.EmailChangeMsg
-	if err := h.JsonToPb(c, &req); err != nil {
+	if err := h.JsonToProto(c, &req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -118,7 +119,7 @@ func (h *HttpEndpoints) userSetPreferredLanguageHandl(c *gin.Context) {
 	token := c.MustGet("validatedToken").(*umAPI.TokenInfos)
 
 	var req umAPI.LanguageChangeMsg
-	if err := h.JsonToPb(c, &req); err != nil {
+	if err := h.JsonToProto(c, &req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -156,7 +157,7 @@ func (h *HttpEndpoints) deleteAccountHandl(c *gin.Context) {
 	token := c.MustGet("validatedToken").(*umAPI.TokenInfos)
 
 	var req umAPI.UserReference
-	if err := h.JsonToPb(c, &req); err != nil {
+	if err := h.JsonToProto(c, &req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -175,7 +176,7 @@ func (h *HttpEndpoints) saveProfileHandl(c *gin.Context) {
 	token := c.MustGet("validatedToken").(*umAPI.TokenInfos)
 
 	var req umAPI.ProfileRequest
-	if err := h.JsonToPb(c, &req); err != nil {
+	if err := h.JsonToProto(c, &req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -193,7 +194,7 @@ func (h *HttpEndpoints) removeProfileHandl(c *gin.Context) {
 	token := c.MustGet("validatedToken").(*umAPI.TokenInfos)
 
 	var req umAPI.ProfileRequest
-	if err := h.JsonToPb(c, &req); err != nil {
+	if err := h.JsonToProto(c, &req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -211,7 +212,7 @@ func (h *HttpEndpoints) userUpdateContactPreferencesHandl(c *gin.Context) {
 	token := c.MustGet("validatedToken").(*umAPI.TokenInfos)
 
 	var req umAPI.ContactPreferencesMsg
-	if err := h.JsonToPb(c, &req); err != nil {
+	if err := h.JsonToProto(c, &req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -229,7 +230,7 @@ func (h *HttpEndpoints) userAddEmailHandl(c *gin.Context) {
 	token := c.MustGet("validatedToken").(*umAPI.TokenInfos)
 
 	var req umAPI.ContactInfoMsg
-	if err := h.JsonToPb(c, &req); err != nil {
+	if err := h.JsonToProto(c, &req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -247,7 +248,7 @@ func (h *HttpEndpoints) userRemoveEmailHandl(c *gin.Context) {
 	token := c.MustGet("validatedToken").(*umAPI.TokenInfos)
 
 	var req umAPI.ContactInfoMsg
-	if err := h.JsonToPb(c, &req); err != nil {
+	if err := h.JsonToProto(c, &req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
