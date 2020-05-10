@@ -12,13 +12,30 @@ import (
 	umAPI "github.com/influenzanet/user-management-service/pkg/api"
 )
 
-func (h *HttpEndpoints) loginWithEmailHandl(c *gin.Context) {
+func (h *HttpEndpoints) loginWithEmailAsParticipantHandl(c *gin.Context) {
 	var req umAPI.LoginWithEmailMsg
 	if err := h.JsonToProto(c, &req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	req.AsParticipant = true
+
+	token, err := h.clients.UserManagement.LoginWithEmail(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+	h.SendProtoAsJSON(c, http.StatusOK, token)
+}
+
+func (h *HttpEndpoints) loginWithEmailForManagementHandl(c *gin.Context) {
+	var req umAPI.LoginWithEmailMsg
+	if err := h.JsonToProto(c, &req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	req.AsParticipant = false
 
 	token, err := h.clients.UserManagement.LoginWithEmail(context.Background(), &req)
 	if err != nil {

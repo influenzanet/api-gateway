@@ -29,12 +29,11 @@ func (h *HttpEndpoints) enterStudyHandl(c *gin.Context) {
 	h.SendProtoAsJSON(c, http.StatusOK, resp)
 }
 
-/*
 func (h *HttpEndpoints) studySystemCreateStudyHandl(c *gin.Context) {
-	token := c.MustGet("validatedToken").(*api.TokenInfos)
+	token := utils.ConvertTokenInfosForStudyAPI(c.MustGet("validatedToken").(*umAPI.TokenInfos))
 
-	var req api.NewStudyRequest
-	if err := gjpb.JsonToProto(c, &req); err != nil {
+	var req studyAPI.NewStudyRequest
+	if err := h.JsonToProto(c, &req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -47,9 +46,10 @@ func (h *HttpEndpoints) studySystemCreateStudyHandl(c *gin.Context) {
 		return
 	}
 
-	gjpb.SendPBAsJSON(c, http.StatusOK, resp)
+	h.SendProtoAsJSON(c, http.StatusOK, resp)
 }
 
+/*
 func (h *HttpEndpoints) saveSurveyToStudyHandl(c *gin.Context) {
 	token := c.MustGet("validatedToken").(*api.TokenInfos)
 

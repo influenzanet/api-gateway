@@ -14,6 +14,15 @@ func (h *HttpEndpoints) AddStudyServiceParticipantAPI(rg *gin.RouterGroup) {
 	}
 }
 
+func (h *HttpEndpoints) AddStudyServiceAdminAPI(rg *gin.RouterGroup) {
+	studiesGroup := rg.Group("/studies")
+	studiesGroup.Use(mw.ExtractToken())
+	studiesGroup.Use(mw.ValidateToken(h.clients.UserManagement))
+	{
+		studiesGroup.POST("", mw.RequirePayload(), h.studySystemCreateStudyHandl)
+	}
+}
+
 /*
 
 	user := rg.Group("/user")
