@@ -75,6 +75,8 @@ github.com/google/go-cmp v0.4.0 h1:xsAVV57WRhGj6kEIi8ReJzQlHHqcBYCElAvkovg3B/4=
 github.com/google/go-cmp v0.4.0/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 github.com/google/gofuzz v1.0.0/go.mod h1:dBl0BpW6vV/+mYPU4Po3pmUjxk6FQPldtuIdl/M65Eg=
 github.com/inconshreveable/mousetrap v1.0.0/go.mod h1:PxqpIevigyE2G7u3NXJIT2ANytuPF1OarO4DADm73n8=
+github.com/influenzanet/study-service v0.0.0-20200510114657-9df7a0bd20a5 h1:eUKTWpXauMiFt77hg353rrAieeB80aDHWRoH0dwhR3E=
+github.com/influenzanet/study-service v0.0.0-20200510114657-9df7a0bd20a5/go.mod h1:UXr+UZ/9rJIHu/WIyI5dBNiXlN1xE3Hn6js+A1V/Fzo=
 github.com/influenzanet/user-management-service v0.1.0 h1:nawl0xSKvXdrxnD3DSgc6WkupeD1Av31faNJInwwN0Q=
 github.com/influenzanet/user-management-service v0.1.0/go.mod h1:hzpAlj0vcpZByruRB5IQmjiuiYuAAy2E7tkr9sc1B64=
 github.com/joho/godotenv v1.3.0/go.mod h1:7hK45KPybAkOC6peb+G5yklZfMxEjkZhHbwpqxOKXbg=
@@ -111,8 +113,6 @@ github.com/modern-go/reflect2 v1.0.1 h1:9f412s+6RmYXLWZSEzVVgPGK7C2PphHj5RJrvfx9
 github.com/modern-go/reflect2 v1.0.1/go.mod h1:bx2lNnkwVCuqBIxFjflWJWanXIb3RllmbCylyMrvgv0=
 github.com/montanaflynn/stats v0.0.0-20171201202039-1bf9dbcd8cbe/go.mod h1:wL8QJuTMNUDYhXwkmfOly8iTdp5TEcJFWZD2D7SIkUc=
 github.com/pelletier/go-toml v1.4.0/go.mod h1:PN7xzY2wHTK0K9p34ErDQMlFxa51Fk0OUruD3k1mMwo=
-github.com/phev8/gin-protobuf-json-converter v0.0.0-20191219093956-fc52dbdfcdbf h1:P56pS9xoO2GknpfU97P0JpkiDOncSSwSYUW6oNV8nQk=
-github.com/phev8/gin-protobuf-json-converter v0.0.0-20191219093956-fc52dbdfcdbf/go.mod h1:LqelyFZ+qF9GTnfsnZdfidkwkt34JOL7GXPtfu9WRxc=
 github.com/pkg/errors v0.8.0/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pkg/errors v0.8.1 h1:iURUrRGxPUNPdy5/HRSm+Yj6okJ6UtLINN0Q9M4+h3I=
 github.com/pkg/errors v0.8.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=

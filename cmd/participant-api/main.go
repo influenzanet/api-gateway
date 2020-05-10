@@ -9,12 +9,9 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 
-	"github.com/golang/protobuf/jsonpb"
-
 	"github.com/influenzanet/api-gateway/pkg/models"
 	gc "github.com/influenzanet/api-gateway/pkg/protocols/grpc/clients"
 	v1 "github.com/influenzanet/api-gateway/pkg/protocols/http/v1"
-	gjpb "github.com/phev8/gin-protobuf-json-converter"
 )
 
 // Conf holds all static configuration information
@@ -35,10 +32,6 @@ func init() {
 	if !conf.DebugMode {
 		gin.SetMode(gin.ReleaseMode)
 	}
-
-	gjpb.SetMarshaler(jsonpb.Marshaler{
-		// EmitDefaults: true,
-	})
 }
 
 func healthCheckHandle(c *gin.Context) {
@@ -48,11 +41,11 @@ func healthCheckHandle(c *gin.Context) {
 func main() {
 	umClient, close := gc.ConnectToUserManagement(conf.ServiceURLs.UserManagement)
 	defer close()
-	// Connect to study service
-	/*studyServiceServerConn := connectToStudyServiceServer()
-	defer studyServiceServerConn.Close()
-	clients.StudyService = api.NewStudyServiceApiClient(studyServiceServerConn)*/
+	studyClient, studyServiceClose := gc.ConnectToStudyService(conf.ServiceURLs.StudyService)
+	defer studyServiceClose()
+
 	grpcClients.UserManagement = umClient
+	grpcClients.StudyService = studyClient
 
 	// Start webserver
 	router := gin.Default()

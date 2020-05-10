@@ -14,7 +14,7 @@ import (
 func (h *HttpEndpoints) AddServiceStatusAPI(rg *gin.RouterGroup) {
 	userRoutes := rg.Group("/status")
 	userRoutes.GET("/user-management", h.statusUserMangementServiceHandl)
-	// userRoutes.GET("/study-service", statusStudyServiceHandl)
+	userRoutes.GET("/study-service", h.statusStudyServiceHandl)
 }
 
 func (h *HttpEndpoints) statusUserMangementServiceHandl(c *gin.Context) {
@@ -27,7 +27,6 @@ func (h *HttpEndpoints) statusUserMangementServiceHandl(c *gin.Context) {
 	h.SendProtoAsJSON(c, http.StatusOK, resp)
 }
 
-/*
 func (h *HttpEndpoints) statusStudyServiceHandl(c *gin.Context) {
 	resp, err := h.clients.StudyService.Status(context.Background(), &empty.Empty{})
 	if err != nil {
@@ -35,6 +34,5 @@ func (h *HttpEndpoints) statusStudyServiceHandl(c *gin.Context) {
 		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
 		return
 	}
-	gjpb.SendPBAsJSON(c, http.StatusOK, resp)
+	h.SendProtoAsJSON(c, http.StatusOK, resp)
 }
-*/
