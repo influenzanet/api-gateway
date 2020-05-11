@@ -49,12 +49,11 @@ func (h *HttpEndpoints) studySystemCreateStudyHandl(c *gin.Context) {
 	h.SendProtoAsJSON(c, http.StatusOK, resp)
 }
 
-/*
 func (h *HttpEndpoints) saveSurveyToStudyHandl(c *gin.Context) {
-	token := c.MustGet("validatedToken").(*api.TokenInfos)
+	token := utils.ConvertTokenInfosForStudyAPI(c.MustGet("validatedToken").(*umAPI.TokenInfos))
 
-	var req api.AddSurveyReq
-	if err := gjpb.JsonToProto(c, &req); err != nil {
+	var req studyAPI.AddSurveyReq
+	if err := h.JsonToProto(c, &req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -67,14 +66,14 @@ func (h *HttpEndpoints) saveSurveyToStudyHandl(c *gin.Context) {
 		return
 	}
 
-	gjpb.SendPBAsJSON(c, http.StatusOK, resp)
+	h.SendProtoAsJSON(c, http.StatusOK, resp)
 }
 
 func (h *HttpEndpoints) removeSurveyFromStudyHandl(c *gin.Context) {
-	token := c.MustGet("validatedToken").(*api.TokenInfos)
+	token := utils.ConvertTokenInfosForStudyAPI(c.MustGet("validatedToken").(*umAPI.TokenInfos))
 
-	var req api.SurveyReferenceRequest
-	if err := gjpb.JsonToProto(c, &req); err != nil {
+	var req studyAPI.SurveyReferenceRequest
+	if err := h.JsonToProto(c, &req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -87,14 +86,14 @@ func (h *HttpEndpoints) removeSurveyFromStudyHandl(c *gin.Context) {
 		return
 	}
 
-	gjpb.SendPBAsJSON(c, http.StatusOK, resp)
+	h.SendProtoAsJSON(c, http.StatusOK, resp)
 }
 
 func (h *HttpEndpoints) getAssignedSurveyHandl(c *gin.Context) {
-	token := c.MustGet("validatedToken").(*api.TokenInfos)
+	token := utils.ConvertTokenInfosForStudyAPI(c.MustGet("validatedToken").(*umAPI.TokenInfos))
 
-	var req api.SurveyReferenceRequest
-	if err := gjpb.JsonToProto(c, &req); err != nil {
+	var req studyAPI.SurveyReferenceRequest
+	if err := h.JsonToProto(c, &req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -105,14 +104,14 @@ func (h *HttpEndpoints) getAssignedSurveyHandl(c *gin.Context) {
 		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
 		return
 	}
-	gjpb.SendPBAsJSON(c, http.StatusOK, resp)
+	h.SendProtoAsJSON(c, http.StatusOK, resp)
 }
 
 func (h *HttpEndpoints) submitSurveyResponseHandl(c *gin.Context) {
-	token := c.MustGet("validatedToken").(*api.TokenInfos)
+	token := utils.ConvertTokenInfosForStudyAPI(c.MustGet("validatedToken").(*umAPI.TokenInfos))
 
-	var req api.SubmitResponseReq
-	if err := gjpb.JsonToProto(c, &req); err != nil {
+	var req studyAPI.SubmitResponseReq
+	if err := h.JsonToProto(c, &req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -123,6 +122,5 @@ func (h *HttpEndpoints) submitSurveyResponseHandl(c *gin.Context) {
 		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
 		return
 	}
-	gjpb.SendPBAsJSON(c, http.StatusOK, resp)
+	h.SendProtoAsJSON(c, http.StatusOK, resp)
 }
-*/

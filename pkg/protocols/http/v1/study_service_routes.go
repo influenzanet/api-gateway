@@ -11,6 +11,8 @@ func (h *HttpEndpoints) AddStudyServiceParticipantAPI(rg *gin.RouterGroup) {
 	studiesGroup.Use(mw.ValidateToken(h.clients.UserManagement))
 	{
 		studiesGroup.POST("/study/enter", mw.RequirePayload(), h.enterStudyHandl)
+		studiesGroup.POST("/study/get-assigned-survey", mw.RequirePayload(), h.getAssignedSurveyHandl)
+		studiesGroup.POST("/study/submit-response", mw.RequirePayload(), h.submitSurveyResponseHandl)
 	}
 }
 
@@ -20,31 +22,7 @@ func (h *HttpEndpoints) AddStudyServiceAdminAPI(rg *gin.RouterGroup) {
 	studiesGroup.Use(mw.ValidateToken(h.clients.UserManagement))
 	{
 		studiesGroup.POST("", mw.RequirePayload(), h.studySystemCreateStudyHandl)
+		studiesGroup.POST("/study/save-survey", mw.RequirePayload(), h.saveSurveyToStudyHandl)
+		studiesGroup.POST("/remove-survey", mw.RequirePayload(), h.removeSurveyFromStudyHandl)
 	}
 }
-
-/*
-
-	user := rg.Group("/user")
-	user.Use(mw.ExtractToken())
-	user.Use(mw.ValidateToken(h.clients.UserManagement))
-
-		studySystem := rg.Group("/study-system")
-		{
-			studySystemWithAuth := studySystem.Group("")
-			studySystemWithAuth.Use(mw.ExtractToken())
-			studySystemWithAuth.Use(mw.ValidateToken(clients.AuthService))
-			{
-				studySystemWithAuth.POST("/create-study", mw.RequirePayload(), studySystemCreateStudyHandl)
-
-				studyRoutes := studySystemWithAuth.Group("/study")
-				{
-					studyRoutes.POST("/save-survey", mw.RequirePayload(), saveSurveyToStudyHandl)
-					studyRoutes.POST("/remove-survey", mw.RequirePayload(), removeSurveyFromStudyHandl)
-					studyRoutes.POST("/get-assigned-survey", mw.RequirePayload(), getAssignedSurveyHandl)
-					studyRoutes.POST("/submit-response", mw.RequirePayload(), submitSurveyResponseHandl)
-				}
-			}
-		}
-}
-*/
