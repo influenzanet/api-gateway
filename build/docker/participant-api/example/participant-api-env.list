@@ -1,0 +1,7 @@
+# listen ports:
+GATEWAY_LISTEN_PORT=3231
+DEBUG_MODE=false
+
+# clients:
+ADDR_USER_MANAGEMENT_SERVICE=localhost:5202
+ADDR_STUDY_SERVICE=localhost:5203

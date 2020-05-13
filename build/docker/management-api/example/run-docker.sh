@@ -1,0 +1,1 @@
+docker run --env-file management-api-env.list -p 3232:3232 github.com/influenzanet/management-api:$1

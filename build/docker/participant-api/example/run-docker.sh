@@ -1,0 +1,1 @@
+docker run --env-file participant-api-env.list -p 3231:3231 github.com/influenzanet/participant-api:$1

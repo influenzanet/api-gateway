@@ -1,7 +1,7 @@
 .PHONY: build test docker-participant-api docker-management-api
 
 DOCKER_OPTS ?= --rm
-VERSION := $(shell git describe --tags)
+VERSION := $(shell git describe --tags --abbrev=0)
 
 help:
 	@echo "Service building targets"
