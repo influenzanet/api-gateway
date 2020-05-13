@@ -20,7 +20,7 @@ test:
 	go test $(TEST_ARGS)
 
 docker-participant-api:
-	docker build -t  github.com/influenzanet/participant-api:$(VERSION)  -f build/participant-api/Dockerfile $(DOCKER_OPTS) .
+	docker build -t  github.com/influenzanet/participant-api:$(VERSION)  -f build/docker/participant-api/Dockerfile $(DOCKER_OPTS) .
 
 docker-management-api:
-	docker build -t  github.com/influenzanet/management-api:$(VERSION)  -f build/management-api/Dockerfile $(DOCKER_OPTS) .
+	docker build -t  github.com/influenzanet/management-api:$(VERSION)  -f build/docker/management-api/Dockerfile $(DOCKER_OPTS) .

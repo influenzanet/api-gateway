@@ -11,7 +11,7 @@ COPY go.mod .
 COPY go.sum .
 RUN go mod download
 COPY . .
-WORKDIR /go/src/github.com/influenzanet/api-gateway/cmd/participant-api
+WORKDIR /go/src/github.com/influenzanet/api-gateway/cmd/management-api
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o app .
 
 ##########################
@@ -20,7 +20,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags '-extldflag
 FROM scratch
 # we need those on scratch for connecting to mongoDB:
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=builder /go/src/github.com/influenzanet/api-gateway/cmd/participant-api/app /app/
+COPY --from=builder /go/src/github.com/influenzanet/api-gateway/cmd/management-api/app /app/
 WORKDIR /app
-EXPOSE 3231:3131
+EXPOSE 3232:3232
 CMD ["./app"]
