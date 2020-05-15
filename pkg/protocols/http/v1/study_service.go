@@ -142,3 +142,16 @@ func (h *HttpEndpoints) submitSurveyResponseHandl(c *gin.Context) {
 	}
 	h.SendProtoAsJSON(c, http.StatusOK, resp)
 }
+
+func (h *HttpEndpoints) getAllAssignedSurveysHandl(c *gin.Context) {
+	token := utils.ConvertTokenInfosForStudyAPI(c.MustGet("validatedToken").(*umAPI.TokenInfos))
+
+	resp, err := h.clients.StudyService.GetAssignedSurveys(context.Background(), token)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+
+	h.SendProtoAsJSON(c, http.StatusOK, resp)
+}
