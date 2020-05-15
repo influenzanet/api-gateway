@@ -346,3 +346,17 @@ func (h *HttpEndpoints) userRemoveRoleHandl(c *gin.Context) {
 	}
 	h.SendProtoAsJSON(c, http.StatusOK, resp)
 }
+
+func (h *HttpEndpoints) revokeRefreshTokensHandl(c *gin.Context) {
+	token := c.MustGet("validatedToken").(*umAPI.TokenInfos)
+
+	var req umAPI.RevokeRefreshTokensReq
+	req.Token = token
+	resp, err := h.clients.UserManagement.RevokeAllRefreshTokens(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+	h.SendProtoAsJSON(c, http.StatusOK, resp)
+}

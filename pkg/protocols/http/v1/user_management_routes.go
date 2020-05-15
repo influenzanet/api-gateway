@@ -20,6 +20,7 @@ func (h *HttpEndpoints) AddUserManagementParticipantAPI(rg *gin.RouterGroup) {
 		// userToken.GET("/:id", getUserHandl)
 		user.POST("/change-password", mw.RequirePayload(), h.userPasswordChangeHandl)
 		user.POST("/change-account-email", mw.RequirePayload(), h.changeAccountEmailHandl)
+		user.POST("/revoke-refresh-tokens", h.revokeRefreshTokensHandl)
 		user.POST("/set-language", mw.RequirePayload(), h.userSetPreferredLanguageHandl)
 		user.POST("/delete", mw.RequirePayload(), h.deleteAccountHandl)
 
