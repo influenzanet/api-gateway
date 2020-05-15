@@ -278,3 +278,71 @@ func (h *HttpEndpoints) userRemoveEmailHandl(c *gin.Context) {
 	}
 	h.SendProtoAsJSON(c, http.StatusOK, resp)
 }
+
+func (h *HttpEndpoints) createUserHandl(c *gin.Context) {
+	token := c.MustGet("validatedToken").(*umAPI.TokenInfos)
+
+	var req umAPI.CreateUserReq
+	if err := h.JsonToProto(c, &req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	req.Token = token
+	resp, err := h.clients.UserManagement.CreateUser(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+	h.SendProtoAsJSON(c, http.StatusOK, resp)
+}
+
+func (h *HttpEndpoints) findNonParticipantUsersHandl(c *gin.Context) {
+	token := c.MustGet("validatedToken").(*umAPI.TokenInfos)
+
+	var req umAPI.FindNonParticipantUsersMsg
+	req.Token = token
+	resp, err := h.clients.UserManagement.FindNonParticipantUsers(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+	h.SendProtoAsJSON(c, http.StatusOK, resp)
+}
+
+func (h *HttpEndpoints) userAddRoleHandl(c *gin.Context) {
+	token := c.MustGet("validatedToken").(*umAPI.TokenInfos)
+
+	var req umAPI.RoleMsg
+	if err := h.JsonToProto(c, &req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	req.Token = token
+	resp, err := h.clients.UserManagement.AddRoleForUser(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+	h.SendProtoAsJSON(c, http.StatusOK, resp)
+}
+
+func (h *HttpEndpoints) userRemoveRoleHandl(c *gin.Context) {
+	token := c.MustGet("validatedToken").(*umAPI.TokenInfos)
+
+	var req umAPI.RoleMsg
+	if err := h.JsonToProto(c, &req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	req.Token = token
+	resp, err := h.clients.UserManagement.RemoveRoleForUser(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+	h.SendProtoAsJSON(c, http.StatusOK, resp)
+}
