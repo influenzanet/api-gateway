@@ -15,7 +15,7 @@ func (h *HttpEndpoints) AddStudyServiceParticipantAPI(rg *gin.RouterGroup) {
 		studiesGroup.POST("/study/submit-response", mw.RequirePayload(), h.submitSurveyResponseHandl)
 		studiesGroup.POST("/study/postpone-survey", mw.RequirePayload(), h.postponeSurveyHandl)
 
-		studiesGroup.GET("/get-all-assigned-surveys", mw.RequirePayload(), h.getAllAssignedSurveysHandl)
+		studiesGroup.GET("/all-assigned-surveys", h.getAllAssignedSurveysHandl)
 	}
 }
 
