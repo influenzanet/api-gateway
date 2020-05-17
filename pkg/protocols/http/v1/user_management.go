@@ -29,6 +29,22 @@ func (h *HttpEndpoints) loginWithEmailAsParticipantHandl(c *gin.Context) {
 	h.SendProtoAsJSON(c, http.StatusOK, token)
 }
 
+func (h *HttpEndpoints) loginWithTemptokenHandl(c *gin.Context) {
+	var req umAPI.JWTRequest
+	if err := h.JsonToProto(c, &req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	token, err := h.clients.UserManagement.LoginWithTempToken(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+	h.SendProtoAsJSON(c, http.StatusOK, token)
+}
+
 func (h *HttpEndpoints) loginWithEmailForManagementHandl(c *gin.Context) {
 	var req umAPI.LoginWithEmailMsg
 	if err := h.JsonToProto(c, &req); err != nil {
