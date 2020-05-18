@@ -8,7 +8,7 @@ require (
 	github.com/golang/protobuf v1.4.2
 	github.com/google/go-cmp v0.4.1 // indirect
 	github.com/influenzanet/study-service v0.3.0
-	github.com/influenzanet/user-management-service v0.3.0
+	github.com/influenzanet/user-management-service v0.4.0-alpha
 	github.com/kr/text v0.2.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.1 // indirect

@@ -376,3 +376,48 @@ func (h *HttpEndpoints) revokeRefreshTokensHandl(c *gin.Context) {
 	}
 	h.SendProtoAsJSON(c, http.StatusOK, resp)
 }
+
+func (h *HttpEndpoints) initiatePasswordResetHandl(c *gin.Context) {
+	var req umAPI.InitiateResetPasswordMsg
+	if err := h.JsonToProto(c, &req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	resp, err := h.clients.UserManagement.InitiatePasswordReset(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+	h.SendProtoAsJSON(c, http.StatusOK, resp)
+}
+
+func (h *HttpEndpoints) getInfosForPasswordResetHandl(c *gin.Context) {
+	var req umAPI.GetInfosForResetPasswordMsg
+	if err := h.JsonToProto(c, &req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	resp, err := h.clients.UserManagement.GetInfosForPasswordReset(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+	h.SendProtoAsJSON(c, http.StatusOK, resp)
+}
+
+func (h *HttpEndpoints) passwordResetHandl(c *gin.Context) {
+	var req umAPI.ResetPasswordMsg
+	if err := h.JsonToProto(c, &req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	resp, err := h.clients.UserManagement.ResetPassword(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+	h.SendProtoAsJSON(c, http.StatusOK, resp)
+}
