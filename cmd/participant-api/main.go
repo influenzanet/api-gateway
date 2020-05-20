@@ -29,6 +29,7 @@ func init() {
 	grpcClients = &models.APIClients{}
 
 	initConfig()
+	log.Println(conf)
 	if !conf.DebugMode {
 		gin.SetMode(gin.ReleaseMode)
 	}
