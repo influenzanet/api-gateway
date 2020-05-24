@@ -23,6 +23,7 @@ func initConfig() {
 	conf.Port = os.Getenv("MANAGEMENT_API_GATEWAY_LISTEN_PORT")
 	conf.ServiceURLs.UserManagement = os.Getenv("ADDR_USER_MANAGEMENT_SERVICE")
 	conf.ServiceURLs.StudyService = os.Getenv("ADDR_STUDY_SERVICE")
+	conf.ServiceURLs.MessagingService = os.Getenv("ADDR_MESSAGING_SERVICE")
 }
 
 func init() {
@@ -43,15 +44,18 @@ func main() {
 	defer close()
 	studyClient, studyServiceClose := gc.ConnectToStudyService(conf.ServiceURLs.StudyService)
 	defer studyServiceClose()
+	messagingClient, messagingServiceClose := gc.ConnectToMessagingService(conf.ServiceURLs.MessagingService)
+	defer messagingServiceClose()
 
 	grpcClients.UserManagement = umClient
 	grpcClients.StudyService = studyClient
+	grpcClients.MessagingService = messagingClient
 
 	// Start webserver
 	router := gin.Default()
 	router.Use(cors.New(cors.Config{
 		AllowAllOrigins: true,
-		// AllowOrigins:     []string{"https://inxp.de", "http://localhost:4200", "https://-1539512783514.firebaseapp.com"},
+		// AllowOrigins:     []string{"http://localhost:4200"},
 		AllowMethods:     []string{"POST", "GET", "PUT"},
 		AllowHeaders:     []string{"Origin", "Authorization", "Content-Type", "Content-Length"},
 		ExposeHeaders:    []string{"Authorization", "Content-Type", "Content-Length"},
@@ -65,6 +69,7 @@ func main() {
 	v1APIHandlers.AddServiceStatusAPI(v1Root)
 	v1APIHandlers.AddUserManagementAdminAPI(v1Root)
 	v1APIHandlers.AddStudyServiceAdminAPI(v1Root)
+	v1APIHandlers.AddMessagingServiceAdminAPI(v1Root)
 
 	log.Printf("gateway listening on port %s", conf.Port)
 	log.Fatal(router.Run(":" + conf.Port))

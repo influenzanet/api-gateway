@@ -52,7 +52,7 @@ func main() {
 	router := gin.Default()
 	router.Use(cors.New(cors.Config{
 		AllowAllOrigins: true,
-		// AllowOrigins:     []string{"https://inxp.de", "http://localhost:4200", "https://-1539512783514.firebaseapp.com"},
+		// AllowOrigins:     []string{"http://localhost:4200", "https://-1539512783514.firebaseapp.com"},
 		AllowMethods:     []string{"POST", "GET", "PUT"},
 		AllowHeaders:     []string{"Origin", "Authorization", "Content-Type", "Content-Length"},
 		ExposeHeaders:    []string{"Authorization", "Content-Type", "Content-Length"},
