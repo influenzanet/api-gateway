@@ -421,3 +421,35 @@ func (h *HttpEndpoints) passwordResetHandl(c *gin.Context) {
 	}
 	h.SendProtoAsJSON(c, http.StatusOK, resp)
 }
+
+func (h *HttpEndpoints) verifyUserContactHandl(c *gin.Context) {
+	var req umAPI.TempToken
+	if err := h.JsonToProto(c, &req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	resp, err := h.clients.UserManagement.VerifyContact(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+	h.SendProtoAsJSON(c, http.StatusOK, resp)
+}
+
+func (h *HttpEndpoints) resendContanctVerificationEmailHandl(c *gin.Context) {
+	token := c.MustGet("validatedToken").(*umAPI.TokenInfos)
+	var req umAPI.ResendContactVerificationReq
+	if err := h.JsonToProto(c, &req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	req.Token = token
+	resp, err := h.clients.UserManagement.ResendContactVerification(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+	h.SendProtoAsJSON(c, http.StatusOK, resp)
+}
