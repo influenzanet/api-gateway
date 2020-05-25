@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -24,6 +25,7 @@ func initConfig() {
 	conf.ServiceURLs.UserManagement = os.Getenv("ADDR_USER_MANAGEMENT_SERVICE")
 	conf.ServiceURLs.StudyService = os.Getenv("ADDR_STUDY_SERVICE")
 	conf.ServiceURLs.MessagingService = os.Getenv("ADDR_MESSAGING_SERVICE")
+	conf.AllowOrigins = strings.Split(os.Getenv("CORS_ALLOW_ORIGINS"), ",")
 }
 
 func init() {
@@ -54,8 +56,8 @@ func main() {
 	// Start webserver
 	router := gin.Default()
 	router.Use(cors.New(cors.Config{
-		AllowAllOrigins: true,
-		// AllowOrigins:     []string{"http://localhost:4200"},
+		// AllowAllOrigins: true,
+		AllowOrigins:     conf.AllowOrigins,
 		AllowMethods:     []string{"POST", "GET", "PUT"},
 		AllowHeaders:     []string{"Origin", "Authorization", "Content-Type", "Content-Length"},
 		ExposeHeaders:    []string{"Authorization", "Content-Type", "Content-Length"},

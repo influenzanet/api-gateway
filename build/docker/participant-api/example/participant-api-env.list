@@ -1,6 +1,7 @@
 # listen ports:
 GATEWAY_LISTEN_PORT=3231
 DEBUG_MODE=false
+CORS_ALLOW_ORIGINS=https://your-domain.tld,https://test-domain.tld
 
 # clients:
 ADDR_USER_MANAGEMENT_SERVICE=localhost:5202
