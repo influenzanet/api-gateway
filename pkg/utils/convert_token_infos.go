@@ -17,6 +17,7 @@ func ConvertTokenInfosForStudyAPI(t *umAPI.TokenInfos) *studyAPI.TokenInfos {
 		IssuedAt:         t.IssuedAt,
 		Payload:          t.Payload,
 		ProfilId:         t.ProfilId,
+		OtherProfileIds:  t.OtherProfileIds,
 	}
 }
 

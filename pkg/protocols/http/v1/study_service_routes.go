@@ -10,12 +10,17 @@ func (h *HttpEndpoints) AddStudyServiceParticipantAPI(rg *gin.RouterGroup) {
 	studiesGroup.Use(mw.ExtractToken())
 	studiesGroup.Use(mw.ValidateToken(h.clients.UserManagement))
 	{
+		studiesGroup.GET("/for-user-profiles", h.getStudiesForUserHandl)
+		studiesGroup.GET("/active", h.getAllActiveStudiesHandl)
+		studiesGroup.POST("/study/get-survey-infos", mw.RequirePayload(), h.getStudySurveyInfosHandl)
+
 		studiesGroup.POST("/study/enter", mw.RequirePayload(), h.enterStudyHandl)
 		studiesGroup.POST("/study/get-assigned-survey", mw.RequirePayload(), h.getAssignedSurveyHandl)
 		studiesGroup.POST("/study/submit-response", mw.RequirePayload(), h.submitSurveyResponseHandl)
 		studiesGroup.POST("/study/postpone-survey", mw.RequirePayload(), h.postponeSurveyHandl)
 		studiesGroup.POST("/study/leave", mw.RequirePayload(), h.leaveStudyHandl)
 
+		// all surveys accross studies:
 		studiesGroup.GET("/all-assigned-surveys", h.getAllAssignedSurveysHandl)
 	}
 }
