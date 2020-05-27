@@ -13,5 +13,7 @@ func (h *HttpEndpoints) AddMessagingServiceAdminAPI(rg *gin.RouterGroup) {
 		messagingGroup.GET("/email-templates", h.getEmailTemplatesHandl)
 		messagingGroup.POST("/email-templates/save", mw.RequirePayload(), h.saveEmailTemplateHandl)
 		messagingGroup.POST("/email-templates/delete", mw.RequirePayload(), h.deleteEmailTemplateHandl)
+
+		messagingGroup.POST("/send-message/all-users", mw.RequirePayload(), h.sendMessageToAllUsersHandl)
 	}
 }
