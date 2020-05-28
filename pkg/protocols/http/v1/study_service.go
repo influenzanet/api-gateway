@@ -253,3 +253,22 @@ func (h *HttpEndpoints) getStudyHandl(c *gin.Context) {
 
 	h.SendProtoAsJSON(c, http.StatusOK, resp)
 }
+
+func (h *HttpEndpoints) getSurveyDefForStudyHandl(c *gin.Context) {
+	token := utils.ConvertTokenInfosForStudyAPI(c.MustGet("validatedToken").(*umAPI.TokenInfos))
+
+	var req studyAPI.SurveyReferenceRequest
+	if err := h.JsonToProto(c, &req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	req.Token = token
+	resp, err := h.clients.StudyService.GetSurveyDefForStudy(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+
+	h.SendProtoAsJSON(c, http.StatusOK, resp)
+}
