@@ -31,6 +31,8 @@ func (h *HttpEndpoints) AddStudyServiceAdminAPI(rg *gin.RouterGroup) {
 	studiesGroup.Use(mw.ValidateToken(h.clients.UserManagement))
 	{
 		studiesGroup.POST("", mw.RequirePayload(), h.studySystemCreateStudyHandl)
+		studiesGroup.GET("", h.getAllStudiesHandl)
+		studiesGroup.POST("/study/get", mw.RequirePayload(), h.getStudyHandl)
 		studiesGroup.POST("/study/save-survey", mw.RequirePayload(), h.saveSurveyToStudyHandl)
 		studiesGroup.POST("/study/remove-survey", mw.RequirePayload(), h.removeSurveyFromStudyHandl)
 	}
