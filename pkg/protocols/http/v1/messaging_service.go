@@ -61,6 +61,56 @@ func (h *HttpEndpoints) deleteEmailTemplateHandl(c *gin.Context) {
 	h.SendProtoAsJSON(c, http.StatusOK, resp)
 }
 
+func (h *HttpEndpoints) getAutoMessagesHandl(c *gin.Context) {
+	token := utils.ConvertTokenInfosForMessageAPI(c.MustGet("validatedToken").(*umAPI.TokenInfos))
+
+	var req messageAPI.GetAutoMessagesReq
+	req.Token = token
+	resp, err := h.clients.MessagingService.GetAutoMessages(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+	h.SendProtoAsJSON(c, http.StatusOK, resp)
+}
+
+func (h *HttpEndpoints) saveAutoMessageHandl(c *gin.Context) {
+	token := utils.ConvertTokenInfosForMessageAPI(c.MustGet("validatedToken").(*umAPI.TokenInfos))
+
+	var req messageAPI.SaveAutoMessageReq
+	if err := h.JsonToProto(c, &req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	req.Token = token
+	resp, err := h.clients.MessagingService.SaveAutoMessage(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+	h.SendProtoAsJSON(c, http.StatusOK, resp)
+}
+
+func (h *HttpEndpoints) deleteAutoMessageHandl(c *gin.Context) {
+	token := utils.ConvertTokenInfosForMessageAPI(c.MustGet("validatedToken").(*umAPI.TokenInfos))
+
+	var req messageAPI.DeleteAutoMessageReq
+	if err := h.JsonToProto(c, &req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	req.Token = token
+	resp, err := h.clients.MessagingService.DeleteAutoMessage(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+	h.SendProtoAsJSON(c, http.StatusOK, resp)
+}
+
 func (h *HttpEndpoints) sendMessageToAllUsersHandl(c *gin.Context) {
 	token := utils.ConvertTokenInfosForMessageAPI(c.MustGet("validatedToken").(*umAPI.TokenInfos))
 
