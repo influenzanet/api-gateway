@@ -17,7 +17,7 @@ func (h *HttpEndpoints) AddUserManagementParticipantAPI(rg *gin.RouterGroup) {
 	user.Use(mw.ExtractToken())
 	user.Use(mw.ValidateToken(h.clients.UserManagement))
 	{
-		user.GET("/", h.getUserHandl)
+		user.GET("", h.getUserHandl)
 		// userToken.GET("/:id", getUserHandl)
 		user.POST("/change-password", mw.RequirePayload(), h.userPasswordChangeHandl)
 		user.POST("/change-account-email", mw.RequirePayload(), h.changeAccountEmailHandl)
