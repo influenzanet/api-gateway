@@ -2,10 +2,14 @@ package v1
 
 import (
 	"context"
+	"io"
+	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/influenzanet/api-gateway/pkg/utils"
+	"github.com/influenzanet/study-service/pkg/api"
 	studyAPI "github.com/influenzanet/study-service/pkg/api"
 	umAPI "github.com/influenzanet/user-management-service/pkg/api"
 	"google.golang.org/grpc/status"
@@ -271,4 +275,86 @@ func (h *HttpEndpoints) getSurveyDefForStudyHandl(c *gin.Context) {
 	}
 
 	h.SendProtoAsJSON(c, http.StatusOK, resp)
+}
+
+func (h *HttpEndpoints) getSurveyResponseStatisticsHandl(c *gin.Context) {
+	token := utils.ConvertTokenInfosForStudyAPI(c.MustGet("validatedToken").(*umAPI.TokenInfos))
+
+	var req studyAPI.SurveyResponseQuery
+	studyKey := c.Param("studyKey")
+	req.StudyKey = studyKey
+	from := c.DefaultQuery("from", "")
+	if len(from) > 0 {
+		n, err := strconv.ParseInt(from, 10, 64)
+		if err == nil {
+			req.From = n
+		}
+	}
+	until := c.DefaultQuery("until", "")
+	if len(from) > 0 {
+		n, err := strconv.ParseInt(until, 10, 64)
+		if err == nil {
+			req.From = n
+		}
+	}
+
+	req.Token = token
+	resp, err := h.clients.StudyService.GetStudyResponseStatistics(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+	h.SendProtoAsJSON(c, http.StatusOK, resp)
+}
+
+type Responses struct {
+	Responses []*api.SurveyResponse "json:'responses'"
+}
+
+func (h *HttpEndpoints) getSurveyResponsesHandl(c *gin.Context) {
+	token := utils.ConvertTokenInfosForStudyAPI(c.MustGet("validatedToken").(*umAPI.TokenInfos))
+
+	var req studyAPI.SurveyResponseQuery
+	studyKey := c.Param("studyKey")
+	req.StudyKey = studyKey
+	from := c.DefaultQuery("from", "")
+	if len(from) > 0 {
+		n, err := strconv.ParseInt(from, 10, 64)
+		if err == nil {
+			req.From = n
+		}
+	}
+	until := c.DefaultQuery("until", "")
+	if len(from) > 0 {
+		n, err := strconv.ParseInt(until, 10, 64)
+		if err == nil {
+			req.From = n
+		}
+	}
+
+	req.Token = token
+	stream, err := h.clients.StudyService.StreamStudyResponses(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+
+	resps := Responses{
+		Responses: []*api.SurveyResponse{},
+	}
+	for {
+		r, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			log.Printf("getSurveyResponsesHandl(_) = _, %v", err)
+			break
+		}
+		resps.Responses = append(resps.Responses, r)
+
+	}
+	h.SendProtoAsJSON(c, http.StatusOK, resps)
 }
