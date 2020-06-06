@@ -308,16 +308,13 @@ func (h *HttpEndpoints) getSurveyResponseStatisticsHandl(c *gin.Context) {
 	h.SendProtoAsJSON(c, http.StatusOK, resp)
 }
 
-type Responses struct {
-	Responses []*api.SurveyResponse "json:'responses'"
-}
-
 func (h *HttpEndpoints) getSurveyResponsesHandl(c *gin.Context) {
 	token := utils.ConvertTokenInfosForStudyAPI(c.MustGet("validatedToken").(*umAPI.TokenInfos))
 
 	var req studyAPI.SurveyResponseQuery
 	studyKey := c.Param("studyKey")
 	req.StudyKey = studyKey
+	req.SurveyKey = c.DefaultQuery("surveyKey", "")
 	from := c.DefaultQuery("from", "")
 	if len(from) > 0 {
 		n, err := strconv.ParseInt(from, 10, 64)
@@ -326,10 +323,10 @@ func (h *HttpEndpoints) getSurveyResponsesHandl(c *gin.Context) {
 		}
 	}
 	until := c.DefaultQuery("until", "")
-	if len(from) > 0 {
+	if len(until) > 0 {
 		n, err := strconv.ParseInt(until, 10, 64)
 		if err == nil {
-			req.From = n
+			req.Until = n
 		}
 	}
 
@@ -341,7 +338,7 @@ func (h *HttpEndpoints) getSurveyResponsesHandl(c *gin.Context) {
 		return
 	}
 
-	resps := Responses{
+	resps := &api.SurveyResponses{
 		Responses: []*api.SurveyResponse{},
 	}
 	for {

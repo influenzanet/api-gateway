@@ -87,8 +87,10 @@ github.com/influenzanet/messaging-service v0.5.1 h1:F9M8oBt/Gv4zALbI1UkUdLYENOKh
 github.com/influenzanet/messaging-service v0.5.1/go.mod h1:sgh1Fx0mdoBUrv0rK2IeiqGuBNQ5Hod5ROfvb1SpKUU=
 github.com/influenzanet/study-service v0.5.0 h1:nhO5m7RpUUGMa381lNnpu7LOJmMQbg1ZDlrSCgGvm0A=
 github.com/influenzanet/study-service v0.5.0/go.mod h1:UXr+UZ/9rJIHu/WIyI5dBNiXlN1xE3Hn6js+A1V/Fzo=
-github.com/influenzanet/study-service v0.6.0 h1:6n7JAbnFGpIymuEWOvhkLda48BzeGD8/yy23uA+ImG8=
-github.com/influenzanet/study-service v0.6.0/go.mod h1:S/inqN3mSNT0cQ3xgi8upUEXWzBIxn6CirfXzhuLZsw=
+github.com/influenzanet/study-service v0.6.1 h1:kjm+pavkdrB5LnmB+kX4ZtMUJXnGx9YMHZCNSaVTo9Y=
+github.com/influenzanet/study-service v0.6.1/go.mod h1:S/inqN3mSNT0cQ3xgi8upUEXWzBIxn6CirfXzhuLZsw=
+github.com/influenzanet/study-service v0.6.2 h1:kBsCnfuC8WDpWkZmpsaqxg++aFVkReFK4DT+uf/DCsM=
+github.com/influenzanet/study-service v0.6.2/go.mod h1:S/inqN3mSNT0cQ3xgi8upUEXWzBIxn6CirfXzhuLZsw=
 github.com/influenzanet/user-management-service v0.4.0-alpha h1:rZjpe41kdW/1jElh6rWXhAqByezW7QtX+XYBTShXlLM=
 github.com/influenzanet/user-management-service v0.4.0-alpha/go.mod h1:hzpAlj0vcpZByruRB5IQmjiuiYuAAy2E7tkr9sc1B64=
 github.com/influenzanet/user-management-service v0.6.0 h1:0ck/UfAzM+biMpIv69L+BQZRTqwdlXk4trlt5I7J5V4=
