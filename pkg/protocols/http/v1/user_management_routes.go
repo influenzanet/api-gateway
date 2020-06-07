@@ -41,6 +41,7 @@ func (h *HttpEndpoints) AddUserManagementParticipantAPI(rg *gin.RouterGroup) {
 		unAuthUser.POST("/password-reset/reset-with", mw.RequirePayload(), h.passwordResetHandl)
 
 		unAuthUser.POST("/contact-verification", mw.RequirePayload(), h.verifyUserContactHandl)
+		unAuthUser.GET("/unsubscribe-newsletter", h.unsubscribeNewsletterHandl)
 	}
 }
 

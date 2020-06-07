@@ -453,3 +453,15 @@ func (h *HttpEndpoints) resendContanctVerificationEmailHandl(c *gin.Context) {
 	}
 	h.SendProtoAsJSON(c, http.StatusOK, resp)
 }
+
+func (h *HttpEndpoints) unsubscribeNewsletterHandl(c *gin.Context) {
+	var req umAPI.TempToken
+	req.Token = c.DefaultQuery("token", "")
+	resp, err := h.clients.UserManagement.UseUnsubscribeToken(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+	h.SendProtoAsJSON(c, http.StatusOK, resp)
+}
