@@ -43,17 +43,17 @@ func (h *HttpEndpoints) AddStudyServiceAdminAPI(rg *gin.RouterGroup) {
 	studyGroup.Use(mw.ExtractToken())
 	studyGroup.Use(mw.ValidateToken(h.clients.UserManagement))
 	{
-		studiesGroup.POST("/:studyKey/get", mw.RequirePayload(), h.getStudyHandl)
-		studiesGroup.POST("/:studyKey/get-survey", mw.RequirePayload(), h.getSurveyDefForStudyHandl)
-		studiesGroup.POST("/:studyKey/save-survey", mw.RequirePayload(), h.saveSurveyToStudyHandl)
-		studiesGroup.POST("/:studyKey/remove-survey", mw.RequirePayload(), h.removeSurveyFromStudyHandl)
+		studyGroup.GET("/:studyKey", h.getStudyHandl)
+		studyGroup.GET("/:studyKey/survey/:surveyKey", mw.RequirePayload(), h.getSurveyDefForStudyHandl)
+		studyGroup.POST("/:studyKey/save-survey", mw.RequirePayload(), h.saveSurveyToStudyHandl)
+		studyGroup.POST("/:studyKey/remove-survey", mw.RequirePayload(), h.removeSurveyFromStudyHandl)
 
-		studiesGroup.POST("/:studyKey/save-member", mw.RequirePayload(), h.studySaveMemberHandl)
-		studiesGroup.POST("/:studyKey/remove-member", mw.RequirePayload(), h.studyRemoveMemberHandl)
-		studiesGroup.POST("/:studyKey/rules", mw.RequirePayload(), h.saveStudyRulesHandl)
-		studiesGroup.POST("/:studyKey/status", mw.RequirePayload(), h.saveStudyStatusHandl)
-		studiesGroup.POST("/:studyKey/props", mw.RequirePayload(), h.saveStudyPropsHandl)
-		studiesGroup.POST("/:studyKey/delete", mw.RequirePayload(), h.deleteStudyHandl)
+		studyGroup.POST("/:studyKey/save-member", mw.RequirePayload(), h.studySaveMemberHandl)
+		studyGroup.POST("/:studyKey/remove-member", mw.RequirePayload(), h.studyRemoveMemberHandl)
+		studyGroup.POST("/:studyKey/rules", mw.RequirePayload(), h.saveStudyRulesHandl)
+		studyGroup.POST("/:studyKey/status", mw.RequirePayload(), h.saveStudyStatusHandl)
+		studyGroup.POST("/:studyKey/props", mw.RequirePayload(), h.saveStudyPropsHandl)
+		studyGroup.DELETE("/:studyKey", mw.RequirePayload(), h.deleteStudyHandl)
 	}
 
 	responsesGroup := rg.Group("/data/:studyKey")

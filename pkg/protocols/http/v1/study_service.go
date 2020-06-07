@@ -82,6 +82,7 @@ func (h *HttpEndpoints) saveSurveyToStudyHandl(c *gin.Context) {
 		return
 	}
 	req.Token = token
+	req.StudyKey = c.Param("studyKey")
 
 	resp, err := h.clients.StudyService.SaveSurveyToStudy(context.Background(), &req)
 	if err != nil {
@@ -102,6 +103,7 @@ func (h *HttpEndpoints) removeSurveyFromStudyHandl(c *gin.Context) {
 		return
 	}
 	req.Token = token
+	req.StudyKey = c.Param("studyKey")
 
 	resp, err := h.clients.StudyService.RemoveSurveyFromStudy(context.Background(), &req)
 	if err != nil {
@@ -242,10 +244,7 @@ func (h *HttpEndpoints) getStudyHandl(c *gin.Context) {
 	token := utils.ConvertTokenInfosForStudyAPI(c.MustGet("validatedToken").(*umAPI.TokenInfos))
 
 	var req studyAPI.StudyReferenceReq
-	if err := h.JsonToProto(c, &req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
+	req.StudyKey = c.Param("studyKey")
 	req.Token = token
 	resp, err := h.clients.StudyService.GetStudy(context.Background(), &req)
 	if err != nil {
@@ -266,6 +265,8 @@ func (h *HttpEndpoints) getSurveyDefForStudyHandl(c *gin.Context) {
 		return
 	}
 	req.Token = token
+	req.StudyKey = c.Param("studyKey")
+	req.SurveyKey = c.Param("surveyKey")
 	resp, err := h.clients.StudyService.GetSurveyDefForStudy(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
@@ -285,6 +286,7 @@ func (h *HttpEndpoints) studySaveMemberHandl(c *gin.Context) {
 		return
 	}
 	req.Token = token
+	req.StudyKey = c.Param("studyKey")
 	resp, err := h.clients.StudyService.SaveStudyMember(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
@@ -302,6 +304,7 @@ func (h *HttpEndpoints) studyRemoveMemberHandl(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	req.StudyKey = c.Param("studyKey")
 	req.Token = token
 	resp, err := h.clients.StudyService.RemoveStudyMember(context.Background(), &req)
 	if err != nil {
@@ -321,6 +324,7 @@ func (h *HttpEndpoints) saveStudyRulesHandl(c *gin.Context) {
 		return
 	}
 	req.Token = token
+	req.StudyKey = c.Param("studyKey")
 	resp, err := h.clients.StudyService.SaveStudyRules(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
@@ -339,6 +343,7 @@ func (h *HttpEndpoints) saveStudyStatusHandl(c *gin.Context) {
 		return
 	}
 	req.Token = token
+	req.StudyKey = c.Param("studyKey")
 	resp, err := h.clients.StudyService.SaveStudyStatus(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
@@ -357,6 +362,7 @@ func (h *HttpEndpoints) saveStudyPropsHandl(c *gin.Context) {
 		return
 	}
 	req.Token = token
+	req.StudyKey = c.Param("studyKey")
 	resp, err := h.clients.StudyService.SaveStudyProps(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
@@ -375,6 +381,7 @@ func (h *HttpEndpoints) deleteStudyHandl(c *gin.Context) {
 		return
 	}
 	req.Token = token
+	req.StudyKey = c.Param("studyKey")
 	resp, err := h.clients.StudyService.DeleteStudy(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
