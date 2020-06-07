@@ -23,6 +23,7 @@ func (h *HttpEndpoints) enterStudyHandl(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	req.StudyKey = c.Param("studyKey")
 	req.Token = token
 	resp, err := h.clients.StudyService.EnterStudy(context.Background(), &req)
 	if err != nil {
@@ -42,6 +43,7 @@ func (h *HttpEndpoints) postponeSurveyHandl(c *gin.Context) {
 		return
 	}
 	req.Token = token
+	req.StudyKey = c.Param("studyKey")
 	resp, err := h.clients.StudyService.PostponeSurvey(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
@@ -115,11 +117,9 @@ func (h *HttpEndpoints) getAssignedSurveyHandl(c *gin.Context) {
 	token := utils.ConvertTokenInfosForStudyAPI(c.MustGet("validatedToken").(*umAPI.TokenInfos))
 
 	var req studyAPI.SurveyReferenceRequest
-	if err := h.JsonToProto(c, &req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
 	req.Token = token
+	req.StudyKey = c.Param("studyKey")
+	req.SurveyKey = c.Param("surveyKey")
 	resp, err := h.clients.StudyService.GetAssignedSurvey(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
@@ -138,6 +138,7 @@ func (h *HttpEndpoints) submitSurveyResponseHandl(c *gin.Context) {
 		return
 	}
 	req.Token = token
+	req.StudyKey = c.Param("studyKey")
 	resp, err := h.clients.StudyService.SubmitResponse(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
@@ -169,6 +170,7 @@ func (h *HttpEndpoints) leaveStudyHandl(c *gin.Context) {
 		return
 	}
 	req.Token = token
+	req.StudyKey = c.Param("studyKey")
 	resp, err := h.clients.StudyService.LeaveStudy(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
@@ -211,11 +213,8 @@ func (h *HttpEndpoints) getStudySurveyInfosHandl(c *gin.Context) {
 	token := utils.ConvertTokenInfosForStudyAPI(c.MustGet("validatedToken").(*umAPI.TokenInfos))
 
 	var req studyAPI.StudyReferenceReq
-	if err := h.JsonToProto(c, &req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
 	req.Token = token
+	req.StudyKey = c.Param("studyKey")
 	resp, err := h.clients.StudyService.GetStudySurveyInfos(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
