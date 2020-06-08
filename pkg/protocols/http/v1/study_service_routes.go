@@ -22,7 +22,7 @@ func (h *HttpEndpoints) AddStudyServiceParticipantAPI(rg *gin.RouterGroup) {
 	{
 		studyGroup.GET("/:studyKey/survey-infos", h.getStudySurveyInfosHandl)
 		studyGroup.POST("/:studyKey/enter", mw.RequirePayload(), h.enterStudyHandl)
-		studyGroup.GET("/:studyKey/survey/:surveyKey", mw.RequirePayload(), h.getAssignedSurveyHandl)
+		studyGroup.GET("/:studyKey/survey/:surveyKey", h.getAssignedSurveyHandl)
 		studyGroup.POST("/:studyKey/submit-response", mw.RequirePayload(), h.submitSurveyResponseHandl)
 		studyGroup.POST("/:studyKey/postpone-survey", mw.RequirePayload(), h.postponeSurveyHandl)
 		studyGroup.POST("/:studyKey/leave", mw.RequirePayload(), h.leaveStudyHandl)
@@ -44,7 +44,7 @@ func (h *HttpEndpoints) AddStudyServiceAdminAPI(rg *gin.RouterGroup) {
 	studyGroup.Use(mw.ValidateToken(h.clients.UserManagement))
 	{
 		studyGroup.GET("/:studyKey", h.getStudyHandl)
-		studyGroup.GET("/:studyKey/survey/:surveyKey", mw.RequirePayload(), h.getSurveyDefForStudyHandl)
+		studyGroup.GET("/:studyKey/survey/:surveyKey", h.getSurveyDefForStudyHandl)
 		studyGroup.POST("/:studyKey/save-survey", mw.RequirePayload(), h.saveSurveyToStudyHandl)
 		studyGroup.POST("/:studyKey/remove-survey", mw.RequirePayload(), h.removeSurveyFromStudyHandl)
 
