@@ -1,8 +1,9 @@
 # listen ports:
-MANAGEMENT_API_GATEWAY_LISTEN_PORT=3232
+MANAGEMENT_API_GATEWAY_LISTEN_PORT=<port>
 DEBUG_MODE=false
 CORS_ALLOW_ORIGINS=https://your-domain.tld,https://test-domain.tld
 
 # clients:
-ADDR_USER_MANAGEMENT_SERVICE=localhost:5202
-ADDR_STUDY_SERVICE=localhost:5203
+ADDR_USER_MANAGEMENT_SERVICE=<user-m-addr>:<user-m-port>
+ADDR_STUDY_SERVICE=<study-addr>:<study-port>
+ADDR_MESSAGING_SERVICE=<messaging-addr>:<messaging-port>
