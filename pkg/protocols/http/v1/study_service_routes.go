@@ -9,6 +9,7 @@ func (h *HttpEndpoints) AddStudyServiceParticipantAPI(rg *gin.RouterGroup) {
 	studiesGroup := rg.Group("/studies")
 	studiesGroup.Use(mw.ExtractToken())
 	studiesGroup.Use(mw.ValidateToken(h.clients.UserManagement))
+	studiesGroup.Use(mw.CheckAccountConfirmed())
 	{
 		studiesGroup.GET("/for-user-profiles", h.getStudiesForUserHandl)
 		studiesGroup.GET("/active", h.getAllActiveStudiesHandl)
@@ -19,6 +20,7 @@ func (h *HttpEndpoints) AddStudyServiceParticipantAPI(rg *gin.RouterGroup) {
 	studyGroup := rg.Group("/study")
 	studyGroup.Use(mw.ExtractToken())
 	studyGroup.Use(mw.ValidateToken(h.clients.UserManagement))
+	studyGroup.Use(mw.CheckAccountConfirmed())
 	{
 		studyGroup.GET("/:studyKey/survey-infos", h.getStudySurveyInfosHandl)
 		studyGroup.POST("/:studyKey/enter", mw.RequirePayload(), h.enterStudyHandl)
