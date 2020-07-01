@@ -26,6 +26,8 @@ func initConfig() {
 	conf.ServiceURLs.StudyService = os.Getenv("ADDR_STUDY_SERVICE")
 	conf.ServiceURLs.MessagingService = os.Getenv("ADDR_MESSAGING_SERVICE")
 	conf.AllowOrigins = strings.Split(os.Getenv("CORS_ALLOW_ORIGINS"), ",")
+
+	conf.UseEndpoints.DeleteParticipantData = os.Getenv("USE_DELETE_PARTICIPANT_DATA_ENDPOINT") == "true"
 }
 
 func init() {
@@ -67,7 +69,7 @@ func main() {
 	router.GET("/", healthCheckHandle)
 	v1Root := router.Group("/v1")
 
-	v1APIHandlers := v1.NewHTTPHandler(grpcClients)
+	v1APIHandlers := v1.NewHTTPHandler(grpcClients, conf.UseEndpoints)
 	v1APIHandlers.AddServiceStatusAPI(v1Root)
 	v1APIHandlers.AddUserManagementAdminAPI(v1Root)
 	v1APIHandlers.AddStudyServiceAdminAPI(v1Root)

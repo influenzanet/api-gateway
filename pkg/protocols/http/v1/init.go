@@ -13,11 +13,12 @@ import (
 
 type HttpEndpoints struct {
 	clients      *models.APIClients
+	useEndpoints models.UseEndpoints
 	marshaller   protojson.MarshalOptions
 	unmarshaller protojson.UnmarshalOptions
 }
 
-func NewHTTPHandler(clientRef *models.APIClients) *HttpEndpoints {
+func NewHTTPHandler(clientRef *models.APIClients, useEndpoints models.UseEndpoints) *HttpEndpoints {
 	m := protojson.MarshalOptions{
 		EmitUnpopulated: false,
 	}
@@ -26,6 +27,7 @@ func NewHTTPHandler(clientRef *models.APIClients) *HttpEndpoints {
 	}
 	return &HttpEndpoints{
 		clients:      clientRef,
+		useEndpoints: useEndpoints,
 		marshaller:   m,
 		unmarshaller: um,
 	}

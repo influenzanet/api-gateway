@@ -6,3 +6,5 @@ CORS_ALLOW_ORIGINS=https://your-domain.tld,https://test-domain.tld
 # clients:
 ADDR_USER_MANAGEMENT_SERVICE=<user-m-addr>:<user-m-port>
 ADDR_STUDY_SERVICE=<study-addr>:<study-port>
+
+USE_DELETE_PARTICIPANT_DATA_ENDPOINT=true

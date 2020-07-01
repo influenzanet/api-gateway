@@ -15,6 +15,9 @@ func (h *HttpEndpoints) AddStudyServiceParticipantAPI(rg *gin.RouterGroup) {
 		studiesGroup.GET("/active", h.getAllActiveStudiesHandl)
 		// all surveys accross studies:
 		studiesGroup.GET("/all-assigned-surveys", h.getAllAssignedSurveysHandl)
+		if h.useEndpoints.DeleteParticipantData {
+			studiesGroup.DELETE("/participant-data", h.deleteParticipantDataHandl)
+		}
 	}
 
 	studyGroup := rg.Group("/study")

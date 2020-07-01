@@ -183,6 +183,27 @@ func (h *HttpEndpoints) leaveStudyHandl(c *gin.Context) {
 	h.SendProtoAsJSON(c, http.StatusOK, resp)
 }
 
+func (h *HttpEndpoints) deleteParticipantDataHandl(c *gin.Context) {
+	// token := utils.ConvertTokenInfosForStudyAPI(c.MustGet("validatedToken").(*umAPI.TokenInfos))
+	c.JSON(http.StatusNotImplemented, gin.H{"error": "not implemented"})
+	/*
+		var req studyAPI.StudyStatusReq
+		if err := h.JsonToProto(c, &req); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		req.Token = token
+		req.StudyKey = c.Param("studyKey")
+		resp, err := h.clients.StudyService.SaveStudyStatus(context.Background(), &req)
+		if err != nil {
+			st := status.Convert(err)
+			c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+			return
+		}
+		h.SendProtoAsJSON(c, http.StatusOK, resp)
+	*/
+}
+
 func (h *HttpEndpoints) getStudiesForUserHandl(c *gin.Context) {
 	token := utils.ConvertTokenInfosForStudyAPI(c.MustGet("validatedToken").(*umAPI.TokenInfos))
 
