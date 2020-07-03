@@ -29,20 +29,36 @@ func (h *HttpEndpoints) loginWithEmailAsParticipantHandl(c *gin.Context) {
 	h.SendProtoAsJSON(c, http.StatusOK, token)
 }
 
-func (h *HttpEndpoints) loginWithTemptokenHandl(c *gin.Context) {
-	var req umAPI.JWTRequest
+func (h *HttpEndpoints) resendVerificationCodeHandl(c *gin.Context) {
+	var req umAPI.SendVerificationCodeReq
 	if err := h.JsonToProto(c, &req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	token, err := h.clients.UserManagement.LoginWithTempToken(context.Background(), &req)
+	resp, err := h.clients.UserManagement.SendVerificationCode(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
 		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
 		return
 	}
-	h.SendProtoAsJSON(c, http.StatusOK, token)
+	h.SendProtoAsJSON(c, http.StatusOK, resp)
+}
+
+func (h *HttpEndpoints) getVerificationCodeWithTokenHandl(c *gin.Context) {
+	var req umAPI.AutoValidateReq
+	if err := h.JsonToProto(c, &req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	resp, err := h.clients.UserManagement.AutoValidateTempToken(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+	h.SendProtoAsJSON(c, http.StatusOK, resp)
 }
 
 func (h *HttpEndpoints) loginWithEmailForManagementHandl(c *gin.Context) {
@@ -53,13 +69,13 @@ func (h *HttpEndpoints) loginWithEmailForManagementHandl(c *gin.Context) {
 	}
 	req.AsParticipant = false
 
-	token, err := h.clients.UserManagement.LoginWithEmail(context.Background(), &req)
+	resp, err := h.clients.UserManagement.LoginWithEmail(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
 		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
 		return
 	}
-	h.SendProtoAsJSON(c, http.StatusOK, token)
+	h.SendProtoAsJSON(c, http.StatusOK, resp)
 }
 
 func (h *HttpEndpoints) signupWithEmailHandl(c *gin.Context) {
@@ -68,13 +84,13 @@ func (h *HttpEndpoints) signupWithEmailHandl(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	token, err := h.clients.UserManagement.SignupWithEmail(context.Background(), &req)
+	resp, err := h.clients.UserManagement.SignupWithEmail(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
 		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
 		return
 	}
-	h.SendProtoAsJSON(c, http.StatusOK, token)
+	h.SendProtoAsJSON(c, http.StatusOK, resp)
 }
 
 func (h *HttpEndpoints) switchProfileHandl(c *gin.Context) {

@@ -7,8 +7,10 @@ import (
 
 func (h *HttpEndpoints) AddUserManagementParticipantAPI(rg *gin.RouterGroup) {
 	auth := rg.Group("/auth")
+	auth.POST("/resend-verification-code", mw.RequirePayload(), h.resendVerificationCodeHandl)
+	auth.POST("/get-verification-code-with-token", mw.RequirePayload(), h.getVerificationCodeWithTokenHandl)
+
 	auth.POST("/login-with-email", mw.RequirePayload(), h.loginWithEmailAsParticipantHandl)
-	auth.POST("/login-with-temptoken", mw.RequirePayload(), h.loginWithTemptokenHandl)
 	auth.POST("/signup-with-email", mw.RequirePayload(), h.signupWithEmailHandl)
 	auth.POST("/switch-profile", mw.ExtractToken(), mw.ValidateToken(h.clients.UserManagement), mw.RequirePayload(), h.switchProfileHandl)
 	auth.POST("/renew-token", mw.ExtractToken(), mw.RequirePayload(), h.tokenRenewHandl)
@@ -19,7 +21,7 @@ func (h *HttpEndpoints) AddUserManagementParticipantAPI(rg *gin.RouterGroup) {
 	{
 		user.GET("", h.getUserHandl)
 		// userToken.GET("/:id", getUserHandl)
-		user.POST("/change-password", mw.RequirePayload(), h.userPasswordChangeHandl)
+		// user.POST("/change-password", mw.RequirePayload(), h.userPasswordChangeHandl)
 		user.POST("/change-account-email", mw.RequirePayload(), h.changeAccountEmailHandl)
 		user.POST("/revoke-refresh-tokens", h.revokeRefreshTokensHandl)
 		user.POST("/set-language", mw.RequirePayload(), h.userSetPreferredLanguageHandl)
