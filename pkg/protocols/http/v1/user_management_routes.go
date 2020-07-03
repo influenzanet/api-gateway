@@ -21,7 +21,7 @@ func (h *HttpEndpoints) AddUserManagementParticipantAPI(rg *gin.RouterGroup) {
 	{
 		user.GET("", h.getUserHandl)
 		// userToken.GET("/:id", getUserHandl)
-		// user.POST("/change-password", mw.RequirePayload(), h.userPasswordChangeHandl)
+		user.POST("/change-password", mw.RequirePayload(), h.userPasswordChangeHandl)
 		user.POST("/change-account-email", mw.RequirePayload(), h.changeAccountEmailHandl)
 		user.POST("/revoke-refresh-tokens", h.revokeRefreshTokensHandl)
 		user.POST("/set-language", mw.RequirePayload(), h.userSetPreferredLanguageHandl)
@@ -38,7 +38,7 @@ func (h *HttpEndpoints) AddUserManagementParticipantAPI(rg *gin.RouterGroup) {
 
 	unAuthUser := rg.Group("/user")
 	{
-		unAuthUser.POST("/password-reset/initiate", mw.RequirePayload(), h.initiatePasswordResetHandl)
+		//unAuthUser.POST("/password-reset/initiate", mw.RequirePayload(), h.initiatePasswordResetHandl)
 		unAuthUser.POST("/password-reset/get-infos", mw.RequirePayload(), h.getInfosForPasswordResetHandl)
 		unAuthUser.POST("/password-reset/reset-with", mw.RequirePayload(), h.passwordResetHandl)
 
