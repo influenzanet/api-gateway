@@ -9,7 +9,7 @@ require (
 	github.com/google/go-cmp v0.5.0 // indirect
 	github.com/influenzanet/messaging-service v0.5.3
 	github.com/influenzanet/study-service v0.8.0
-	github.com/influenzanet/user-management-service v0.9.1
+	github.com/influenzanet/user-management-service v0.9.2
 	github.com/kr/text v0.2.0 // indirect
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	google.golang.org/grpc v1.30.0
