@@ -6,13 +6,13 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/influenzanet/api-gateway/pkg/utils"
+	"github.com/influenzanet/go-utils/pkg/api_types"
 	messageAPI "github.com/influenzanet/messaging-service/pkg/api/messaging_service"
-	umAPI "github.com/influenzanet/user-management-service/pkg/api"
 	"google.golang.org/grpc/status"
 )
 
 func (h *HttpEndpoints) getEmailTemplatesHandl(c *gin.Context) {
-	token := utils.ConvertTokenInfosForMessageAPI(c.MustGet("validatedToken").(*umAPI.TokenInfos))
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req messageAPI.GetEmailTemplatesReq
 	req.Token = token
@@ -26,7 +26,7 @@ func (h *HttpEndpoints) getEmailTemplatesHandl(c *gin.Context) {
 }
 
 func (h *HttpEndpoints) saveEmailTemplateHandl(c *gin.Context) {
-	token := utils.ConvertTokenInfosForMessageAPI(c.MustGet("validatedToken").(*umAPI.TokenInfos))
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req messageAPI.SaveEmailTemplateReq
 	if err := h.JsonToProto(c, &req); err != nil {
@@ -44,7 +44,7 @@ func (h *HttpEndpoints) saveEmailTemplateHandl(c *gin.Context) {
 }
 
 func (h *HttpEndpoints) deleteEmailTemplateHandl(c *gin.Context) {
-	token := utils.ConvertTokenInfosForMessageAPI(c.MustGet("validatedToken").(*umAPI.TokenInfos))
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req messageAPI.DeleteEmailTemplateReq
 	if err := h.JsonToProto(c, &req); err != nil {
@@ -62,7 +62,7 @@ func (h *HttpEndpoints) deleteEmailTemplateHandl(c *gin.Context) {
 }
 
 func (h *HttpEndpoints) getAutoMessagesHandl(c *gin.Context) {
-	token := utils.ConvertTokenInfosForMessageAPI(c.MustGet("validatedToken").(*umAPI.TokenInfos))
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req messageAPI.GetAutoMessagesReq
 	req.Token = token
@@ -76,7 +76,7 @@ func (h *HttpEndpoints) getAutoMessagesHandl(c *gin.Context) {
 }
 
 func (h *HttpEndpoints) saveAutoMessageHandl(c *gin.Context) {
-	token := utils.ConvertTokenInfosForMessageAPI(c.MustGet("validatedToken").(*umAPI.TokenInfos))
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req messageAPI.SaveAutoMessageReq
 	if err := h.JsonToProto(c, &req); err != nil {
@@ -94,7 +94,7 @@ func (h *HttpEndpoints) saveAutoMessageHandl(c *gin.Context) {
 }
 
 func (h *HttpEndpoints) deleteAutoMessageHandl(c *gin.Context) {
-	token := utils.ConvertTokenInfosForMessageAPI(c.MustGet("validatedToken").(*umAPI.TokenInfos))
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req messageAPI.DeleteAutoMessageReq
 	if err := h.JsonToProto(c, &req); err != nil {
@@ -112,7 +112,7 @@ func (h *HttpEndpoints) deleteAutoMessageHandl(c *gin.Context) {
 }
 
 func (h *HttpEndpoints) sendMessageToAllUsersHandl(c *gin.Context) {
-	token := utils.ConvertTokenInfosForMessageAPI(c.MustGet("validatedToken").(*umAPI.TokenInfos))
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req messageAPI.SendMessageToAllUsersReq
 	if err := h.JsonToProto(c, &req); err != nil {
@@ -130,7 +130,7 @@ func (h *HttpEndpoints) sendMessageToAllUsersHandl(c *gin.Context) {
 }
 
 func (h *HttpEndpoints) sendMessageToStudyParticipantsHandl(c *gin.Context) {
-	token := utils.ConvertTokenInfosForMessageAPI(c.MustGet("validatedToken").(*umAPI.TokenInfos))
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req messageAPI.SendMessageToStudyParticipantsReq
 	if err := h.JsonToProto(c, &req); err != nil {

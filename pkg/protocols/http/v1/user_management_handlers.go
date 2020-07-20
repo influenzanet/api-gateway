@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/influenzanet/api-gateway/pkg/utils"
+	"github.com/influenzanet/go-utils/pkg/api_types"
 	"google.golang.org/grpc/status"
 
 	umAPI "github.com/influenzanet/user-management-service/pkg/api"
@@ -94,7 +95,7 @@ func (h *HttpEndpoints) signupWithEmailHandl(c *gin.Context) {
 }
 
 func (h *HttpEndpoints) switchProfileHandl(c *gin.Context) {
-	token := c.MustGet("validatedToken").(*umAPI.TokenInfos)
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 	var req umAPI.SwitchProfileRequest
 	if err := h.JsonToProto(c, &req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -127,7 +128,7 @@ func (h *HttpEndpoints) tokenRenewHandl(c *gin.Context) {
 }
 
 func (h *HttpEndpoints) userPasswordChangeHandl(c *gin.Context) {
-	token := c.MustGet("validatedToken").(*umAPI.TokenInfos)
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req umAPI.PasswordChangeMsg
 	if err := h.JsonToProto(c, &req); err != nil {
@@ -147,7 +148,7 @@ func (h *HttpEndpoints) userPasswordChangeHandl(c *gin.Context) {
 }
 
 func (h *HttpEndpoints) changeAccountEmailHandl(c *gin.Context) {
-	token := c.MustGet("validatedToken").(*umAPI.TokenInfos)
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req umAPI.EmailChangeMsg
 	if err := h.JsonToProto(c, &req); err != nil {
@@ -165,7 +166,7 @@ func (h *HttpEndpoints) changeAccountEmailHandl(c *gin.Context) {
 }
 
 func (h *HttpEndpoints) userSetPreferredLanguageHandl(c *gin.Context) {
-	token := c.MustGet("validatedToken").(*umAPI.TokenInfos)
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req umAPI.LanguageChangeMsg
 	if err := h.JsonToProto(c, &req); err != nil {
@@ -183,7 +184,7 @@ func (h *HttpEndpoints) userSetPreferredLanguageHandl(c *gin.Context) {
 }
 
 func (h *HttpEndpoints) getUserHandl(c *gin.Context) {
-	token := c.MustGet("validatedToken").(*umAPI.TokenInfos)
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	userID := c.Param("id")
 
@@ -203,7 +204,7 @@ func (h *HttpEndpoints) getUserHandl(c *gin.Context) {
 }
 
 func (h *HttpEndpoints) deleteAccountHandl(c *gin.Context) {
-	token := c.MustGet("validatedToken").(*umAPI.TokenInfos)
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req umAPI.UserReference
 	if err := h.JsonToProto(c, &req); err != nil {
@@ -222,7 +223,7 @@ func (h *HttpEndpoints) deleteAccountHandl(c *gin.Context) {
 }
 
 func (h *HttpEndpoints) saveProfileHandl(c *gin.Context) {
-	token := c.MustGet("validatedToken").(*umAPI.TokenInfos)
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req umAPI.ProfileRequest
 	if err := h.JsonToProto(c, &req); err != nil {
@@ -240,7 +241,7 @@ func (h *HttpEndpoints) saveProfileHandl(c *gin.Context) {
 }
 
 func (h *HttpEndpoints) removeProfileHandl(c *gin.Context) {
-	token := c.MustGet("validatedToken").(*umAPI.TokenInfos)
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req umAPI.ProfileRequest
 	if err := h.JsonToProto(c, &req); err != nil {
@@ -258,7 +259,7 @@ func (h *HttpEndpoints) removeProfileHandl(c *gin.Context) {
 }
 
 func (h *HttpEndpoints) userUpdateContactPreferencesHandl(c *gin.Context) {
-	token := c.MustGet("validatedToken").(*umAPI.TokenInfos)
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req umAPI.ContactPreferencesMsg
 	if err := h.JsonToProto(c, &req); err != nil {
@@ -276,7 +277,7 @@ func (h *HttpEndpoints) userUpdateContactPreferencesHandl(c *gin.Context) {
 }
 
 func (h *HttpEndpoints) userAddEmailHandl(c *gin.Context) {
-	token := c.MustGet("validatedToken").(*umAPI.TokenInfos)
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req umAPI.ContactInfoMsg
 	if err := h.JsonToProto(c, &req); err != nil {
@@ -294,7 +295,7 @@ func (h *HttpEndpoints) userAddEmailHandl(c *gin.Context) {
 }
 
 func (h *HttpEndpoints) userRemoveEmailHandl(c *gin.Context) {
-	token := c.MustGet("validatedToken").(*umAPI.TokenInfos)
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req umAPI.ContactInfoMsg
 	if err := h.JsonToProto(c, &req); err != nil {
@@ -312,7 +313,7 @@ func (h *HttpEndpoints) userRemoveEmailHandl(c *gin.Context) {
 }
 
 func (h *HttpEndpoints) createUserHandl(c *gin.Context) {
-	token := c.MustGet("validatedToken").(*umAPI.TokenInfos)
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req umAPI.CreateUserReq
 	if err := h.JsonToProto(c, &req); err != nil {
@@ -330,7 +331,7 @@ func (h *HttpEndpoints) createUserHandl(c *gin.Context) {
 }
 
 func (h *HttpEndpoints) findNonParticipantUsersHandl(c *gin.Context) {
-	token := c.MustGet("validatedToken").(*umAPI.TokenInfos)
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req umAPI.FindNonParticipantUsersMsg
 	req.Token = token
@@ -344,7 +345,7 @@ func (h *HttpEndpoints) findNonParticipantUsersHandl(c *gin.Context) {
 }
 
 func (h *HttpEndpoints) userAddRoleHandl(c *gin.Context) {
-	token := c.MustGet("validatedToken").(*umAPI.TokenInfos)
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req umAPI.RoleMsg
 	if err := h.JsonToProto(c, &req); err != nil {
@@ -362,7 +363,7 @@ func (h *HttpEndpoints) userAddRoleHandl(c *gin.Context) {
 }
 
 func (h *HttpEndpoints) userRemoveRoleHandl(c *gin.Context) {
-	token := c.MustGet("validatedToken").(*umAPI.TokenInfos)
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req umAPI.RoleMsg
 	if err := h.JsonToProto(c, &req); err != nil {
@@ -380,7 +381,7 @@ func (h *HttpEndpoints) userRemoveRoleHandl(c *gin.Context) {
 }
 
 func (h *HttpEndpoints) revokeRefreshTokensHandl(c *gin.Context) {
-	token := c.MustGet("validatedToken").(*umAPI.TokenInfos)
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req umAPI.RevokeRefreshTokensReq
 	req.Token = token
@@ -454,7 +455,7 @@ func (h *HttpEndpoints) verifyUserContactHandl(c *gin.Context) {
 }
 
 func (h *HttpEndpoints) resendContanctVerificationEmailHandl(c *gin.Context) {
-	token := c.MustGet("validatedToken").(*umAPI.TokenInfos)
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 	var req umAPI.ResendContactVerificationReq
 	if err := h.JsonToProto(c, &req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

@@ -4,12 +4,12 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	umAPI "github.com/influenzanet/user-management-service/pkg/api"
+	"github.com/influenzanet/go-utils/pkg/api_types"
 )
 
 func CheckAccountConfirmed() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		token := c.MustGet("validatedToken").(*umAPI.TokenInfos)
+		token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 		if !token.AccountConfirmed {
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "account not confirmed yet"})

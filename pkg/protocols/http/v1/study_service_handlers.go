@@ -9,14 +9,14 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/influenzanet/api-gateway/pkg/utils"
+	"github.com/influenzanet/go-utils/pkg/api_types"
 	"github.com/influenzanet/study-service/pkg/api"
 	studyAPI "github.com/influenzanet/study-service/pkg/api"
-	umAPI "github.com/influenzanet/user-management-service/pkg/api"
 	"google.golang.org/grpc/status"
 )
 
 func (h *HttpEndpoints) enterStudyHandl(c *gin.Context) {
-	token := utils.ConvertTokenInfosForStudyAPI(c.MustGet("validatedToken").(*umAPI.TokenInfos))
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req studyAPI.EnterStudyRequest
 	if err := h.JsonToProto(c, &req); err != nil {
@@ -35,7 +35,7 @@ func (h *HttpEndpoints) enterStudyHandl(c *gin.Context) {
 }
 
 func (h *HttpEndpoints) postponeSurveyHandl(c *gin.Context) {
-	token := utils.ConvertTokenInfosForStudyAPI(c.MustGet("validatedToken").(*umAPI.TokenInfos))
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req studyAPI.PostponeSurveyRequest
 	if err := h.JsonToProto(c, &req); err != nil {
@@ -54,7 +54,7 @@ func (h *HttpEndpoints) postponeSurveyHandl(c *gin.Context) {
 }
 
 func (h *HttpEndpoints) studySystemCreateStudyHandl(c *gin.Context) {
-	token := utils.ConvertTokenInfosForStudyAPI(c.MustGet("validatedToken").(*umAPI.TokenInfos))
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req studyAPI.NewStudyRequest
 	if err := h.JsonToProto(c, &req); err != nil {
@@ -74,7 +74,7 @@ func (h *HttpEndpoints) studySystemCreateStudyHandl(c *gin.Context) {
 }
 
 func (h *HttpEndpoints) saveSurveyToStudyHandl(c *gin.Context) {
-	token := utils.ConvertTokenInfosForStudyAPI(c.MustGet("validatedToken").(*umAPI.TokenInfos))
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req studyAPI.AddSurveyReq
 	if err := h.JsonToProto(c, &req); err != nil {
@@ -95,7 +95,7 @@ func (h *HttpEndpoints) saveSurveyToStudyHandl(c *gin.Context) {
 }
 
 func (h *HttpEndpoints) removeSurveyFromStudyHandl(c *gin.Context) {
-	token := utils.ConvertTokenInfosForStudyAPI(c.MustGet("validatedToken").(*umAPI.TokenInfos))
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req studyAPI.SurveyReferenceRequest
 	if err := h.JsonToProto(c, &req); err != nil {
@@ -116,7 +116,7 @@ func (h *HttpEndpoints) removeSurveyFromStudyHandl(c *gin.Context) {
 }
 
 func (h *HttpEndpoints) getAssignedSurveyHandl(c *gin.Context) {
-	token := utils.ConvertTokenInfosForStudyAPI(c.MustGet("validatedToken").(*umAPI.TokenInfos))
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req studyAPI.SurveyReferenceRequest
 	req.Token = token
@@ -132,7 +132,7 @@ func (h *HttpEndpoints) getAssignedSurveyHandl(c *gin.Context) {
 }
 
 func (h *HttpEndpoints) submitSurveyResponseHandl(c *gin.Context) {
-	token := utils.ConvertTokenInfosForStudyAPI(c.MustGet("validatedToken").(*umAPI.TokenInfos))
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req studyAPI.SubmitResponseReq
 	if err := h.JsonToProto(c, &req); err != nil {
@@ -151,7 +151,7 @@ func (h *HttpEndpoints) submitSurveyResponseHandl(c *gin.Context) {
 }
 
 func (h *HttpEndpoints) getAllAssignedSurveysHandl(c *gin.Context) {
-	token := utils.ConvertTokenInfosForStudyAPI(c.MustGet("validatedToken").(*umAPI.TokenInfos))
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	resp, err := h.clients.StudyService.GetAssignedSurveys(context.Background(), token)
 	if err != nil {
@@ -164,7 +164,7 @@ func (h *HttpEndpoints) getAllAssignedSurveysHandl(c *gin.Context) {
 }
 
 func (h *HttpEndpoints) leaveStudyHandl(c *gin.Context) {
-	token := utils.ConvertTokenInfosForStudyAPI(c.MustGet("validatedToken").(*umAPI.TokenInfos))
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req studyAPI.LeaveStudyMsg
 	if err := h.JsonToProto(c, &req); err != nil {
@@ -184,7 +184,7 @@ func (h *HttpEndpoints) leaveStudyHandl(c *gin.Context) {
 }
 
 func (h *HttpEndpoints) deleteParticipantDataHandl(c *gin.Context) {
-	// token := utils.ConvertTokenInfosForStudyAPI(c.MustGet("validatedToken").(*umAPI.TokenInfos))
+	// token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 	c.JSON(http.StatusNotImplemented, gin.H{"error": "not implemented"})
 	/*
 		var req studyAPI.StudyStatusReq
@@ -205,7 +205,7 @@ func (h *HttpEndpoints) deleteParticipantDataHandl(c *gin.Context) {
 }
 
 func (h *HttpEndpoints) getStudiesForUserHandl(c *gin.Context) {
-	token := utils.ConvertTokenInfosForStudyAPI(c.MustGet("validatedToken").(*umAPI.TokenInfos))
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req studyAPI.GetStudiesForUserReq
 	req.Token = token
@@ -220,7 +220,7 @@ func (h *HttpEndpoints) getStudiesForUserHandl(c *gin.Context) {
 }
 
 func (h *HttpEndpoints) getAllActiveStudiesHandl(c *gin.Context) {
-	req := utils.ConvertTokenInfosForStudyAPI(c.MustGet("validatedToken").(*umAPI.TokenInfos))
+	req := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	resp, err := h.clients.StudyService.GetActiveStudies(context.Background(), req)
 	if err != nil {
@@ -233,7 +233,7 @@ func (h *HttpEndpoints) getAllActiveStudiesHandl(c *gin.Context) {
 }
 
 func (h *HttpEndpoints) getStudySurveyInfosHandl(c *gin.Context) {
-	token := utils.ConvertTokenInfosForStudyAPI(c.MustGet("validatedToken").(*umAPI.TokenInfos))
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req studyAPI.StudyReferenceReq
 	req.Token = token
@@ -249,7 +249,7 @@ func (h *HttpEndpoints) getStudySurveyInfosHandl(c *gin.Context) {
 }
 
 func (h *HttpEndpoints) getAllStudiesHandl(c *gin.Context) {
-	token := utils.ConvertTokenInfosForStudyAPI(c.MustGet("validatedToken").(*umAPI.TokenInfos))
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	resp, err := h.clients.StudyService.GetAllStudies(context.Background(), token)
 	if err != nil {
@@ -262,7 +262,7 @@ func (h *HttpEndpoints) getAllStudiesHandl(c *gin.Context) {
 }
 
 func (h *HttpEndpoints) getStudyHandl(c *gin.Context) {
-	token := utils.ConvertTokenInfosForStudyAPI(c.MustGet("validatedToken").(*umAPI.TokenInfos))
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req studyAPI.StudyReferenceReq
 	req.StudyKey = c.Param("studyKey")
@@ -278,7 +278,7 @@ func (h *HttpEndpoints) getStudyHandl(c *gin.Context) {
 }
 
 func (h *HttpEndpoints) getSurveyDefForStudyHandl(c *gin.Context) {
-	token := utils.ConvertTokenInfosForStudyAPI(c.MustGet("validatedToken").(*umAPI.TokenInfos))
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req studyAPI.SurveyReferenceRequest
 	if err := h.JsonToProto(c, &req); err != nil {
@@ -299,7 +299,7 @@ func (h *HttpEndpoints) getSurveyDefForStudyHandl(c *gin.Context) {
 }
 
 func (h *HttpEndpoints) studySaveMemberHandl(c *gin.Context) {
-	token := utils.ConvertTokenInfosForStudyAPI(c.MustGet("validatedToken").(*umAPI.TokenInfos))
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req studyAPI.StudyMemberReq
 	if err := h.JsonToProto(c, &req); err != nil {
@@ -318,7 +318,7 @@ func (h *HttpEndpoints) studySaveMemberHandl(c *gin.Context) {
 }
 
 func (h *HttpEndpoints) studyRemoveMemberHandl(c *gin.Context) {
-	token := utils.ConvertTokenInfosForStudyAPI(c.MustGet("validatedToken").(*umAPI.TokenInfos))
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req studyAPI.StudyMemberReq
 	if err := h.JsonToProto(c, &req); err != nil {
@@ -337,7 +337,7 @@ func (h *HttpEndpoints) studyRemoveMemberHandl(c *gin.Context) {
 }
 
 func (h *HttpEndpoints) saveStudyRulesHandl(c *gin.Context) {
-	token := utils.ConvertTokenInfosForStudyAPI(c.MustGet("validatedToken").(*umAPI.TokenInfos))
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req studyAPI.StudyRulesReq
 	if err := h.JsonToProto(c, &req); err != nil {
@@ -356,7 +356,7 @@ func (h *HttpEndpoints) saveStudyRulesHandl(c *gin.Context) {
 }
 
 func (h *HttpEndpoints) saveStudyStatusHandl(c *gin.Context) {
-	token := utils.ConvertTokenInfosForStudyAPI(c.MustGet("validatedToken").(*umAPI.TokenInfos))
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req studyAPI.StudyStatusReq
 	if err := h.JsonToProto(c, &req); err != nil {
@@ -375,7 +375,7 @@ func (h *HttpEndpoints) saveStudyStatusHandl(c *gin.Context) {
 }
 
 func (h *HttpEndpoints) saveStudyPropsHandl(c *gin.Context) {
-	token := utils.ConvertTokenInfosForStudyAPI(c.MustGet("validatedToken").(*umAPI.TokenInfos))
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req studyAPI.StudyPropsReq
 	if err := h.JsonToProto(c, &req); err != nil {
@@ -394,7 +394,7 @@ func (h *HttpEndpoints) saveStudyPropsHandl(c *gin.Context) {
 }
 
 func (h *HttpEndpoints) deleteStudyHandl(c *gin.Context) {
-	token := utils.ConvertTokenInfosForStudyAPI(c.MustGet("validatedToken").(*umAPI.TokenInfos))
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req studyAPI.StudyReferenceReq
 	if err := h.JsonToProto(c, &req); err != nil {
@@ -413,7 +413,7 @@ func (h *HttpEndpoints) deleteStudyHandl(c *gin.Context) {
 }
 
 func (h *HttpEndpoints) getSurveyResponseStatisticsHandl(c *gin.Context) {
-	token := utils.ConvertTokenInfosForStudyAPI(c.MustGet("validatedToken").(*umAPI.TokenInfos))
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req studyAPI.SurveyResponseQuery
 	studyKey := c.Param("studyKey")
@@ -444,7 +444,7 @@ func (h *HttpEndpoints) getSurveyResponseStatisticsHandl(c *gin.Context) {
 }
 
 func (h *HttpEndpoints) getSurveyResponsesHandl(c *gin.Context) {
-	token := utils.ConvertTokenInfosForStudyAPI(c.MustGet("validatedToken").(*umAPI.TokenInfos))
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req studyAPI.SurveyResponseQuery
 	studyKey := c.Param("studyKey")
