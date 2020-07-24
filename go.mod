@@ -8,8 +8,8 @@ require (
 	github.com/golang/protobuf v1.4.2
 	github.com/google/go-cmp v0.5.1 // indirect
 	github.com/influenzanet/go-utils v0.0.0-20200720123801-a189fee40438
-	github.com/influenzanet/messaging-service v0.6.0
-	github.com/influenzanet/study-service v0.9.0
+	github.com/influenzanet/messaging-service v0.6.1
+	github.com/influenzanet/study-service v0.10.0
 	github.com/influenzanet/user-management-service v0.10.1
 	github.com/kr/text v0.2.0 // indirect
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
