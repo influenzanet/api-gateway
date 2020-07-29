@@ -426,10 +426,10 @@ func (h *HttpEndpoints) getSurveyResponseStatisticsHandl(c *gin.Context) {
 		}
 	}
 	until := c.DefaultQuery("until", "")
-	if len(from) > 0 {
+	if len(until) > 0 {
 		n, err := strconv.ParseInt(until, 10, 64)
 		if err == nil {
-			req.From = n
+			req.Until = n
 		}
 	}
 
