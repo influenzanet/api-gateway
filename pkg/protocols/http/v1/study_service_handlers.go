@@ -98,12 +98,9 @@ func (h *HttpEndpoints) removeSurveyFromStudyHandl(c *gin.Context) {
 	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req studyAPI.SurveyReferenceRequest
-	if err := h.JsonToProto(c, &req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
 	req.Token = token
 	req.StudyKey = c.Param("studyKey")
+	req.SurveyKey = c.Param("surveyKey")
 
 	resp, err := h.clients.StudyService.RemoveSurveyFromStudy(context.Background(), &req)
 	if err != nil {
