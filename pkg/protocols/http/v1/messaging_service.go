@@ -97,11 +97,8 @@ func (h *HttpEndpoints) deleteAutoMessageHandl(c *gin.Context) {
 	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req messageAPI.DeleteAutoMessageReq
-	if err := h.JsonToProto(c, &req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
 	req.Token = token
+	req.AutoMessageId = c.Param("id")
 	resp, err := h.clients.MessagingService.DeleteAutoMessage(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
