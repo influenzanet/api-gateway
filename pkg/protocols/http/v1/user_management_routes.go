@@ -56,6 +56,7 @@ func (h *HttpEndpoints) AddUserManagementAdminAPI(rg *gin.RouterGroup) {
 	user.Use(mw.ValidateToken(h.clients.UserManagement))
 	{
 		user.POST("/", mw.RequirePayload(), h.createUserHandl)
+		user.POST("/migrate", mw.RequirePayload(), h.migrateUserHandl)
 		user.GET("/", h.findNonParticipantUsersHandl)
 		user.POST("/add-role", mw.RequirePayload(), h.userAddRoleHandl)
 		user.POST("/remove-role", mw.RequirePayload(), h.userRemoveRoleHandl)

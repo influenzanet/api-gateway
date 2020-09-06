@@ -7,7 +7,7 @@ require (
 	github.com/gin-gonic/gin v1.6.3
 	github.com/golang/protobuf v1.4.2
 	github.com/google/go-cmp v0.5.2 // indirect
-	github.com/influenzanet/go-utils v0.1.2
+	github.com/influenzanet/go-utils v0.1.6
 	github.com/influenzanet/messaging-service v0.7.0
 	github.com/influenzanet/study-service v0.11.0
 	github.com/influenzanet/user-management-service v0.14.2

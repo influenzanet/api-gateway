@@ -4,12 +4,15 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/influenzanet/api-gateway/pkg/utils"
 	"github.com/influenzanet/go-utils/pkg/api_types"
+	"github.com/influenzanet/go-utils/pkg/constants"
 	"google.golang.org/grpc/status"
 
+	studyAPI "github.com/influenzanet/study-service/pkg/api"
 	umAPI "github.com/influenzanet/user-management-service/pkg/api"
 )
 
@@ -328,6 +331,83 @@ func (h *HttpEndpoints) createUserHandl(c *gin.Context) {
 		return
 	}
 	h.SendProtoAsJSON(c, http.StatusOK, resp)
+}
+
+type MigrateUserReq struct {
+	AccountID         string   `json:"accountId"`
+	OldParticipantID  string   `json:"oldParticipantID"`
+	InitialPassword   string   `json:"initialPassword"`
+	PreferredLanguage string   `json:"preferredLanguage"`
+	Studies           []string `json:"studies"`
+}
+
+func (h *HttpEndpoints) migrateUserHandl(c *gin.Context) {
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
+
+	var req MigrateUserReq
+	if err := c.BindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Create user
+	cuReq := umAPI.CreateUserReq{
+		AccountId:         req.AccountID,
+		InitialPassword:   req.InitialPassword,
+		PreferredLanguage: req.InitialPassword,
+		Roles:             []string{constants.USER_ROLE_PARTICIPANT},
+		Token:             token,
+	}
+	newUser, err := h.clients.UserManagement.CreateUser(context.Background(), &cuReq)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+
+	newUserToken := &api_types.TokenInfos{
+		Id:               newUser.Id,
+		AccountConfirmed: true,
+		InstanceId:       token.InstanceId,
+		ProfilId:         newUser.Profiles[0].Id,
+	}
+	for _, studyKey := range req.Studies {
+		// enter studies:
+		_, err = h.clients.StudyService.EnterStudy(context.TODO(), &studyAPI.EnterStudyRequest{
+			Token:    newUserToken,
+			StudyKey: studyKey,
+		})
+		if err != nil {
+			st := status.Convert(err)
+			c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+			return
+		}
+
+		// submit migration survey
+		_, err = h.clients.StudyService.SubmitResponse(context.TODO(), &studyAPI.SubmitResponseReq{
+			Token:    newUserToken,
+			StudyKey: studyKey,
+			Response: &studyAPI.SurveyResponse{
+				Key:         "migration",
+				SubmittedAt: time.Now().Unix(),
+				Responses: []*studyAPI.SurveyItemResponse{
+					{Key: "migration.OldID", Response: &studyAPI.ResponseItem{Key: "rg", Items: []*studyAPI.ResponseItem{
+						{Key: "ic", Value: req.OldParticipantID},
+					}}},
+				},
+				Context: map[string]string{
+					"engineVersion": "-",
+				},
+			},
+		})
+		if err != nil {
+			st := status.Convert(err)
+			c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+			return
+		}
+	}
+
+	h.SendProtoAsJSON(c, http.StatusOK, newUser)
 }
 
 func (h *HttpEndpoints) findNonParticipantUsersHandl(c *gin.Context) {
