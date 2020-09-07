@@ -121,6 +121,8 @@ github.com/influenzanet/user-management-service v0.10.1 h1:Ph/OrIpfp4xUYHn8QvG51
 github.com/influenzanet/user-management-service v0.10.1/go.mod h1:XPngUpSor1iAHM8NfeWkpP3MnuX6CoQC7yNhBVoDIp0=
 github.com/influenzanet/user-management-service v0.14.2 h1:1s0aOdgzqXbKqzxunvTYPFr0QwIiWZWbytOA72GhbvY=
 github.com/influenzanet/user-management-service v0.14.2/go.mod h1:o2y5z0vb8RmutQTUv7UO8yBu2pQctdxtcUwegVztkZA=
+github.com/influenzanet/user-management-service v0.15.0 h1:MrIgO2Og/CFMSt+iU2d9OurC26i7zdW8FHF842fEBdo=
+github.com/influenzanet/user-management-service v0.15.0/go.mod h1:ymVtC9Tc6kcqv/E7T7O55ZYgXkMupxaLiFhArbbqDdU=
 github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af/go.mod h1:Nht3zPeWKUH0NzdCt2Blrr5ys8VGpn0CEB0cQHVjt7k=
 github.com/joho/godotenv v1.3.0/go.mod h1:7hK45KPybAkOC6peb+G5yklZfMxEjkZhHbwpqxOKXbg=
 github.com/jordan-wright/email v0.0.0-20200521030443-c069f37d901d/go.mod h1:Fy2gCFfZhay8jplf/Csj6cyH/oshQTkLQYZbKkcV+SY=

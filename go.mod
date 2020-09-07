@@ -10,7 +10,7 @@ require (
 	github.com/influenzanet/go-utils v0.1.6
 	github.com/influenzanet/messaging-service v0.7.0
 	github.com/influenzanet/study-service v0.11.0
-	github.com/influenzanet/user-management-service v0.14.2
+	github.com/influenzanet/user-management-service v0.15.0
 	github.com/kr/text v0.2.0 // indirect
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	google.golang.org/grpc v1.31.1

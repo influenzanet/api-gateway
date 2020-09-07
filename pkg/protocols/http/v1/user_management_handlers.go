@@ -339,6 +339,7 @@ type MigrateUserReq struct {
 	InitialPassword   string   `json:"initialPassword"`
 	PreferredLanguage string   `json:"preferredLanguage"`
 	Studies           []string `json:"studies"`
+	Use2FA            bool     `json:"use2FA"`
 }
 
 func (h *HttpEndpoints) migrateUserHandl(c *gin.Context) {
@@ -357,6 +358,7 @@ func (h *HttpEndpoints) migrateUserHandl(c *gin.Context) {
 		PreferredLanguage: req.InitialPassword,
 		Roles:             []string{constants.USER_ROLE_PARTICIPANT},
 		Token:             token,
+		Use_2Fa:           req.Use2FA,
 	}
 	newUser, err := h.clients.UserManagement.CreateUser(context.Background(), &cuReq)
 	if err != nil {
