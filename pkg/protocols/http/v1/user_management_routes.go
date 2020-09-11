@@ -27,12 +27,12 @@ func (h *HttpEndpoints) AddUserManagementParticipantAPI(rg *gin.RouterGroup) {
 		user.POST("/set-language", mw.RequirePayload(), h.userSetPreferredLanguageHandl)
 		user.POST("/delete", mw.RequirePayload(), h.deleteAccountHandl)
 
-		user.POST("/profile/save", mw.RequirePayload(), h.saveProfileHandl)
+		user.POST("/profile/save", mw.CheckAccountConfirmed(), mw.RequirePayload(), h.saveProfileHandl)
 		user.POST("/profile/remove", mw.RequirePayload(), h.removeProfileHandl)
 
 		user.POST("/resend-verification-message", mw.RequirePayload(), h.resendContanctVerificationEmailHandl)
 		user.POST("/contact-preferences", mw.RequirePayload(), h.userUpdateContactPreferencesHandl)
-		user.POST("/contact/add-email", mw.RequirePayload(), h.userAddEmailHandl)
+		user.POST("/contact/add-email", mw.CheckAccountConfirmed(), mw.RequirePayload(), h.userAddEmailHandl)
 		user.POST("/contact/remove-email", mw.RequirePayload(), h.userRemoveEmailHandl)
 	}
 
@@ -54,6 +54,7 @@ func (h *HttpEndpoints) AddUserManagementAdminAPI(rg *gin.RouterGroup) {
 	user := rg.Group("/user")
 	user.Use(mw.ExtractToken())
 	user.Use(mw.ValidateToken(h.clients.UserManagement))
+	user.Use(mw.CheckAccountConfirmed())
 	{
 		user.POST("/", mw.RequirePayload(), h.createUserHandl)
 		user.POST("/migrate", mw.RequirePayload(), h.migrateUserHandl)

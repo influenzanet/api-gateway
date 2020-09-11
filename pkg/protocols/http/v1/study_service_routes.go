@@ -38,6 +38,7 @@ func (h *HttpEndpoints) AddStudyServiceAdminAPI(rg *gin.RouterGroup) {
 	studiesGroup := rg.Group("/studies")
 	studiesGroup.Use(mw.ExtractToken())
 	studiesGroup.Use(mw.ValidateToken(h.clients.UserManagement))
+	studiesGroup.Use(mw.CheckAccountConfirmed())
 	{
 		studiesGroup.POST("", mw.RequirePayload(), h.studySystemCreateStudyHandl)
 		studiesGroup.GET("", h.getAllStudiesHandl)
@@ -47,6 +48,7 @@ func (h *HttpEndpoints) AddStudyServiceAdminAPI(rg *gin.RouterGroup) {
 	studyGroup := rg.Group("/study")
 	studyGroup.Use(mw.ExtractToken())
 	studyGroup.Use(mw.ValidateToken(h.clients.UserManagement))
+	studyGroup.Use(mw.CheckAccountConfirmed())
 	{
 		studyGroup.GET("/:studyKey", h.getStudyHandl)
 		studyGroup.GET("/:studyKey/surveys", h.getStudySurveyInfosHandl)
@@ -65,6 +67,7 @@ func (h *HttpEndpoints) AddStudyServiceAdminAPI(rg *gin.RouterGroup) {
 	responsesGroup := rg.Group("/data/:studyKey")
 	responsesGroup.Use(mw.ExtractToken())
 	responsesGroup.Use(mw.ValidateToken(h.clients.UserManagement))
+	responsesGroup.Use(mw.CheckAccountConfirmed())
 	{
 		responsesGroup.GET("/statistics", h.getSurveyResponseStatisticsHandl)
 		responsesGroup.GET("/responses", h.getSurveyResponsesHandl)

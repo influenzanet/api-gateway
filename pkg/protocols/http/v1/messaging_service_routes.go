@@ -9,6 +9,7 @@ func (h *HttpEndpoints) AddMessagingServiceAdminAPI(rg *gin.RouterGroup) {
 	messagingGroup := rg.Group("/messaging")
 	messagingGroup.Use(mw.ExtractToken())
 	messagingGroup.Use(mw.ValidateToken(h.clients.UserManagement))
+	messagingGroup.Use(mw.CheckAccountConfirmed())
 	{
 		messagingGroup.GET("/email-templates", h.getEmailTemplatesHandl)
 		messagingGroup.POST("/email-templates", mw.RequirePayload(), h.saveEmailTemplateHandl)
