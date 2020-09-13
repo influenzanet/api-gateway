@@ -117,6 +117,7 @@ func (h *HttpEndpoints) getAssignedSurveyHandl(c *gin.Context) {
 
 	var req studyAPI.SurveyReferenceRequest
 	req.Token = token
+	req.ProfileId = c.Query("pid")
 	req.StudyKey = c.Param("studyKey")
 	req.SurveyKey = c.Param("surveyKey")
 	resp, err := h.clients.StudyService.GetAssignedSurvey(context.Background(), &req)

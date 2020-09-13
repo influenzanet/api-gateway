@@ -7,10 +7,10 @@ require (
 	github.com/gin-gonic/gin v1.6.3
 	github.com/golang/protobuf v1.4.2
 	github.com/google/go-cmp v0.5.2 // indirect
-	github.com/influenzanet/go-utils v0.2.2
-	github.com/influenzanet/messaging-service v0.7.1
-	github.com/influenzanet/study-service v0.12.0
-	github.com/influenzanet/user-management-service v0.16.1
+	github.com/influenzanet/go-utils v0.2.5
+	github.com/influenzanet/messaging-service v0.8.0
+	github.com/influenzanet/study-service v0.13.0
+	github.com/influenzanet/user-management-service v0.17.0
 	github.com/kr/text v0.2.0 // indirect
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	google.golang.org/grpc v1.32.0

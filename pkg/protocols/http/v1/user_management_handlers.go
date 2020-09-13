@@ -97,23 +97,6 @@ func (h *HttpEndpoints) signupWithEmailHandl(c *gin.Context) {
 	h.SendProtoAsJSON(c, http.StatusOK, resp)
 }
 
-func (h *HttpEndpoints) switchProfileHandl(c *gin.Context) {
-	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
-	var req umAPI.SwitchProfileRequest
-	if err := h.JsonToProto(c, &req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	req.Token = token
-	resp, err := h.clients.UserManagement.SwitchProfile(context.Background(), &req)
-	if err != nil {
-		st := status.Convert(err)
-		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
-		return
-	}
-	h.SendProtoAsJSON(c, http.StatusOK, resp)
-}
-
 func (h *HttpEndpoints) tokenRenewHandl(c *gin.Context) {
 	var req umAPI.RefreshJWTRequest
 	if err := h.JsonToProto(c, &req); err != nil {

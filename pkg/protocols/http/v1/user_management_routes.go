@@ -12,7 +12,6 @@ func (h *HttpEndpoints) AddUserManagementParticipantAPI(rg *gin.RouterGroup) {
 
 	auth.POST("/login-with-email", mw.RequirePayload(), h.loginWithEmailAsParticipantHandl)
 	auth.POST("/signup-with-email", mw.RequirePayload(), h.signupWithEmailHandl)
-	auth.POST("/switch-profile", mw.ExtractToken(), mw.ValidateToken(h.clients.UserManagement), mw.RequirePayload(), h.switchProfileHandl)
 	auth.POST("/renew-token", mw.ExtractToken(), mw.RequirePayload(), h.tokenRenewHandl)
 
 	user := rg.Group("/user")
