@@ -359,8 +359,9 @@ func (h *HttpEndpoints) migrateUserHandl(c *gin.Context) {
 	for _, studyKey := range req.Studies {
 		// enter studies:
 		_, err = h.clients.StudyService.EnterStudy(context.TODO(), &studyAPI.EnterStudyRequest{
-			Token:    newUserToken,
-			StudyKey: studyKey,
+			Token:     newUserToken,
+			StudyKey:  studyKey,
+			ProfileId: newUser.Profiles[0].Id,
 		})
 		if err != nil {
 			st := status.Convert(err)
@@ -370,8 +371,9 @@ func (h *HttpEndpoints) migrateUserHandl(c *gin.Context) {
 
 		// submit migration survey
 		_, err = h.clients.StudyService.SubmitResponse(context.TODO(), &studyAPI.SubmitResponseReq{
-			Token:    newUserToken,
-			StudyKey: studyKey,
+			Token:     newUserToken,
+			StudyKey:  studyKey,
+			ProfileId: newUser.Profiles[0].Id,
 			Response: &studyAPI.SurveyResponse{
 				Key:         "migration",
 				SubmittedAt: time.Now().Unix(),
