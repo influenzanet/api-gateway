@@ -15,4 +15,5 @@ type Config struct {
 
 type UseEndpoints struct {
 	DeleteParticipantData bool
+	SignupWithEmail       bool
 }

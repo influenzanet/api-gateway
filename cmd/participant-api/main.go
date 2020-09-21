@@ -26,6 +26,7 @@ func initConfig() {
 	conf.ServiceURLs.StudyService = os.Getenv("ADDR_STUDY_SERVICE")
 	conf.AllowOrigins = strings.Split(os.Getenv("CORS_ALLOW_ORIGINS"), ",")
 	conf.UseEndpoints.DeleteParticipantData = os.Getenv("USE_DELETE_PARTICIPANT_DATA_ENDPOINT") == "true"
+	conf.UseEndpoints.SignupWithEmail = !(os.Getenv("DISABLE_SIGNUP_WITH_EMAIL_ENDPOINT") == "true")
 }
 
 func init() {

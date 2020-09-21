@@ -11,7 +11,9 @@ func (h *HttpEndpoints) AddUserManagementParticipantAPI(rg *gin.RouterGroup) {
 	auth.POST("/get-verification-code-with-token", mw.RequirePayload(), h.getVerificationCodeWithTokenHandl)
 
 	auth.POST("/login-with-email", mw.RequirePayload(), h.loginWithEmailAsParticipantHandl)
-	auth.POST("/signup-with-email", mw.RequirePayload(), h.signupWithEmailHandl)
+	if h.useEndpoints.SignupWithEmail {
+		auth.POST("/signup-with-email", mw.RequirePayload(), h.signupWithEmailHandl)
+	}
 	auth.POST("/renew-token", mw.ExtractToken(), mw.RequirePayload(), h.tokenRenewHandl)
 
 	user := rg.Group("/user")
