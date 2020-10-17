@@ -25,8 +25,12 @@ func initConfig() {
 	conf.ServiceURLs.UserManagement = os.Getenv("ADDR_USER_MANAGEMENT_SERVICE")
 	conf.ServiceURLs.StudyService = os.Getenv("ADDR_STUDY_SERVICE")
 	conf.AllowOrigins = strings.Split(os.Getenv("CORS_ALLOW_ORIGINS"), ",")
+
 	conf.UseEndpoints.DeleteParticipantData = os.Getenv("USE_DELETE_PARTICIPANT_DATA_ENDPOINT") == "true"
 	conf.UseEndpoints.SignupWithEmail = !(os.Getenv("DISABLE_SIGNUP_WITH_EMAIL_ENDPOINT") == "true")
+
+	conf.Recaptcha.Use = os.Getenv("USE_RECAPTCHA") == "true"
+	conf.Recaptcha.Secret = os.Getenv("RECAPTCHA_SECRET")
 }
 
 func init() {
@@ -58,7 +62,7 @@ func main() {
 		// AllowAllOrigins: true,
 		AllowOrigins:     conf.AllowOrigins,
 		AllowMethods:     []string{"POST", "GET", "PUT", "DELETE"},
-		AllowHeaders:     []string{"Origin", "Authorization", "Content-Type", "Content-Length"},
+		AllowHeaders:     []string{"Origin", "Authorization", "Content-Type", "Content-Length", "Recaptcha-Token"},
 		ExposeHeaders:    []string{"Authorization", "Content-Type", "Content-Length"},
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
@@ -66,7 +70,7 @@ func main() {
 	router.GET("/", healthCheckHandle)
 	v1Root := router.Group("/v1")
 
-	v1APIHandlers := v1.NewHTTPHandler(grpcClients, conf.UseEndpoints)
+	v1APIHandlers := v1.NewHTTPHandler(grpcClients, conf.UseEndpoints, &conf.Recaptcha)
 	v1APIHandlers.AddServiceStatusAPI(v1Root)
 	v1APIHandlers.AddUserManagementParticipantAPI(v1Root)
 	v1APIHandlers.AddStudyServiceParticipantAPI(v1Root)

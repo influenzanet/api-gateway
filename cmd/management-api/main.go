@@ -69,7 +69,7 @@ func main() {
 	router.GET("/", healthCheckHandle)
 	v1Root := router.Group("/v1")
 
-	v1APIHandlers := v1.NewHTTPHandler(grpcClients, conf.UseEndpoints)
+	v1APIHandlers := v1.NewHTTPHandler(grpcClients, conf.UseEndpoints, nil)
 	v1APIHandlers.AddServiceStatusAPI(v1Root)
 	v1APIHandlers.AddUserManagementAdminAPI(v1Root)
 	v1APIHandlers.AddStudyServiceAdminAPI(v1Root)

@@ -14,20 +14,29 @@ import (
 type HttpEndpoints struct {
 	clients      *models.APIClients
 	useEndpoints models.UseEndpoints
+	reCaptcha    *models.RecaptchaProps
 	marshaller   protojson.MarshalOptions
 	unmarshaller protojson.UnmarshalOptions
 }
 
-func NewHTTPHandler(clientRef *models.APIClients, useEndpoints models.UseEndpoints) *HttpEndpoints {
+func NewHTTPHandler(
+	clientRef *models.APIClients,
+	useEndpoints models.UseEndpoints,
+	reCaptcha *models.RecaptchaProps,
+) *HttpEndpoints {
 	m := protojson.MarshalOptions{
 		EmitUnpopulated: false,
 	}
 	um := protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}
+	if reCaptcha == nil {
+		reCaptcha = &models.RecaptchaProps{}
+	}
 	return &HttpEndpoints{
 		clients:      clientRef,
 		useEndpoints: useEndpoints,
+		reCaptcha:    reCaptcha,
 		marshaller:   m,
 		unmarshaller: um,
 	}
