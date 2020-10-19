@@ -35,4 +35,9 @@ USE_DELETE_PARTICIPANT_DATA_ENDPOINT=true
 
 # to disable signup
 DISABLE_SIGNUP_WITH_EMAIL_ENDPOINT=true
+
+# Use ReCaptcha
+USE_RECAPTCHA=true
+RECAPTCHA_SECRET=<secret key>
+
 ```
