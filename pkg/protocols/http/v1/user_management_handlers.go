@@ -338,7 +338,7 @@ func (h *HttpEndpoints) migrateUserHandl(c *gin.Context) {
 	cuReq := umAPI.CreateUserReq{
 		AccountId:         req.AccountID,
 		InitialPassword:   req.InitialPassword,
-		PreferredLanguage: req.InitialPassword,
+		PreferredLanguage: req.PreferredLanguage,
 		Roles:             []string{constants.USER_ROLE_PARTICIPANT},
 		Token:             token,
 		Use_2Fa:           req.Use2FA,
