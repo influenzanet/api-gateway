@@ -44,13 +44,13 @@ func NewHTTPHandler(
 
 func (h *HttpEndpoints) SendProtoAsJSON(c *gin.Context, statusCode int, pbMsg proto.Message) {
 	// b, err := .MarshalToString(pbMsg)
-	b, err := h.marshaller.Marshal(pbMsg)
+	jsonObject, err := h.marshaller.Marshal(pbMsg)
 
 	if err != nil {
 		fmt.Println("error:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "protobuf message couldn't be transform to json"})
 	}
-	c.Data(statusCode, "application/json; charset=utf-8", b)
+	c.Data(statusCode, "application/json; charset=utf-8", jsonObject)
 }
 
 func (h *HttpEndpoints) JsonToProto(c *gin.Context, pbObj interface{}) error {

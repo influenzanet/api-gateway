@@ -12,9 +12,9 @@ import (
 
 // AddServiceStatusAPI creates all API routes on the supplied RouterGroup
 func (h *HttpEndpoints) AddServiceStatusAPI(rg *gin.RouterGroup) {
-	userRoutes := rg.Group("/status")
-	userRoutes.GET("/user-management", h.statusUserMangementServiceHandl)
-	userRoutes.GET("/study-service", h.statusStudyServiceHandl)
+	statusRoutes := rg.Group("/status")
+	statusRoutes.GET("/user-management", h.statusUserMangementServiceHandl)
+	statusRoutes.GET("/study-service", h.statusStudyServiceHandl)
 }
 
 func (h *HttpEndpoints) statusUserMangementServiceHandl(c *gin.Context) {
