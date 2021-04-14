@@ -14,7 +14,7 @@ func ExtractToken() gin.HandlerFunc {
 
 		var token string
 		tokens, ok := req.Header["Authorization"]
-		if ok && len(tokens) >= 1 {
+		if ok && len(tokens) > 0 {
 			token = tokens[0]
 			token = strings.TrimPrefix(token, "Bearer ")
 			if len(token) == 0 {

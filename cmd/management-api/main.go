@@ -44,8 +44,8 @@ func healthCheckHandle(c *gin.Context) {
 }
 
 func main() {
-	umClient, close := gc.ConnectToUserManagement(conf.ServiceURLs.UserManagement)
-	defer close()
+	umClient, userManagementClose := gc.ConnectToUserManagement(conf.ServiceURLs.UserManagement)
+	defer userManagementClose()
 	studyClient, studyServiceClose := gc.ConnectToStudyService(conf.ServiceURLs.StudyService)
 	defer studyServiceClose()
 	messagingClient, messagingServiceClose := gc.ConnectToMessagingService(conf.ServiceURLs.MessagingService)
