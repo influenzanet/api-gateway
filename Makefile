@@ -1,4 +1,4 @@
-.PHONY: build test docker-participant-api docker-management-api management-api participant-api
+.PHONY: build test docker-participant-api docker-management-api management-api participant-api docker
 
 DOCKER_OPTS ?= --rm
 VERSION := $(shell git describe --tags --abbrev=0)
