@@ -31,3 +31,5 @@ docker-participant-api:
 
 docker-management-api:
 	docker build -t  github.com/influenzanet/management-api:$(VERSION)  -f build/docker/management-api/Dockerfile $(DOCKER_OPTS) .
+
+docker: docker-participant-api docker-management-api
