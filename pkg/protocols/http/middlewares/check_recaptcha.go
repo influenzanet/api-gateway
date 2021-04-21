@@ -65,8 +65,6 @@ func CheckRecaptcha() gin.HandlerFunc {
 
 		instanceID, hasInstanceID := getInstanceID(req.Header)
 		useRecaptcha, secretKey := getRecaptchaConfig(hasInstanceID, instanceID)
-		log.Printf("%v %v", instanceID, hasInstanceID)
-		log.Printf("%v %v", useRecaptcha, secretKey)
 		if !useRecaptcha || len(secretKey) < 1 {
 			c.Next()
 			return
