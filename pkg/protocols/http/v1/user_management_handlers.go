@@ -10,7 +10,9 @@ import (
 	"github.com/influenzanet/api-gateway/pkg/utils"
 	"github.com/influenzanet/go-utils/pkg/api_types"
 	"github.com/influenzanet/go-utils/pkg/constants"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/reflect/protoreflect"
 
 	studyAPI "github.com/influenzanet/study-service/pkg/api"
 	umAPI "github.com/influenzanet/user-management-service/pkg/api"
@@ -91,6 +93,46 @@ func (h *HttpEndpoints) signupWithEmailHandl(c *gin.Context) {
 	resp, err := h.clients.UserManagement.SignupWithEmail(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+	h.SendProtoAsJSON(c, http.StatusOK, resp)
+}
+
+func (h *HttpEndpoints) signupWithEmailHandlV2(c *gin.Context) {
+	var req umAPI.SignupWithEmailMsg
+	if err := h.JsonToProto(c, &req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	resp, err := h.clients.UserManagement.SignupWithEmail(context.Background(), &req)
+	h.handleGRPCResponse(c, resp, err)
+}
+
+type customHandlerMethod func(*gin.Context) (protoreflect.ProtoMessage, error)
+
+func (h *HttpEndpoints) signupWithEmailHandlV3(c *gin.Context) {
+	h.grpcCallHandler(
+		c,
+		func(c *gin.Context) (protoreflect.ProtoMessage, error) {
+			var req umAPI.SignupWithEmailMsg
+			if err := h.JsonToProto(c, &req); err != nil {
+				return nil, status.Error(codes.InvalidArgument, err.Error())
+			}
+			return h.clients.UserManagement.SignupWithEmail(context.Background(), &req)
+		},
+	)
+}
+
+func (h *HttpEndpoints) grpcCallHandler(c *gin.Context, customMethod customHandlerMethod) {
+	resp, err := customMethod(c)
+	h.handleGRPCResponse(c, resp, err)
+}
+
+func (h *HttpEndpoints) handleGRPCResponse(c *gin.Context, resp protoreflect.ProtoMessage, err error) {
+	if err != nil {
+		st := status.Convert(err)
+		log.Println(st.Message())
 		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
 		return
 	}

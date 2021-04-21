@@ -69,7 +69,7 @@ func main() {
 	router.GET("/", healthCheckHandle)
 	v1Root := router.Group("/v1")
 
-	v1APIHandlers := v1.NewHTTPHandler(grpcClients, conf.UseEndpoints, nil)
+	v1APIHandlers := v1.NewHTTPHandler(grpcClients, conf.UseEndpoints)
 	v1APIHandlers.AddServiceStatusAPI(v1Root)
 	v1APIHandlers.AddUserManagementAdminAPI(v1Root)
 	v1APIHandlers.AddStudyServiceAdminAPI(v1Root)
@@ -78,5 +78,3 @@ func main() {
 	log.Printf("gateway listening on port %s", conf.Port)
 	log.Fatal(router.Run(":" + conf.Port))
 }
-
-// InitExperimentalEndpoints(router.Group(""))

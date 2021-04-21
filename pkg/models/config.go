@@ -6,7 +6,6 @@ type Config struct {
 	AllowOrigins []string
 	Port         string
 	UseEndpoints UseEndpoints
-	Recaptcha    RecaptchaProps
 	ServiceURLs  struct {
 		UserManagement   string `yaml:"user_management"`
 		StudyService     string `yaml:"study_service"`
@@ -17,9 +16,4 @@ type Config struct {
 type UseEndpoints struct {
 	DeleteParticipantData bool
 	SignupWithEmail       bool
-}
-
-type RecaptchaProps struct {
-	Use    bool
-	Secret string
 }
