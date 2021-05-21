@@ -349,6 +349,25 @@ func (h *HttpEndpoints) saveStudyRulesHandl(c *gin.Context) {
 	h.SendProtoAsJSON(c, http.StatusOK, resp)
 }
 
+func (h *HttpEndpoints) runCustomStudyRulesHandl(c *gin.Context) {
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
+
+	var req studyAPI.StudyRulesReq
+	if err := h.JsonToProto(c, &req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	req.Token = token
+	req.StudyKey = c.Param("studyKey")
+	resp, err := h.clients.StudyService.RunRules(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+	h.SendProtoAsJSON(c, http.StatusOK, resp)
+}
+
 func (h *HttpEndpoints) saveStudyStatusHandl(c *gin.Context) {
 	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
