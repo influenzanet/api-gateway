@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [v0.13.1] - 2021-05-24
 
 ### Added:
 - New route to the management-api of the study-service to run custom study rules

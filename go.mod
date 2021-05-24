@@ -4,7 +4,7 @@ go 1.14
 
 require (
 	github.com/gin-contrib/cors v1.3.1
-	github.com/gin-gonic/gin v1.7.1
+	github.com/gin-gonic/gin v1.7.2
 	github.com/golang/protobuf v1.5.2
 	github.com/influenzanet/go-utils v0.2.8
 	github.com/influenzanet/messaging-service v0.9.2
