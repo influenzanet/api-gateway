@@ -14,7 +14,6 @@ import (
 type HttpEndpoints struct {
 	clients      *models.APIClients
 	useEndpoints models.UseEndpoints
-	reCaptcha    *models.RecaptchaProps
 	marshaller   protojson.MarshalOptions
 	unmarshaller protojson.UnmarshalOptions
 }
@@ -22,7 +21,6 @@ type HttpEndpoints struct {
 func NewHTTPHandler(
 	clientRef *models.APIClients,
 	useEndpoints models.UseEndpoints,
-	reCaptcha *models.RecaptchaProps,
 ) *HttpEndpoints {
 	m := protojson.MarshalOptions{
 		EmitUnpopulated: false,
@@ -30,13 +28,9 @@ func NewHTTPHandler(
 	um := protojson.UnmarshalOptions{
 		DiscardUnknown: false,
 	}
-	if reCaptcha == nil {
-		reCaptcha = &models.RecaptchaProps{}
-	}
 	return &HttpEndpoints{
 		clients:      clientRef,
 		useEndpoints: useEndpoints,
-		reCaptcha:    reCaptcha,
 		marshaller:   m,
 		unmarshaller: um,
 	}

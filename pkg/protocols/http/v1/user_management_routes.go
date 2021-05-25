@@ -12,11 +12,7 @@ func (h *HttpEndpoints) AddUserManagementParticipantAPI(rg *gin.RouterGroup) {
 
 	auth.POST("/login-with-email", mw.RequirePayload(), h.loginWithEmailAsParticipantHandl)
 	if h.useEndpoints.SignupWithEmail {
-		if h.reCaptcha.Use {
-			auth.POST("/signup-with-email", mw.CheckRecaptcha(h.reCaptcha.Secret), mw.RequirePayload(), h.signupWithEmailHandl)
-		} else {
-			auth.POST("/signup-with-email", mw.RequirePayload(), h.signupWithEmailHandl)
-		}
+		auth.POST("/signup-with-email", mw.CheckRecaptcha(), mw.RequirePayload(), h.signupWithEmailHandlV3)
 	}
 	auth.POST("/renew-token", mw.ExtractToken(), mw.RequirePayload(), h.tokenRenewHandl)
 
