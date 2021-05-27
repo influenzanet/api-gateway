@@ -1,5 +1,12 @@
 # Changelog
 
+## [v0.14.0] - Unreleased
+
+### Added:
+
+- New endpoints for data export in CSV formats
+
+
 ## [v0.13.1] - 2021-05-24
 
 ### Added:

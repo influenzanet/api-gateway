@@ -1,7 +1,9 @@
 package v1
 
 import (
+	"bytes"
 	"context"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -502,4 +504,196 @@ func (h *HttpEndpoints) getSurveyResponsesHandl(c *gin.Context) {
 
 	}
 	h.SendProtoAsJSON(c, http.StatusOK, resps)
+}
+
+func (h *HttpEndpoints) getResponseWideFormatCSV(c *gin.Context) {
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
+	var req studyAPI.ResponseExportQuery
+	studyKey := c.Param("studyKey")
+	req.StudyKey = studyKey
+	surveyKey := c.Param("surveyKey")
+	req.SurveyKey = surveyKey
+
+	from := c.DefaultQuery("from", "")
+	if len(from) > 0 {
+		n, err := strconv.ParseInt(from, 10, 64)
+		if err == nil {
+			req.From = n
+		}
+	}
+	until := c.DefaultQuery("until", "")
+	if len(until) > 0 {
+		n, err := strconv.ParseInt(until, 10, 64)
+		if err == nil {
+			req.Until = n
+		}
+	}
+	req.IncludeMeta = &studyAPI.ResponseExportQuery_IncludeMeta{
+		Position:       c.DefaultQuery("withPositions", "false") == "true",
+		ItemVersion:    c.DefaultQuery("withItemVersions", "false") == "true",
+		InitTimes:      c.DefaultQuery("withInitTimes", "false") == "true",
+		DisplayedTimes: c.DefaultQuery("withDisplayTimes", "false") == "true",
+		ResponsedTimes: c.DefaultQuery("withResponseTimes", "false") == "true",
+	}
+	req.Separator = c.DefaultQuery("sep", "-")
+	req.ShortQuestionKeys = c.DefaultQuery("shortKeys", "true") == "true"
+	req.Token = token
+
+	stream, err := h.clients.StudyService.GetResponsesWideFormatCSV(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+
+	content := []byte{}
+	for {
+		chnk, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			st := status.Convert(err)
+			c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+			return
+		}
+		content = append(content, chnk.Chunk...)
+	}
+
+	reader := bytes.NewReader(content)
+	contentLength := int64(len(content))
+	contentType := "text/csv"
+
+	extraHeaders := map[string]string{
+		"Content-Disposition": `attachment; filename=` + fmt.Sprintf("%s_%s.csv", studyKey, surveyKey),
+	}
+
+	c.DataFromReader(http.StatusOK, contentLength, contentType, reader, extraHeaders)
+}
+
+func (h *HttpEndpoints) getResponseLongFormatCSV(c *gin.Context) {
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
+	var req studyAPI.ResponseExportQuery
+	studyKey := c.Param("studyKey")
+	req.StudyKey = studyKey
+	surveyKey := c.Param("surveyKey")
+	req.SurveyKey = surveyKey
+
+	from := c.DefaultQuery("from", "")
+	if len(from) > 0 {
+		n, err := strconv.ParseInt(from, 10, 64)
+		if err == nil {
+			req.From = n
+		}
+	}
+	until := c.DefaultQuery("until", "")
+	if len(until) > 0 {
+		n, err := strconv.ParseInt(until, 10, 64)
+		if err == nil {
+			req.Until = n
+		}
+	}
+	req.IncludeMeta = &studyAPI.ResponseExportQuery_IncludeMeta{
+		Position:       c.DefaultQuery("withPositions", "false") == "true",
+		ItemVersion:    c.DefaultQuery("withItemVersions", "false") == "true",
+		InitTimes:      c.DefaultQuery("withInitTimes", "false") == "true",
+		DisplayedTimes: c.DefaultQuery("withDisplayTimes", "false") == "true",
+		ResponsedTimes: c.DefaultQuery("withResponseTimes", "false") == "true",
+	}
+	req.Separator = c.DefaultQuery("sep", "-")
+	req.ShortQuestionKeys = c.DefaultQuery("shortKeys", "true") == "true"
+	req.Token = token
+
+	stream, err := h.clients.StudyService.GetResponsesLongFormatCSV(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+
+	content := []byte{}
+	for {
+		chnk, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			st := status.Convert(err)
+			c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+			return
+		}
+		content = append(content, chnk.Chunk...)
+	}
+
+	reader := bytes.NewReader(content)
+	contentLength := int64(len(content))
+	contentType := "text/csv"
+
+	extraHeaders := map[string]string{
+		"Content-Disposition": `attachment; filename=` + fmt.Sprintf("%s_%s.csv", studyKey, surveyKey),
+	}
+
+	c.DataFromReader(http.StatusOK, contentLength, contentType, reader, extraHeaders)
+}
+func (h *HttpEndpoints) getSurveyInfoPreview(c *gin.Context) {
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
+	var req studyAPI.SurveyInfoExportQuery
+	studyKey := c.Param("studyKey")
+	req.StudyKey = studyKey
+	surveyKey := c.Param("surveyKey")
+	req.SurveyKey = surveyKey
+	req.PreviewLanguage = c.DefaultQuery("lang", "en")
+	req.ShortQuestionKeys = c.DefaultQuery("shortKeys", "true") == "true"
+	req.Token = token
+
+	resp, err := h.clients.StudyService.GetSurveyInfoPreview(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+	h.SendProtoAsJSON(c, http.StatusOK, resp)
+}
+
+func (h *HttpEndpoints) getSurveyInfoPreviewCSV(c *gin.Context) {
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
+	var req studyAPI.SurveyInfoExportQuery
+	studyKey := c.Param("studyKey")
+	req.StudyKey = studyKey
+	surveyKey := c.Param("surveyKey")
+	req.SurveyKey = surveyKey
+	req.PreviewLanguage = c.DefaultQuery("lang", "en")
+	req.ShortQuestionKeys = c.DefaultQuery("shortKeys", "true") == "true"
+	req.Token = token
+
+	stream, err := h.clients.StudyService.GetSurveyInfoPreviewCSV(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+
+	content := []byte{}
+	for {
+		chnk, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			st := status.Convert(err)
+			c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+			return
+		}
+		content = append(content, chnk.Chunk...)
+	}
+
+	reader := bytes.NewReader(content)
+	contentLength := int64(len(content))
+	contentType := "text/csv"
+
+	extraHeaders := map[string]string{
+		"Content-Disposition": `attachment; filename=` + fmt.Sprintf("survey_%s_%s.csv", studyKey, surveyKey),
+	}
+
+	c.DataFromReader(http.StatusOK, contentLength, contentType, reader, extraHeaders)
 }

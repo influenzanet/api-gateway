@@ -72,5 +72,13 @@ func (h *HttpEndpoints) AddStudyServiceAdminAPI(rg *gin.RouterGroup) {
 	{
 		responsesGroup.GET("/statistics", h.getSurveyResponseStatisticsHandl)
 		responsesGroup.GET("/responses", h.getSurveyResponsesHandl)
+
+		surveyResponsesGroup := responsesGroup.Group("/survey/:surveyKey")
+		{
+			surveyResponsesGroup.GET("/response", h.getResponseWideFormatCSV)
+			surveyResponsesGroup.GET("/response/long-format", h.getResponseLongFormatCSV)
+			surveyResponsesGroup.GET("/survey-info", h.getSurveyInfoPreview)
+			surveyResponsesGroup.GET("/survey-info/csv", h.getSurveyInfoPreviewCSV)
+		}
 	}
 }
