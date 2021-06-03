@@ -360,7 +360,8 @@ func (h *HttpEndpoints) createUserHandl(c *gin.Context) {
 
 type MigrateUserReq struct {
 	AccountID         string   `json:"accountId"`
-	OldParticipantID  string   `json:"oldParticipantID"`
+	OldParticipantIDs []string `json:"oldParticipantIDs"` // per profile
+	ProfileNames      []string `json:"profileNames"`      // per profile
 	InitialPassword   string   `json:"initialPassword"`
 	PreferredLanguage string   `json:"preferredLanguage"`
 	Studies           []string `json:"studies"`
@@ -376,6 +377,11 @@ func (h *HttpEndpoints) migrateUserHandl(c *gin.Context) {
 		return
 	}
 
+	if len(req.ProfileNames) > len(req.OldParticipantIDs) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "request data must have the same number of entries for oldParticipantIDs and profileNames, if profileNames are not empty."})
+		return
+	}
+
 	// Create user
 	cuReq := umAPI.CreateUserReq{
 		AccountId:         req.AccountID,
@@ -384,6 +390,7 @@ func (h *HttpEndpoints) migrateUserHandl(c *gin.Context) {
 		Roles:             []string{constants.USER_ROLE_PARTICIPANT},
 		Token:             token,
 		Use_2Fa:           req.Use2FA,
+		ProfileNames:      req.ProfileNames,
 	}
 	newUser, err := h.clients.UserManagement.CreateUser(context.Background(), &cuReq)
 	if err != nil {
@@ -392,47 +399,50 @@ func (h *HttpEndpoints) migrateUserHandl(c *gin.Context) {
 		return
 	}
 
-	newUserToken := &api_types.TokenInfos{
-		Id:               newUser.Id,
-		AccountConfirmed: true,
-		InstanceId:       token.InstanceId,
-		ProfilId:         newUser.Profiles[0].Id,
-	}
 	for _, studyKey := range req.Studies {
-		// enter studies:
-		_, err = h.clients.StudyService.EnterStudy(context.TODO(), &studyAPI.EnterStudyRequest{
-			Token:     newUserToken,
-			StudyKey:  studyKey,
-			ProfileId: newUser.Profiles[0].Id,
-		})
-		if err != nil {
-			st := status.Convert(err)
-			c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
-			return
-		}
+		for pIndex, profile := range newUser.Profiles {
+			newUserToken := &api_types.TokenInfos{
+				Id:               newUser.Id,
+				AccountConfirmed: true,
+				InstanceId:       token.InstanceId,
+				ProfilId:         profile.Id,
+			}
 
-		// submit migration survey
-		_, err = h.clients.StudyService.SubmitResponse(context.TODO(), &studyAPI.SubmitResponseReq{
-			Token:     newUserToken,
-			StudyKey:  studyKey,
-			ProfileId: newUser.Profiles[0].Id,
-			Response: &studyAPI.SurveyResponse{
-				Key:         "migration",
-				SubmittedAt: time.Now().Unix(),
-				Responses: []*studyAPI.SurveyItemResponse{
-					{Key: "migration.OldID", Response: &studyAPI.ResponseItem{Key: "rg", Items: []*studyAPI.ResponseItem{
-						{Key: "ic", Value: req.OldParticipantID},
-					}}},
+			// enter studies:
+			_, err = h.clients.StudyService.EnterStudy(context.TODO(), &studyAPI.EnterStudyRequest{
+				Token:     newUserToken,
+				StudyKey:  studyKey,
+				ProfileId: profile.Id,
+			})
+			if err != nil {
+				st := status.Convert(err)
+				c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+				return
+			}
+
+			// submit migration survey
+			_, err = h.clients.StudyService.SubmitResponse(context.TODO(), &studyAPI.SubmitResponseReq{
+				Token:     newUserToken,
+				StudyKey:  studyKey,
+				ProfileId: profile.Id,
+				Response: &studyAPI.SurveyResponse{
+					Key:         "migration",
+					SubmittedAt: time.Now().Unix(),
+					Responses: []*studyAPI.SurveyItemResponse{
+						{Key: "migration.OldID", Response: &studyAPI.ResponseItem{Key: "rg", Items: []*studyAPI.ResponseItem{
+							{Key: "ic", Value: req.OldParticipantIDs[pIndex]},
+						}}},
+					},
+					Context: map[string]string{
+						"engineVersion": "-",
+					},
 				},
-				Context: map[string]string{
-					"engineVersion": "-",
-				},
-			},
-		})
-		if err != nil {
-			st := status.Convert(err)
-			c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
-			return
+			})
+			if err != nil {
+				st := status.Convert(err)
+				c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+				return
+			}
 		}
 	}
 

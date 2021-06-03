@@ -1,5 +1,14 @@
 # Changelog
 
+## [v0.14.1] - 2021-06-03
+
+### Changed:
+
+- Migration endpoint can receive a list of profile names, that will be used to create profiles for the user, and submit a migration survey for each of the new profiles. Profile names can be defined through the optional attribute `profileNames`, which is expected to be a string array.
+Also `oldParticipantID` is renamed to `oldParticipantIDs` and expects a string array.
+If `profileNames` is populated, `oldParticipantIDs` must contain at least the same number of entries (and any values without matching profile name, will be ignored.)
+
+
 ## [v0.14.0] - 2021-05-28
 
 ### Added:
