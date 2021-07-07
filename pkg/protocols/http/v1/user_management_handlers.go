@@ -2,10 +2,14 @@ package v1
 
 import (
 	"context"
+	"fmt"
+	"html/template"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
+	"github.com/crewjam/saml/samlsp"
 	"github.com/gin-gonic/gin"
 	"github.com/influenzanet/api-gateway/pkg/utils"
 	"github.com/influenzanet/go-utils/pkg/api_types"
@@ -600,4 +604,143 @@ func (h *HttpEndpoints) unsubscribeNewsletterHandl(c *gin.Context) {
 		return
 	}
 	h.SendProtoAsJSON(c, http.StatusOK, resp)
+}
+
+type GroupInfo struct {
+	Customer   string
+	Prefix     string
+	InstanceID string
+	Role       string
+}
+
+func parseSAMLgroupInfo(groups []string) []GroupInfo {
+	sep := "-"
+	infos := []GroupInfo{}
+	for _, groupText := range groups {
+		parts := strings.Split(groupText, sep)
+		if len(parts) != 4 {
+			log.Printf("'%s' has only %d parts when using '%s' as a separator", groupText, len(parts), sep)
+			continue
+		}
+
+		c := GroupInfo{
+			Customer:   parts[0],
+			Prefix:     parts[1],
+			InstanceID: parts[2],
+			Role:       parts[3],
+		}
+		infos = append(infos, c)
+	}
+	return infos
+}
+
+func checkPermission(samlGroupInfos []GroupInfo, instanceID string, role string) (bool, *GroupInfo) {
+	for _, g := range samlGroupInfos {
+		if g.InstanceID == instanceID && role == g.Role {
+			return true, &g
+		}
+	}
+	return false, nil
+}
+
+type SAMLLoginInfo struct {
+	Username   string
+	Tokens     string
+	InstanceID string
+	Role       string
+}
+
+func (h *HttpEndpoints) loginWithSAML(w http.ResponseWriter, r *http.Request) {
+	instanceIDs, ok := r.URL.Query()["instance"]
+	if !ok || len(instanceIDs[0]) < 1 {
+		http.Error(w, "Url Param 'instance' is missing", http.StatusBadRequest)
+		return
+	}
+	roles, ok := r.URL.Query()["role"]
+	if !ok || len(roles[0]) < 1 {
+		http.Error(w, "Url Param 'role' is missing", http.StatusBadRequest)
+		return
+	}
+
+	instanceID := instanceIDs[0]
+	role := roles[0]
+
+	s := samlsp.SessionFromContext(r.Context())
+	if s == nil {
+		log.Println("session not found")
+		return
+	}
+
+	jwtSessionClaims, ok := s.(samlsp.JWTSessionClaims)
+	if !ok {
+		log.Println("Unable to decode session into JWTSessionClaims")
+		return
+	}
+
+	email := jwtSessionClaims.Subject
+
+	sa, ok := s.(samlsp.SessionWithAttributes)
+	if !ok {
+		log.Println("attributes not found")
+		return
+	}
+
+	attributes := sa.GetAttributes()
+	groups, ok := attributes["http://schemas.xmlsoap.org/claims/Group"]
+	if !ok {
+		err := fmt.Errorf("group infos not found in the response token for %s", email)
+		log.Println(err.Error())
+		http.Error(w, err.Error(), http.StatusForbidden)
+		return
+	}
+	groupInfos := parseSAMLgroupInfo(groups)
+
+	hasPermission, usedGroupInfo := checkPermission(groupInfos, instanceID, role)
+	if !hasPermission {
+		err := fmt.Errorf("%s not authorized to access %s with role %s", email, instanceID, role)
+		log.Println(err.Error())
+		http.Error(w, err.Error(), http.StatusForbidden)
+		return
+	}
+
+	req := umAPI.LoginWithExternalIDPMsg{
+		InstanceId: instanceID,
+		Email:      email,
+		Role:       strings.ToUpper(role),
+		Customer:   usedGroupInfo.Customer,
+		GroupInfo:  strings.Join(groups, ";"),
+		Idp:        h.samlConfig.IDPUrl,
+	}
+
+	resp, err := h.clients.UserManagement.LoginWithExternalIDP(context.Background(), &req)
+	if err != nil {
+		log.Println(err.Error())
+		http.Error(w, err.Error(), http.StatusForbidden)
+		return
+	}
+
+	loginInfos := SAMLLoginInfo{
+		Username:   email,
+		InstanceID: instanceID,
+		Role:       role,
+		Tokens: strings.Join([]string{
+			resp.Token.AccessToken,
+			resp.Token.RefreshToken,
+		}, "<!>"),
+	}
+
+	parsedTemplate, _ := template.ParseFiles(h.samlConfig.TemplatePathLoginSuccess)
+	err = parsedTemplate.Execute(w, loginInfos)
+	if err != nil {
+		log.Println(err.Error())
+		http.Error(w, err.Error(), http.StatusForbidden)
+		return
+	}
+	if err != nil {
+		log.Println("Error executing template :", err)
+		return
+	}
+
+	// c.Data(http.StatusOK, "text/html; charset=utf-8", tpl.Bytes())
+	//fmt.Fprintf(w, "Logged in as: %s, Token contents, %+v!\n\n%v \n\n %s - %s \n\n%s", email, sa.GetAttributes(), groupInfos, instanceID, role, resp.Token.AccessToken)
 }

@@ -1,5 +1,13 @@
 # Changelog
 
+## [v0.15.0] - 2021-07-07
+
+### New:
+
+- Added new form of authentication for management-api: the service can be connected with a SAML based identity provider. Upon successful authentication, it calls the user-management-service's new endpoint for logging in with external identity provider and display the token provided by the that.
+In this current concept, this workflow is set up to work with the Python scripts by copy pasting that token string into the terminal. Documentation about how to configure this new SAML interface can be found at [docs/saml-config.md](docs/saml-config.md).
+
+
 ## [v0.14.1] - 2021-06-03
 
 ### Changed:

@@ -21,3 +21,9 @@ func GRPCStatusToHTTP(status codes.Code) int {
 	}
 	return http.StatusInternalServerError
 }
+
+func PanicIfError(err error) {
+	if err != nil {
+		panic(err)
+	}
+}

@@ -11,9 +11,21 @@ type Config struct {
 		StudyService     string `yaml:"study_service"`
 		MessagingService string `yaml:"messaging_service"`
 	} `yaml:"service_urls"`
+	SAMLConfig *SAMLConfig `yaml:"saml_config"`
 }
 
 type UseEndpoints struct {
 	DeleteParticipantData bool
 	SignupWithEmail       bool
+	LoginWithExternalIDP  bool
+}
+
+type SAMLConfig struct {
+	IDPUrl                   string `yaml:"idp_root_url"`
+	SPRootUrl                string `yaml:"sp_root_url"`
+	EntityID                 string `yaml:"entity_id"`
+	MetaDataURL              string `yaml:"metadata_url"`
+	SessionCertPath          string `yaml:"session_cert"`
+	SessionKeyPath           string `yaml:"session_key"`
+	TemplatePathLoginSuccess string `yaml:"templates_login_success"`
 }

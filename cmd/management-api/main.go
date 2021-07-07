@@ -28,6 +28,25 @@ func initConfig() {
 	conf.AllowOrigins = strings.Split(os.Getenv("CORS_ALLOW_ORIGINS"), ",")
 
 	conf.UseEndpoints.DeleteParticipantData = os.Getenv("USE_DELETE_PARTICIPANT_DATA_ENDPOINT") == "true"
+
+	// SAML configs
+	conf.UseEndpoints.LoginWithExternalIDP = os.Getenv("USE_LOGIN_WITH_EXTERNAL_IDP_ENDPOINT") == "true"
+
+	if conf.UseEndpoints.LoginWithExternalIDP {
+		conf.SAMLConfig = &models.SAMLConfig{
+			IDPUrl:                   os.Getenv("SAML_IDP_URL"),                   // arbitrary name to refer to IDP in the logs
+			SPRootUrl:                os.Getenv("SAML_SERVICE_PROVIDER_ROOT_URL"), // url of the management api
+			EntityID:                 os.Getenv("SAML_ENTITY_ID"),
+			MetaDataURL:              os.Getenv("SAML_IDP_METADATA_URL"),
+			SessionCertPath:          os.Getenv("SAML_SESSION_CERT_PATH"),
+			SessionKeyPath:           os.Getenv("SAML_SESSION_KEY_PATH"),
+			TemplatePathLoginSuccess: os.Getenv("SAML_TEMPLATE_PATH_LOGIN_SUCCESS"),
+		}
+
+		if len(conf.SAMLConfig.IDPUrl) > 0 {
+			conf.AllowOrigins = append(conf.AllowOrigins, conf.SAMLConfig.IDPUrl)
+		}
+	}
 }
 
 func init() {
@@ -69,7 +88,7 @@ func main() {
 	router.GET("/", healthCheckHandle)
 	v1Root := router.Group("/v1")
 
-	v1APIHandlers := v1.NewHTTPHandler(grpcClients, conf.UseEndpoints)
+	v1APIHandlers := v1.NewHTTPHandler(grpcClients, conf.UseEndpoints, conf.SAMLConfig)
 	v1APIHandlers.AddServiceStatusAPI(v1Root)
 	v1APIHandlers.AddUserManagementAdminAPI(v1Root)
 	v1APIHandlers.AddStudyServiceAdminAPI(v1Root)

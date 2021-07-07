@@ -1,8 +1,11 @@
 package v1
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	mw "github.com/influenzanet/api-gateway/pkg/protocols/http/middlewares"
+	"github.com/influenzanet/api-gateway/pkg/utils"
 )
 
 func (h *HttpEndpoints) AddUserManagementParticipantAPI(rg *gin.RouterGroup) {
@@ -51,6 +54,16 @@ func (h *HttpEndpoints) AddUserManagementParticipantAPI(rg *gin.RouterGroup) {
 func (h *HttpEndpoints) AddUserManagementAdminAPI(rg *gin.RouterGroup) {
 	auth := rg.Group("/auth")
 	auth.POST("/login-with-email", mw.RequirePayload(), h.loginWithEmailForManagementHandl)
+
+	// SAML endpoints
+	if h.useEndpoints.LoginWithExternalIDP {
+		samlSP, err := h.InitSamlSP()
+		utils.PanicIfError(err)
+
+		rg.POST("/saml/acs", gin.WrapF(samlSP.ServeACS))
+		app := http.HandlerFunc(h.loginWithSAML)
+		auth.GET("/login-with-saml", mw.RequireQueryParams([]string{"role", "instance"}), gin.WrapH(samlSP.RequireAccount(app)))
+	}
 
 	user := rg.Group("/user")
 	user.Use(mw.ExtractToken())

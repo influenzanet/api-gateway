@@ -1,0 +1,84 @@
+<html>
+
+<head>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            padding: 30px;
+        }
+
+        .tokenInfos {
+            background-color: #3464D5;
+            color: white;
+            padding: 15px 30px;
+            overflow-x: scroll;
+            -moz-user-select: all;
+            -webkit-user-select: all;
+            -ms-user-select: all;
+            user-select: all;
+        }
+
+        .tokenInfos:hover {
+            background-color: #1c4ab4;
+        }
+
+        .copied {
+            background-color: #BCE0FA;
+            padding: 15px 30px;
+        }
+
+        .visible {
+            visibility: visible;
+        }
+
+        .hidden {
+            visibility: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <h3>Logged in as: {{ .Username }}</h3>
+    <p>
+        Currently authorised to access the instance "{{ .InstanceID }}" with "{{ .Role }}" role.
+    </p>
+
+    <div style="margin-top: 60px;">
+        <h3>Copy to token texts into the script:</h3>
+        <p>(clicking the box will automatically copy the content to the clipboard)</p>
+        <div id="tokens" class="tokenInfos" onclick="copyToClipboard()">
+            {{ .Tokens }}
+        </div>
+        <div id="copied" class="copied hidden">
+            Tokens has been copy to clipboard.
+        </div>
+    </div>
+
+    <p style="margin-top: 20px;">
+        After copying the text into the script's console input, you can close this window.
+    </p>
+
+    <script>
+        var hideCallback = undefined;
+        function copyToClipboard() {
+            /* Get the text field */
+            var copyText = document.getElementById("tokens").innerHTML.trim();
+            // console.log(copyText);
+
+            /* Copy the text inside the text field */
+            document.execCommand("copy", true, copyText);
+
+            document.getElementById("copied").className = "copied visible";
+            if (hideCallback !== undefined) {
+                clearTimeout(hideCallback);
+            }
+            hideCallback = setTimeout(
+                () => {
+                    document.getElementById("copied").className = "copied hidden";
+                }, 3000
+            )
+        }
+    </script>
+</body>
+
+</html>
