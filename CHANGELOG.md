@@ -1,5 +1,9 @@
 # Changelog
 
+## [v0.15.1] - 2021-07-28
+
+- Update dependency for messaging service, to use recent API.
+
 ## [v0.15.0] - 2021-07-07
 
 ### New:
