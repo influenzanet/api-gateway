@@ -71,6 +71,7 @@ func main() {
 	v1APIHandlers.AddServiceStatusAPI(v1Root)
 	v1APIHandlers.AddUserManagementParticipantAPI(v1Root)
 	v1APIHandlers.AddStudyServiceParticipantAPI(v1Root)
+	v1APIHandlers.AddRTRSpecificEndpoints(v1Root)
 
 	log.Printf("gateway listening on port %s", conf.Port)
 	log.Fatal(router.Run(":" + conf.Port))
