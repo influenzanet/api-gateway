@@ -635,6 +635,72 @@ func (h *HttpEndpoints) getResponseLongFormatCSV(c *gin.Context) {
 
 	c.DataFromReader(http.StatusOK, contentLength, contentType, reader, extraHeaders)
 }
+
+func (h *HttpEndpoints) getResponseFlatJSON(c *gin.Context) {
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
+	var req studyAPI.ResponseExportQuery
+	studyKey := c.Param("studyKey")
+	req.StudyKey = studyKey
+	surveyKey := c.Param("surveyKey")
+	req.SurveyKey = surveyKey
+
+	from := c.DefaultQuery("from", "")
+	if len(from) > 0 {
+		n, err := strconv.ParseInt(from, 10, 64)
+		if err == nil {
+			req.From = n
+		}
+	}
+	until := c.DefaultQuery("until", "")
+	if len(until) > 0 {
+		n, err := strconv.ParseInt(until, 10, 64)
+		if err == nil {
+			req.Until = n
+		}
+	}
+	req.IncludeMeta = &studyAPI.ResponseExportQuery_IncludeMeta{
+		Position:       c.DefaultQuery("withPositions", "false") == "true",
+		ItemVersion:    c.DefaultQuery("withItemVersions", "false") == "true",
+		InitTimes:      c.DefaultQuery("withInitTimes", "false") == "true",
+		DisplayedTimes: c.DefaultQuery("withDisplayTimes", "false") == "true",
+		ResponsedTimes: c.DefaultQuery("withResponseTimes", "false") == "true",
+	}
+	req.Separator = c.DefaultQuery("sep", "-")
+	req.ShortQuestionKeys = c.DefaultQuery("shortKeys", "true") == "true"
+	req.Token = token
+
+	stream, err := h.clients.StudyService.GetResponsesFlatJSON(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+
+	content := []byte{}
+	for {
+		chnk, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			st := status.Convert(err)
+			c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+			return
+		}
+		content = append(content, chnk.Chunk...)
+	}
+
+	reader := bytes.NewReader(content)
+	contentLength := int64(len(content))
+	contentType := "application/json"
+
+	extraHeaders := map[string]string{
+		"Content-Disposition": `attachment; filename=` + fmt.Sprintf("%s_%s.json", studyKey, surveyKey),
+	}
+
+	c.DataFromReader(http.StatusOK, contentLength, contentType, reader, extraHeaders)
+}
+
 func (h *HttpEndpoints) getSurveyInfoPreview(c *gin.Context) {
 	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 	var req studyAPI.SurveyInfoExportQuery
