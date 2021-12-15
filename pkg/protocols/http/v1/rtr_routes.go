@@ -1,15 +1,171 @@
 package v1
 
 import (
+	"bytes"
+	"context"
+	"io"
+	"log"
 	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	mw "github.com/influenzanet/api-gateway/pkg/protocols/http/middlewares"
+	"github.com/influenzanet/api-gateway/pkg/utils"
+	"github.com/influenzanet/go-utils/pkg/api_types"
+	studyAPI "github.com/influenzanet/study-service/pkg/api"
+	"google.golang.org/grpc/status"
+
+	"github.com/h2non/filetype"
 )
+
+const chunkSize = 64 * 1024 // 64 KiB
 
 func (h *HttpEndpoints) AddRTRSpecificEndpoints(rg *gin.RouterGroup) {
 	auth := rg.Group("/rtr")
 	auth.GET("/code-validation", h.rtrCodeValidationEndpoint)
+	auth.POST("/sync/:studyKey/:start/:end", mw.ExtractToken(), mw.ValidateToken(h.clients.UserManagement), h.uploadRTRSync)
+}
+
+func (h *HttpEndpoints) uploadRTRSync(c *gin.Context) {
+	log.Println("File upload")
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
+	studyKey := c.Param("studyKey")
+	start := c.Param("start")
+	end := c.Param("end")
+
+	file, err := c.FormFile("file")
+	// file, header, err := c.Request.FormFile("file")
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	log.Println(file.Filename)
+	log.Println(file.Size)
+
+	// Open file
+	f, err := file.Open()
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	defer f.Close()
+
+	// Get bytes
+	buf := bytes.NewBuffer(nil)
+	if _, err := io.Copy(buf, f); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	content := buf.Bytes()
+
+	stream, err := h.clients.StudyService.UploadParticipantFile(context.Background())
+	if err != nil {
+		log.Fatal("cannot upload image: ", err)
+	}
+
+	kind, _ := filetype.Match(content)
+	log.Printf("%v", kind)
+	log.Printf("%v", kind.MIME.Value)
+
+	// Send infos
+	req := &studyAPI.UploadParticipantFileReq{
+		Data: &studyAPI.UploadParticipantFileReq_Info_{
+			Info: &studyAPI.UploadParticipantFileReq_Info{
+				Token:                token,
+				StudyKey:             studyKey,
+				VisibleToParticipant: true,
+				FileType: &studyAPI.FileType{
+					Type:    kind.MIME.Type,
+					Subtype: kind.MIME.Subtype,
+					Value:   kind.MIME.Value,
+				},
+				Participant: &studyAPI.UploadParticipantFileReq_Info_ProfileId{
+					ProfileId: token.ProfilId,
+				},
+			},
+		},
+	}
+
+	err = stream.Send(req)
+	if err != nil {
+		st := status.Convert(err)
+		log.Println(st.Message())
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+
+	}
+
+	for currentByte := 0; currentByte < len(content); currentByte += chunkSize {
+		var currentChnk []byte
+		if currentByte+chunkSize > len(content) {
+			currentChnk = content[currentByte:]
+		} else {
+			currentChnk = content[currentByte : currentByte+chunkSize]
+		}
+		log.Println(len(currentChnk))
+		req = &studyAPI.UploadParticipantFileReq{
+			Data: &studyAPI.UploadParticipantFileReq_Chunk{
+				Chunk: currentChnk,
+			},
+		}
+
+		if err := stream.Send(req); err != nil {
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+				return
+			}
+
+		}
+	}
+	reply, err := stream.CloseAndRecv()
+	if err != nil {
+		st := status.Convert(err)
+		log.Println(st.Message())
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+
+	}
+
+	sReq := studyAPI.SubmitResponseReq{
+		Token:     token,
+		StudyKey:  c.Param("studyKey"),
+		ProfileId: token.ProfilId,
+		Response: &studyAPI.SurveyResponse{
+			SubmittedAt: time.Now().Unix(),
+			Key:         "rtrsyncfile",
+			Responses: []*studyAPI.SurveyItemResponse{
+				{Key: "file", Response: &studyAPI.ResponseItem{
+					Key: "rg", Items: []*studyAPI.ResponseItem{
+						{Key: "input", Value: reply.Id},
+					},
+				}},
+				{Key: "start", Response: &studyAPI.ResponseItem{
+					Key: "rg", Items: []*studyAPI.ResponseItem{
+						{Key: "input", Value: start},
+					},
+				}},
+				{Key: "end", Response: &studyAPI.ResponseItem{
+					Key: "rg", Items: []*studyAPI.ResponseItem{
+						{Key: "input", Value: end},
+					},
+				}},
+			},
+		},
+	}
+	_, err = h.clients.StudyService.SubmitResponse(context.Background(), &sReq)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+
+	h.SendProtoAsJSON(c, http.StatusOK, reply)
 }
 
 func (h *HttpEndpoints) rtrCodeValidationEndpoint(c *gin.Context) {
@@ -20,6 +176,7 @@ func (h *HttpEndpoints) rtrCodeValidationEndpoint(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "code error"})
 		return
 	}
+	log.Printf("GROUP CODE: %s", code)
 
 	for k, codes := range codeLists {
 		for _, ec := range codes {
@@ -38,169 +195,126 @@ func (h *HttpEndpoints) rtrCodeValidationEndpoint(c *gin.Context) {
 }
 
 var codeLists map[string][]string = map[string][]string{
-	"KG0829": {
-		"K101",
-		"K102",
-		"K103",
-		"K104",
-		"K105",
-		"K106",
-		"K107",
-		"K108",
-		"K109",
-		"K110",
-		"K111",
-		"K112",
-		"K113",
-		"K114",
-		"K115",
-		"K116",
-		"K117",
-		"K118",
-		"K119",
-		"K120",
-		"K121",
-		"K122",
-		"K123",
-		"K124",
-		"K125",
-		"K126",
-		"K127",
-		"K128",
-		"K129",
-		"K130",
-	},
-	"KG0912": {
-		"K201",
-		"K203",
-		"K202",
-		"K204",
-		"K205",
-		"K206",
-		"K207",
-		"K208",
-		"K209",
-		"K210",
-		"K211",
-		"K212",
-		"K213",
-		"K214",
-		"K215",
-		"K216",
-		"K217",
-		"K218",
-		"K219",
-		"K220",
-		"K221",
-		"K222",
-		"K223",
-		"K224",
-		"K225",
-		"K226",
-		"K227",
-		"K228",
-		"K229",
-		"K230",
-	},
 	"EG": {
-		"E001",
-		"E002",
-		"E003",
-		"E004",
-		"E005",
-		"E006",
-		"E007",
-		"E008",
-		"E009",
-		"E010",
-		"E011",
-		"E012",
-		"E013",
-		"E014",
-		"E015",
-		"E016",
-		"E017",
-		"E018",
-		"E019",
-		"E020",
-		"E021",
-		"E022",
-		"E023",
-		"E024",
-		"E025",
-		"E026",
-		"E027",
-		"E028",
-		"E029",
-		"E030",
-		"E031",
-		"E032",
-		"E033",
-		"E034",
-		"E035",
-		"E036",
-		"E037",
-		"E038",
-		"E039",
-		"E040",
-		"E041",
-		"E042",
-		"E043",
-		"E044",
-		"E045",
-		"E046",
-		"E047",
-		"E048",
-		"E049",
-		"E050",
-		"E051",
-		"E052",
-		"E053",
-		"E054",
-		"E055",
-		"E056",
-		"E057",
-		"E058",
-		"E059",
-		"E060",
-		"E061",
-		"E062",
-		"E063",
-		"E064",
-		"E065",
-		"E066",
-		"E067",
-		"E068",
-		"E069",
-		"E070",
-		"E071",
-		"E072",
-		"E073",
-		"E074",
-		"E075",
-		"E076",
-		"E077",
-		"E078",
-		"E079",
-		"E080",
-		"E081",
-		"E082",
-		"E083",
-		"E084",
-		"E085",
-		"E086",
-		"E087",
-		"E088",
-		"E089",
-		"E090",
-		"E091",
-		"E092",
-		"E093",
-		"E094",
-		"E095",
-		"E096",
-		"E097",
-		"E098",
-		"E099",
+		"eg08",
+		"testeg",
+		"i6ECbF",
+		"FgPnim",
+		"FT6HtP",
+		"tKPypo",
+		"UZWmzN",
+		"H2SCQF",
+		"QR856t",
+		"Bjd4ew",
+		"axnxYG",
+		"WaAMxn",
+		"yWQsFN",
+		"83nrhm",
+		"XAegyd",
+		"mtFL6m",
+		"T9LTqK",
+		"bdByYS",
+		"4AXm6r",
+		"S5cjWK",
+		"ooig4R",
+		"rmR87N",
+		"4Mma7f",
+		"J4Lvqq",
+		"ntHRTg",
+		"LaSy76",
+		"EPgLFD",
+		"dhjxSN",
+		"6MrRAP",
+		"xc9tBq",
+		"oU9sfV",
+		"3UHjmU",
+		"JshoCA",
+		"BKggC5",
+		"erZ4uw",
+		"5vbV5D",
+		"twDvBF",
+		"WT8BZU",
+		"dtfZyA",
+		"5wMDfZ",
+		"APS4Kc",
+		"UzyDKf",
+		"ZQvxGx",
+		"YYQeNE",
+		"zWfEGW",
+		"CVv8QP",
+		"kyV5Qn",
+		"6mqduu",
+		"4CUbUE",
+		"HtUeWW",
+		"QDd5TW",
+		"xLn25j",
+		"X89tPT",
+		"5T9LZX",
+		"GSTdf4",
+		"Q8GGtj",
+		"UZnvsv",
+		"2qeYLw",
+		"kNCHTk",
+		"Gnit9Z",
+		"CZTAWA",
+		"LswGiV",
+		"bcnm8E",
+		"tvQDMV",
+		"uP22Mn",
+		"yGpaAs",
+		"fzG4S5",
+		"rWoe4T",
+		"xyFNCy",
+		"whYDkM",
+		"puwmc9",
+		"4CeDj6",
+		"FJtvsK",
+		"qCryq6",
+		"RBDCwL",
+		"UZYWqj",
+		"QMWakZ",
+		"HBQD7B",
+		"yoUHEC",
+		"2uJHzs",
+		"uwVaD8",
+		"nP6vTb",
+		"5R5bpv",
+		"3Vxa6Y",
+		"Mb9NSZ",
+		"zZ4mhN",
+		"JAtYW5",
+		"ibdxTq",
+		"XJNyTF",
+		"c43W7h",
+		"Lqs8pk",
+		"XbKLgS",
+		"DG8ftE",
+		"bnpHGe",
+		"RuTEQ4",
+		"Zc867f",
+		"gQcpJu",
+		"Put79F",
+		"fvQjzB",
+		"JmCGTr",
+		"oqzpht",
+		"miGUVf",
+	},
+	"EG09": {
+		"eg09",
+	},
+	"PUB08": {
+		"pub08",
+	},
+	"PUB09": {
+		"pub09",
+	},
+	"RTR05": {
+		"rtr05",
+	},
+	"RTR60": {
+		"rtr60",
+	},
+	"TEST01": {
+		"empty",
 	},
 }
