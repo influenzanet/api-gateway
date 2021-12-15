@@ -20,16 +20,26 @@ func (h *HttpEndpoints) AddStudyServiceParticipantAPI(rg *gin.RouterGroup) {
 		}
 	}
 
+	tempStudyParticipantGroup := rg.Group("/temp-participant")
+	{
+		tempStudyParticipantGroup.GET("/register", h.registerTempParticipant)  // ?instance=todo&study=todo
+		tempStudyParticipantGroup.GET("/surveys", h.getTempParticipantSurveys) // ?instance=todo&study=todo&pid=todo
+
+		tempStudyParticipantGroup.GET("/survey", h.getSurveyDefForTempParticipantHandl) // ?instance=todo&study=todo&pid=todo&survey=todo
+		tempStudyParticipantGroup.POST("/submit-response", mw.RequirePayload(), h.submitSurveyResponseForTempParticipantHandl)
+	}
+
 	studyGroup := rg.Group("/study")
 	studyGroup.Use(mw.ExtractToken())
 	studyGroup.Use(mw.ValidateToken(h.clients.UserManagement))
-	studyGroup.Use(mw.CheckAccountConfirmed())
 	{
 		studyGroup.GET("/:studyKey/survey-infos", h.getStudySurveyInfosHandl)
 		studyGroup.POST("/:studyKey/enter", mw.RequirePayload(), h.enterStudyHandl)
 		studyGroup.GET("/:studyKey/survey/:surveyKey", h.getAssignedSurveyHandl)
 		studyGroup.POST("/:studyKey/submit-response", mw.RequirePayload(), h.submitSurveyResponseHandl)
 		studyGroup.POST("/:studyKey/leave", mw.RequirePayload(), h.leaveStudyHandl)
+
+		studyGroup.POST("/:studyKey/assume-temp-participant", mw.RequirePayload(), h.convertTempToActiveParticipant)
 	}
 }
 

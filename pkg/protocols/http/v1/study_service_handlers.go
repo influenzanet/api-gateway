@@ -95,6 +95,86 @@ func (h *HttpEndpoints) removeSurveyFromStudyHandl(c *gin.Context) {
 	h.SendProtoAsJSON(c, http.StatusOK, resp)
 }
 
+func (h *HttpEndpoints) registerTempParticipant(c *gin.Context) {
+	var req studyAPI.RegisterTempParticipantReq
+
+	req.StudyKey = c.Query("study")
+	req.InstanceId = c.Query("instance")
+	resp, err := h.clients.StudyService.RegisterTemporaryParticipant(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+	h.SendProtoAsJSON(c, http.StatusOK, resp)
+}
+
+func (h *HttpEndpoints) getTempParticipantSurveys(c *gin.Context) {
+	var req studyAPI.GetAssignedSurveysForTemporaryParticipantReq
+	req.StudyKey = c.Query("study")
+	req.InstanceId = c.Query("instance")
+	req.TemporaryParticipantId = c.Query("pid")
+	resp, err := h.clients.StudyService.GetAssignedSurveysForTemporaryParticipant(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+	h.SendProtoAsJSON(c, http.StatusOK, resp)
+}
+
+func (h *HttpEndpoints) getSurveyDefForTempParticipantHandl(c *gin.Context) {
+	// ?instance=todo&study=todo&pid=todo&survey=todo
+	var req studyAPI.SurveyReferenceRequest
+	req.SurveyKey = c.Query("survey")
+	req.StudyKey = c.Query("study")
+	req.InstanceId = c.Query("instance")
+	req.TemporaryParticipantId = c.Query("pid")
+	resp, err := h.clients.StudyService.GetAssignedSurvey(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+	h.SendProtoAsJSON(c, http.StatusOK, resp)
+}
+
+func (h *HttpEndpoints) submitSurveyResponseForTempParticipantHandl(c *gin.Context) {
+	var req studyAPI.SubmitResponseReq
+	if err := h.JsonToProto(c, &req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	resp, err := h.clients.StudyService.SubmitResponse(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+	h.SendProtoAsJSON(c, http.StatusOK, resp)
+}
+
+func (h *HttpEndpoints) convertTempToActiveParticipant(c *gin.Context) {
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
+
+	var req studyAPI.ConvertTempParticipantReq
+	if err := h.JsonToProto(c, &req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	req.Token = token
+	req.StudyKey = c.Param("studyKey")
+
+	resp, err := h.clients.StudyService.ConvertTemporaryToParticipant(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+	h.SendProtoAsJSON(c, http.StatusOK, resp)
+}
+
 func (h *HttpEndpoints) getAssignedSurveyHandl(c *gin.Context) {
 	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
