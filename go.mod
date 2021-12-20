@@ -1,6 +1,6 @@
 module github.com/influenzanet/api-gateway
 
-go 1.14
+go 1.16
 
 require (
 	github.com/crewjam/saml v0.4.6-0.20210521115923-29c6295245bd
@@ -9,7 +9,7 @@ require (
 	github.com/golang/protobuf v1.5.2
 	github.com/influenzanet/go-utils v0.2.10
 	github.com/influenzanet/messaging-service v0.9.3
-	github.com/influenzanet/study-service v0.16.3-0.20211215155347-1551bda0ad2e
+	github.com/influenzanet/study-service v0.16.3-0.20211220140539-1989c9fe1c93
 	github.com/influenzanet/user-management-service v0.20.2
 	google.golang.org/grpc v1.39.1
 	google.golang.org/protobuf v1.27.1
