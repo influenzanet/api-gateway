@@ -22,17 +22,23 @@ func (h *HttpEndpoints) AddStudyServiceParticipantAPI(rg *gin.RouterGroup) {
 
 	tempStudyParticipantGroup := rg.Group("/temp-participant")
 	{
-		tempStudyParticipantGroup.GET("/register", h.registerTempParticipant)  // ?instance=todo&study=todo
-		tempStudyParticipantGroup.GET("/surveys", h.getTempParticipantSurveys) // ?instance=todo&study=todo&pid=todo
-
+		tempStudyParticipantGroup.GET("/register", h.registerTempParticipant)           // ?instance=todo&study=todo
+		tempStudyParticipantGroup.GET("/surveys", h.getTempParticipantSurveys)          // ?instance=todo&study=todo&pid=todo
 		tempStudyParticipantGroup.GET("/survey", h.getSurveyDefForTempParticipantHandl) // ?instance=todo&study=todo&pid=todo&survey=todo
 		tempStudyParticipantGroup.POST("/submit-response", mw.RequirePayload(), h.submitSurveyResponseForTempParticipantHandl)
 	}
+
+	rg.GET("/reports",
+		mw.ExtractToken(),
+		mw.ValidateToken(h.clients.UserManagement),
+		mw.CheckAccountConfirmed(),
+		h.getReportsForParticipant) // ?studies=todo1,todo2&profileIds=todo1,todo2&from=time1&until=time2&reportKey=todo3
 
 	studyGroup := rg.Group("/study")
 	studyGroup.Use(mw.ExtractToken())
 	studyGroup.Use(mw.ValidateToken(h.clients.UserManagement))
 	{
+
 		studyGroup.GET("/:studyKey/survey-infos", h.getStudySurveyInfosHandl)
 		studyGroup.POST("/:studyKey/enter", mw.RequirePayload(), h.enterStudyHandl)
 		studyGroup.GET("/:studyKey/survey/:surveyKey", h.getAssignedSurveyHandl)
@@ -80,6 +86,8 @@ func (h *HttpEndpoints) AddStudyServiceAdminAPI(rg *gin.RouterGroup) {
 	responsesGroup.Use(mw.CheckAccountConfirmed())
 	{
 		responsesGroup.GET("/statistics", h.getSurveyResponseStatisticsHandl)
+		responsesGroup.GET("/participants", h.getParticipantStatesForStudy) // ?&status=active(opt)
+		responsesGroup.GET("/reports", h.getReportsForStudy)                // ?reportKey=todo&from=time1&until=time2&participant=todo
 		responsesGroup.GET("/responses", h.getSurveyResponsesHandl)
 
 		surveyResponsesGroup := responsesGroup.Group("/survey/:surveyKey")

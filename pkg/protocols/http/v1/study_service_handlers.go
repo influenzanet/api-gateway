@@ -5,10 +5,11 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"strconv"
+	"strings"
 
+	"github.com/coneno/logger"
 	"github.com/gin-gonic/gin"
 	"github.com/influenzanet/api-gateway/pkg/utils"
 	"github.com/influenzanet/go-utils/pkg/api_types"
@@ -322,6 +323,47 @@ func (h *HttpEndpoints) getAllStudiesHandl(c *gin.Context) {
 	h.SendProtoAsJSON(c, http.StatusOK, resp)
 }
 
+func (h *HttpEndpoints) getReportsForParticipant(c *gin.Context) {
+	// ?studies=todo1,todo2&profileIds=todo1,todo2&from=time1&until=time2&reportKey=todo3
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
+
+	var req studyAPI.GetReportsForUserReq
+	req.Token = token
+
+	studies := c.DefaultQuery("studies", "")
+	if len(studies) > 0 {
+		req.OnlyForStudies = strings.Split(studies, ",")
+	}
+	profileIds := c.DefaultQuery("profileIds", "")
+	if len(profileIds) > 0 {
+		req.OnlyForProfiles = strings.Split(profileIds, ",")
+	}
+	req.ReportKeyFilter = c.DefaultQuery("reportKey", "")
+	from := c.DefaultQuery("from", "")
+	if len(from) > 0 {
+		n, err := strconv.ParseInt(from, 10, 64)
+		if err == nil {
+			req.From = n
+		}
+	}
+	until := c.DefaultQuery("until", "")
+	if len(until) > 0 {
+		n, err := strconv.ParseInt(until, 10, 64)
+		if err == nil {
+			req.Until = n
+		}
+	}
+
+	resp, err := h.clients.StudyService.GetReportsForUser(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+
+	h.SendProtoAsJSON(c, http.StatusOK, resp)
+}
+
 func (h *HttpEndpoints) getStudyHandl(c *gin.Context) {
 	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
@@ -558,10 +600,96 @@ func (h *HttpEndpoints) getSurveyResponsesHandl(c *gin.Context) {
 			break
 		}
 		if err != nil {
-			log.Printf("getSurveyResponsesHandl(_) = _, %v", err)
+			logger.Error.Printf("unexpected error during stream: %v", err)
 			break
 		}
 		resps.Responses = append(resps.Responses, r)
+
+	}
+	h.SendProtoAsJSON(c, http.StatusOK, resps)
+}
+func (h *HttpEndpoints) getParticipantStatesForStudy(c *gin.Context) {
+	// ?status=active(opt)
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
+
+	var req studyAPI.ParticipantStateQuery
+	studyKey := c.Param("studyKey")
+	req.StudyKey = studyKey
+	req.Status = c.DefaultQuery("status", "")
+
+	req.Token = token
+	stream, err := h.clients.StudyService.StreamParticipantStates(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+
+	resp := &studyAPI.ParticipantStates{
+		ParticipantStates: []*studyAPI.ParticipantState{},
+	}
+	for {
+		r, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			logger.Error.Printf("unexpected error during stream: %v", err)
+			break
+		}
+		resp.ParticipantStates = append(resp.ParticipantStates, r)
+
+	}
+
+	h.SendProtoAsJSON(c, http.StatusOK, resp)
+}
+
+func (h *HttpEndpoints) getReportsForStudy(c *gin.Context) {
+	// ?reportKey=todo&from=time1&until=time2&participant=todo
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
+
+	var req studyAPI.ReportHistoryQuery
+	studyKey := c.Param("studyKey")
+	req.StudyKey = studyKey
+	req.ReportKey = c.DefaultQuery("reportKey", "")
+	req.ParticipantId = c.DefaultQuery("participant", "")
+
+	from := c.DefaultQuery("from", "")
+	if len(from) > 0 {
+		n, err := strconv.ParseInt(from, 10, 64)
+		if err == nil {
+			req.From = n
+		}
+	}
+	until := c.DefaultQuery("until", "")
+	if len(until) > 0 {
+		n, err := strconv.ParseInt(until, 10, 64)
+		if err == nil {
+			req.Until = n
+		}
+	}
+
+	req.Token = token
+	stream, err := h.clients.StudyService.StreamReportHistory(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+
+	resps := &api.ReportHistory{
+		Reports: []*api.Report{},
+	}
+	for {
+		r, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			logger.Error.Printf("unexpected error during stream: %v", err)
+			break
+		}
+		resps.Reports = append(resps.Reports, r)
 
 	}
 	h.SendProtoAsJSON(c, http.StatusOK, resps)
