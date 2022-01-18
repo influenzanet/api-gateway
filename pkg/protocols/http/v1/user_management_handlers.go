@@ -4,11 +4,11 @@ import (
 	"context"
 	"fmt"
 	"html/template"
-	"log"
 	"net/http"
 	"strings"
 	"time"
 
+	"github.com/coneno/logger"
 	"github.com/crewjam/saml/samlsp"
 	"github.com/gin-gonic/gin"
 	"github.com/influenzanet/api-gateway/pkg/utils"
@@ -136,7 +136,7 @@ func (h *HttpEndpoints) grpcCallHandler(c *gin.Context, customMethod customHandl
 func (h *HttpEndpoints) handleGRPCResponse(c *gin.Context, resp protoreflect.ProtoMessage, err error) {
 	if err != nil {
 		st := status.Convert(err)
-		log.Println(st.Message())
+		logger.Error.Println(st.Message())
 		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
 		return
 	}
@@ -172,7 +172,7 @@ func (h *HttpEndpoints) userPasswordChangeHandl(c *gin.Context) {
 	resp, err := h.clients.UserManagement.ChangePassword(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
-		log.Println(st.Message())
+		logger.Error.Println(st.Message())
 		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
 		return
 	}
@@ -228,7 +228,7 @@ func (h *HttpEndpoints) getUserHandl(c *gin.Context) {
 	resp, err := h.clients.UserManagement.GetUser(context.Background(), userRefReq)
 	if err != nil {
 		st := status.Convert(err)
-		log.Println(st.Message())
+		logger.Error.Println(st.Message())
 		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
 		return
 	}
@@ -247,7 +247,7 @@ func (h *HttpEndpoints) deleteAccountHandl(c *gin.Context) {
 	resp, err := h.clients.UserManagement.DeleteAccount(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
-		log.Println(st.Message())
+		logger.Error.Println(st.Message())
 		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
 		return
 	}
@@ -619,7 +619,7 @@ func parseSAMLgroupInfo(groups []string) []GroupInfo {
 	for _, groupText := range groups {
 		parts := strings.Split(groupText, sep)
 		if len(parts) != 4 {
-			log.Printf("'%s' has only %d parts when using '%s' as a separator", groupText, len(parts), sep)
+			logger.Error.Printf("'%s' has only %d parts when using '%s' as a separator", groupText, len(parts), sep)
 			continue
 		}
 
@@ -667,13 +667,13 @@ func (h *HttpEndpoints) loginWithSAML(w http.ResponseWriter, r *http.Request) {
 
 	s := samlsp.SessionFromContext(r.Context())
 	if s == nil {
-		log.Println("session not found")
+		logger.Error.Println("session not found")
 		return
 	}
 
 	jwtSessionClaims, ok := s.(samlsp.JWTSessionClaims)
 	if !ok {
-		log.Println("Unable to decode session into JWTSessionClaims")
+		logger.Error.Println("Unable to decode session into JWTSessionClaims")
 		return
 	}
 
@@ -681,7 +681,7 @@ func (h *HttpEndpoints) loginWithSAML(w http.ResponseWriter, r *http.Request) {
 
 	sa, ok := s.(samlsp.SessionWithAttributes)
 	if !ok {
-		log.Println("attributes not found")
+		logger.Error.Println("attributes not found")
 		return
 	}
 
@@ -689,7 +689,7 @@ func (h *HttpEndpoints) loginWithSAML(w http.ResponseWriter, r *http.Request) {
 	groups, ok := attributes["http://schemas.xmlsoap.org/claims/Group"]
 	if !ok {
 		err := fmt.Errorf("group infos not found in the response token for %s", email)
-		log.Println(err.Error())
+		logger.Error.Println(err.Error())
 		http.Error(w, err.Error(), http.StatusForbidden)
 		return
 	}
@@ -697,8 +697,9 @@ func (h *HttpEndpoints) loginWithSAML(w http.ResponseWriter, r *http.Request) {
 
 	hasPermission, usedGroupInfo := checkPermission(groupInfos, instanceID, role)
 	if !hasPermission {
-		err := fmt.Errorf("%s not authorized to access %s with role %s", email, instanceID, role)
-		log.Println(err.Error())
+		err := fmt.Errorf("'%s' is not authorized to access '%s' with role '%s'.", email, instanceID, role)
+		logger.Error.Println(err.Error())
+		logger.Debug.Printf("valid group infos are %v", groupInfos)
 		http.Error(w, err.Error(), http.StatusForbidden)
 		return
 	}
@@ -714,7 +715,7 @@ func (h *HttpEndpoints) loginWithSAML(w http.ResponseWriter, r *http.Request) {
 
 	resp, err := h.clients.UserManagement.LoginWithExternalIDP(context.Background(), &req)
 	if err != nil {
-		log.Println(err.Error())
+		logger.Error.Println(err.Error())
 		http.Error(w, err.Error(), http.StatusForbidden)
 		return
 	}
@@ -732,12 +733,12 @@ func (h *HttpEndpoints) loginWithSAML(w http.ResponseWriter, r *http.Request) {
 	parsedTemplate, _ := template.ParseFiles(h.samlConfig.TemplatePathLoginSuccess)
 	err = parsedTemplate.Execute(w, loginInfos)
 	if err != nil {
-		log.Println(err.Error())
+		logger.Error.Println(err.Error())
 		http.Error(w, err.Error(), http.StatusForbidden)
 		return
 	}
 	if err != nil {
-		log.Println("Error executing template :", err)
+		logger.Error.Println("Error executing template :", err)
 		return
 	}
 
