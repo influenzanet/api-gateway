@@ -619,7 +619,7 @@ func parseSAMLgroupInfo(groups []string) []GroupInfo {
 	for _, groupText := range groups {
 		parts := strings.Split(groupText, sep)
 		if len(parts) != 4 {
-			logger.Error.Printf("'%s' has only %d parts when using '%s' as a separator", groupText, len(parts), sep)
+			logger.Error.Printf("'%s' has %d parts when using '%s' as a separator but 4 are expected.", groupText, len(parts), sep)
 			continue
 		}
 
