@@ -1,8 +1,15 @@
 package models
 
+import (
+	"os"
+
+	"github.com/coneno/logger"
+)
+
 // Config is the structure corresponding to config.yaml that holds all static configuration data
 type Config struct {
 	DebugMode    bool
+	LogLevel     logger.LogLevel
 	AllowOrigins []string
 	Port         string
 	UseEndpoints UseEndpoints
@@ -28,4 +35,19 @@ type SAMLConfig struct {
 	SessionCertPath          string `yaml:"session_cert"`
 	SessionKeyPath           string `yaml:"session_key"`
 	TemplatePathLoginSuccess string `yaml:"templates_login_success"`
+}
+
+func GetLogLevel() logger.LogLevel {
+	switch os.Getenv("LOG_LEVEL") {
+	case "debug":
+		return logger.LEVEL_DEBUG
+	case "info":
+		return logger.LEVEL_INFO
+	case "error":
+		return logger.LEVEL_ERROR
+	case "warning":
+		return logger.LEVEL_WARNING
+	default:
+		return logger.LEVEL_INFO
+	}
 }

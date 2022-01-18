@@ -1,12 +1,12 @@
 package main
 
 import (
-	"log"
 	"net/http"
 	"os"
 	"strings"
 	"time"
 
+	"github.com/coneno/logger"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 
@@ -20,6 +20,7 @@ var conf models.Config
 var grpcClients *models.APIClients
 
 func initConfig() {
+	conf.LogLevel = models.GetLogLevel()
 	conf.DebugMode = os.Getenv("DEBUG_MODE") == "true"
 	conf.Port = os.Getenv("MANAGEMENT_API_GATEWAY_LISTEN_PORT")
 	conf.ServiceURLs.UserManagement = os.Getenv("ADDR_USER_MANAGEMENT_SERVICE")
@@ -56,6 +57,7 @@ func init() {
 	if !conf.DebugMode {
 		gin.SetMode(gin.ReleaseMode)
 	}
+	logger.SetLevel(conf.LogLevel)
 }
 
 func healthCheckHandle(c *gin.Context) {
@@ -94,6 +96,6 @@ func main() {
 	v1APIHandlers.AddStudyServiceAdminAPI(v1Root)
 	v1APIHandlers.AddMessagingServiceAdminAPI(v1Root)
 
-	log.Printf("gateway listening on port %s", conf.Port)
-	log.Fatal(router.Run(":" + conf.Port))
+	logger.Info.Printf("gateway listening on port %s", conf.Port)
+	logger.Error.Fatal(router.Run(":" + conf.Port))
 }
