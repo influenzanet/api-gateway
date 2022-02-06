@@ -225,6 +225,29 @@ func (h *HttpEndpoints) getAllAssignedSurveysHandl(c *gin.Context) {
 	h.SendProtoAsJSON(c, http.StatusOK, resp)
 }
 
+func (h *HttpEndpoints) removeConfidentialDataHandl(c *gin.Context) {
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
+
+	p := c.DefaultQuery("profiles", "")
+	profiles := []string{}
+	if len(p) > 0 {
+		profiles = strings.Split(p, ",")
+	}
+	req := &studyAPI.RemoveConfidentialResponsesForProfilesReq{
+		Token:       token,
+		ForProfiles: profiles,
+	}
+
+	resp, err := h.clients.StudyService.RemoveConfidentialResponsesForProfiles(context.Background(), req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+
+	h.SendProtoAsJSON(c, http.StatusOK, resp)
+}
+
 func (h *HttpEndpoints) leaveStudyHandl(c *gin.Context) {
 	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
@@ -608,6 +631,28 @@ func (h *HttpEndpoints) getSurveyResponsesHandl(c *gin.Context) {
 	}
 	h.SendProtoAsJSON(c, http.StatusOK, resps)
 }
+
+func (h *HttpEndpoints) getConfidentialResponsesHandl(c *gin.Context) {
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
+
+	var req studyAPI.ConfidentialResponsesQuery
+	if err := h.JsonToProto(c, &req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	req.Token = token
+	req.StudyKey = c.Param("studyKey")
+
+	resp, err := h.clients.StudyService.GetConfidentialResponses(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+
+	h.SendProtoAsJSON(c, http.StatusOK, resp)
+}
+
 func (h *HttpEndpoints) getParticipantStatesForStudy(c *gin.Context) {
 	// ?status=active(opt)
 	token := c.MustGet("validatedToken").(*api_types.TokenInfos)

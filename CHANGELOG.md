@@ -1,11 +1,12 @@
 # Changelog
 
-## [v0.16.0] - ??
+## [v1.0.0] - ??
 
 ### Added
 
 - New endpoints for temporary participants.
 - New endpoint to be able to download response export in a JSON format.
+- New endpoints for handling confidential responses (remove for profiles/researcher access).
 
 ### Changed
 

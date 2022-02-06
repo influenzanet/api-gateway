@@ -15,6 +15,7 @@ func (h *HttpEndpoints) AddStudyServiceParticipantAPI(rg *gin.RouterGroup) {
 		studiesGroup.GET("/active", h.getAllActiveStudiesHandl)
 		// all surveys accross studies:
 		studiesGroup.GET("/all-assigned-surveys", h.getAllAssignedSurveysHandl)
+		studiesGroup.DELETE("/confidential-data", h.removeConfidentialDataHandl) // ?profiles=todo1,todo2 (optional)
 		if h.useEndpoints.DeleteParticipantData {
 			studiesGroup.DELETE("/participant-data", h.deleteParticipantDataHandl)
 		}
@@ -89,6 +90,7 @@ func (h *HttpEndpoints) AddStudyServiceAdminAPI(rg *gin.RouterGroup) {
 		responsesGroup.GET("/participants", h.getParticipantStatesForStudy) // ?&status=active(opt)
 		responsesGroup.GET("/reports", h.getReportsForStudy)                // ?reportKey=todo&from=time1&until=time2&participant=todo
 		responsesGroup.GET("/responses", h.getSurveyResponsesHandl)
+		responsesGroup.POST("/fetch-confidential-responses", h.getConfidentialResponsesHandl)
 
 		surveyResponsesGroup := responsesGroup.Group("/survey/:surveyKey")
 		{

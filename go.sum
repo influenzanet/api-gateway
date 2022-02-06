@@ -11,8 +11,9 @@ github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDk
 github.com/cncf/udpa/go v0.0.0-20191209042840-269d4d468f6f/go.mod h1:M8M6+tZqaGXZJjfX53e64911xZQV5JYwmTeXPW+k8Sc=
 github.com/cncf/udpa/go v0.0.0-20201120205902-5459f2c99403/go.mod h1:WmhPx2Nbnhtbo57+VJT5O0JRkEi1Wbu0z5j0R8u5Hbk=
 github.com/cncf/xds/go v0.0.0-20210312221358-fbca930ec8ed/go.mod h1:eXthEFrGJvWHgFFCl3hGmgk+/aYT6PnTQLykKQRLhEs=
-github.com/coneno/logger v1.2.0 h1:I7o5Qg9F+mToyBgIk1au9Dhni/N5bO3ky0p2ndEUK7U=
 github.com/coneno/logger v1.2.0/go.mod h1:kcCUVLvOb9KEoZTo1++dFi5TlvVxbQEsvxlm4vW5V4g=
+github.com/coneno/logger v1.2.1 h1:cmAuzBEegzHA7G3K8X56kUK2s0on4Jke9OWP4QrIv5o=
+github.com/coneno/logger v1.2.1/go.mod h1:kcCUVLvOb9KEoZTo1++dFi5TlvVxbQEsvxlm4vW5V4g=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/crewjam/httperr v0.2.0 h1:b2BfXR8U3AlIHwNeFFvZ+BV1LFvKLlzMjzaTnZMybNo=
 github.com/crewjam/httperr v0.2.0/go.mod h1:Jlz+Sg/XqBQhyMjdDiC+GNNRzZTD7x39Gu3pglZ5oH4=
@@ -38,8 +39,8 @@ github.com/gin-contrib/cors v1.3.1/go.mod h1:jjEJ4268OPZUcU7k9Pm653S7lXUGcqMADzF
 github.com/gin-contrib/sse v0.1.0 h1:Y/yl/+YNO8GZSjAhjMsSuLt29uWRFHdHYUb5lYOV9qE=
 github.com/gin-contrib/sse v0.1.0/go.mod h1:RHrZQHXnP2xjPF+u1gW/2HnVO7nvIa9PG3Gm+fLHvGI=
 github.com/gin-gonic/gin v1.5.0/go.mod h1:Nd6IXA8m5kNZdNEHMBd93KT+mdY3+bewLgRvmCsR2Do=
-github.com/gin-gonic/gin v1.7.2 h1:Tg03T9yM2xa8j6I3Z3oqLaQRSmKvxPd6g/2HJ6zICFA=
-github.com/gin-gonic/gin v1.7.2/go.mod h1:jD2toBW3GZUr5UMcdrwQA10I7RuaFOl/SGeDjXkfUtY=
+github.com/gin-gonic/gin v1.7.7 h1:3DoBmSbJbZAWqXJC3SLjAPfutPJJRN1U5pALB7EeTTs=
+github.com/gin-gonic/gin v1.7.7/go.mod h1:axIBovoeJpVj8S3BwE0uPMTeReE4+AfFtqpqaZ1qq1U=
 github.com/go-playground/assert/v2 v2.0.1 h1:MsBgLAaY856+nPRTKrp3/OZK38U/wa0CcBYNjji3q3A=
 github.com/go-playground/assert/v2 v2.0.1/go.mod h1:VDjEfimB/XKnb+ZQfWdccd7VUvScMdVu0Titje2rxJ4=
 github.com/go-playground/locales v0.12.1/go.mod h1:IUMDtCfWo/w/mtMfIE/IG2K+Ey3ygWanZIBtBW0W2TM=
@@ -76,7 +77,7 @@ github.com/gobuffalo/packd v0.1.0/go.mod h1:M2Juc+hhDXf/PnmBANFCqx4DM3wRbgDvnVWe
 github.com/gobuffalo/packr/v2 v2.0.9/go.mod h1:emmyGweYTm6Kdper+iywB6YK5YzuKchGtJQZ0Odn4pQ=
 github.com/gobuffalo/packr/v2 v2.2.0/go.mod h1:CaAwI0GPIAv+5wKLtv8Afwl+Cm78K/I/VCm/3ptBN+0=
 github.com/gobuffalo/syncx v0.0.0-20190224160051-33c29581e754/go.mod h1:HhnNqWY95UYwwW3uSASeV7vtgYkT2t16hJgV3AEPUpw=
-github.com/golang-jwt/jwt v3.2.1+incompatible/go.mod h1:8pz2t5EyA70fFQQSrl6XZXzqecmYZeUEB8OUGHkxJ+I=
+github.com/golang-jwt/jwt/v4 v4.2.0/go.mod h1:/xlHOz8bRuivTWchD4jCa+NbatV+wEUSzwAxVc6locg=
 github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b/go.mod h1:SBH7ygxi8pfUlaOkMMuAQtPIUF8ecWP5IEl/CR7VP2Q=
 github.com/golang/mock v1.1.1/go.mod h1:oTYuIxOrZwtPieC+H1uAHpcLFnEyAGVDL/k47Jfbm0A=
 github.com/golang/mock v1.4.3/go.mod h1:UOMv5ysSaYNkG+OFQykRIcU/QvvxJf3p21QfJ2Bt3cw=
@@ -133,7 +134,6 @@ github.com/influenzanet/messaging-service v0.7.1/go.mod h1:mnd4+t7q/EaWGRGOliu5Y
 github.com/influenzanet/messaging-service v0.8.0/go.mod h1:JnbHpEDNp/YI+GGnIr/7n9hGCP87aBY1M+8h40dzg7k=
 github.com/influenzanet/messaging-service v0.8.1/go.mod h1:FXEXU/As0Kl4AVXUMMe0aP1r/QsN3JjrwOLNPG7mFnM=
 github.com/influenzanet/messaging-service v0.8.5/go.mod h1:hsiGenj7fInqQEQpfr5ABwr4oh4lunEr2maKieDz5DQ=
-github.com/influenzanet/messaging-service v0.9.2/go.mod h1:iqrekwXS8w6cUB7K3EkI3cbzFIsCJkZhpf9pTHI+QTw=
 github.com/influenzanet/messaging-service v0.9.3 h1:uN8GdIlFL4rbeskEsPVQQlSLlco1SBFUxWr3KA/oh1I=
 github.com/influenzanet/messaging-service v0.9.3/go.mod h1:iqrekwXS8w6cUB7K3EkI3cbzFIsCJkZhpf9pTHI+QTw=
 github.com/influenzanet/study-service v0.6.2/go.mod h1:S/inqN3mSNT0cQ3xgi8upUEXWzBIxn6CirfXzhuLZsw=
@@ -144,10 +144,8 @@ github.com/influenzanet/study-service v0.12.0/go.mod h1:fYwv5ZaD4sdz63nwLIY3kAfw
 github.com/influenzanet/study-service v0.13.1/go.mod h1:XB9KbWI4wgpYnBgIcy7W/zYaob+P4SX0/VqcRQEozJQ=
 github.com/influenzanet/study-service v0.13.2/go.mod h1:XB9KbWI4wgpYnBgIcy7W/zYaob+P4SX0/VqcRQEozJQ=
 github.com/influenzanet/study-service v0.13.5/go.mod h1:mF5ojH/KN2Wp1XdFryZ50FDbRYIHF71ircM++5VN1Hk=
-github.com/influenzanet/study-service v1.0.0-beta.2.0.20220116075703-a1621e7842be h1:YXxqAl309K/dKwDw02Z5njsf5X7vGNaGR9GArLoyfi4=
-github.com/influenzanet/study-service v1.0.0-beta.2.0.20220116075703-a1621e7842be/go.mod h1:mj4jfETF7D/mu8ef4hVe7/fFdtxfLFYX/0IvkphYepc=
-github.com/influenzanet/study-service v1.0.0-beta.2.0.20220117144507-7ccdd2e811af h1:NUiGWEtGA8HHewdWQnc5uyhZ+rDLhe6RQ5UqVLnGe68=
-github.com/influenzanet/study-service v1.0.0-beta.2.0.20220117144507-7ccdd2e811af/go.mod h1:mj4jfETF7D/mu8ef4hVe7/fFdtxfLFYX/0IvkphYepc=
+github.com/influenzanet/study-service v1.0.0-beta.3.0.20220205114907-ba49c57f42f7 h1:/euBKG36Plsvu92LPYS0VR5/29/lKaKxlwJBALNYBv8=
+github.com/influenzanet/study-service v1.0.0-beta.3.0.20220205114907-ba49c57f42f7/go.mod h1:mj4jfETF7D/mu8ef4hVe7/fFdtxfLFYX/0IvkphYepc=
 github.com/influenzanet/user-management-service v0.4.0-alpha/go.mod h1:hzpAlj0vcpZByruRB5IQmjiuiYuAAy2E7tkr9sc1B64=
 github.com/influenzanet/user-management-service v0.7.0/go.mod h1:0z88Izqm7YWEUFUTC7dHrN9XVG2CevyWXyNeoTkRWvk=
 github.com/influenzanet/user-management-service v0.10.0/go.mod h1:Qn1E8bFezQ1peyaC+P5dAo0PqH3G8/UNV5pnShfuwGI=
@@ -157,8 +155,8 @@ github.com/influenzanet/user-management-service v0.16.1/go.mod h1:EdF7PcJJSNAAGB
 github.com/influenzanet/user-management-service v0.17.5/go.mod h1:WIn9RuBmeF86P3sj7XSCEY0+v8hJi4uPDySnzo4c8mk=
 github.com/influenzanet/user-management-service v0.18.7/go.mod h1:m8ZuAnADw3e/UvA376vHVfeycJqCQcr4LlWo96qEgKE=
 github.com/influenzanet/user-management-service v0.19.2/go.mod h1:/gcCE9/vLSXgJQq9ZbkUnIFs8eFAK2gpIMd/pTrjE5M=
-github.com/influenzanet/user-management-service v0.20.2 h1:3AXkkQQt9+9w5z/KNFEc3KrWMZovZdk8PAW73j5V2LI=
-github.com/influenzanet/user-management-service v0.20.2/go.mod h1:UXTVmqLdm4pPKmbYkFhG8KIMsePuyycOhb6NRFrU5og=
+github.com/influenzanet/user-management-service v0.20.4 h1:HgPS9SQU075AzXMquxnUOsoTFlZiaCYmynNlo51hYpU=
+github.com/influenzanet/user-management-service v0.20.4/go.mod h1:qnwxY12yYibEc2c7T726iJzYuVP8VBTi6HFOmeN672M=
 github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af/go.mod h1:Nht3zPeWKUH0NzdCt2Blrr5ys8VGpn0CEB0cQHVjt7k=
 github.com/jmespath/go-jmespath v0.4.0/go.mod h1:T8mJZnbsbmF+m6zOOFylbeCJqk5+pHWvzYPziyZiYoo=
 github.com/jmespath/go-jmespath/internal/testify v1.5.1/go.mod h1:L3OGu8Wl2/fWfCI6z80xFu9LTZmf1ZRjMHUOPmWr69U=
@@ -177,6 +175,7 @@ github.com/karrick/godirwalk v1.8.0/go.mod h1:H5KPZjojv4lE+QYImBI8xVtrBRgYrIVsaR
 github.com/karrick/godirwalk v1.10.3/go.mod h1:RoGL9dQei4vP9ilrpETWE8CLOZ1kiN0LhBygSwrAsHA=
 github.com/kisielk/errcheck v1.2.0/go.mod h1:/BMXB+zMLi60iA8Vv6Ksmxu/1UDYcXs4uQLJ+jE2L00=
 github.com/klauspost/compress v1.9.5/go.mod h1:RyIbtBH6LamlWaDj8nUwkbUhJ87Yi3uG0guNDohfE1A=
+github.com/klauspost/compress v1.13.6/go.mod h1:/3/Vjq9QcHkK5uEr5lBEmyoZ1iFhe47etQ6QUkpK6sk=
 github.com/konsorten/go-windows-terminal-sequences v1.0.1/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
 github.com/konsorten/go-windows-terminal-sequences v1.0.2/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
 github.com/kr/pretty v0.1.0/go.mod h1:dAy3ld7l9f0ibDNOQOHHMYYIIbhfbHSm3C4ZsoJORNo=
@@ -249,8 +248,8 @@ go.mongodb.org/mongo-driver v1.4.0/go.mod h1:llVBH2pkj9HywK0Dtdt6lDikOjFLbceHVu/
 go.mongodb.org/mongo-driver v1.4.1/go.mod h1:llVBH2pkj9HywK0Dtdt6lDikOjFLbceHVu/Rc0iMKLs=
 go.mongodb.org/mongo-driver v1.4.3/go.mod h1:WcMNYLx/IlOxLe6JRJiv2uXuCz6zBLndR4SoGjYphSc=
 go.mongodb.org/mongo-driver v1.5.1/go.mod h1:gRXCHX4Jo7J0IJ1oDQyUxF7jfy19UfxniMS4xxMmUqw=
-go.mongodb.org/mongo-driver v1.7.0/go.mod h1:Q4oFMbo1+MSNqICAdYMlC/zSTrwCogR4R8NzkI+yfU8=
 go.mongodb.org/mongo-driver v1.7.1/go.mod h1:Q4oFMbo1+MSNqICAdYMlC/zSTrwCogR4R8NzkI+yfU8=
+go.mongodb.org/mongo-driver v1.8.0/go.mod h1:0sQWfOeY63QTntERDJJ/0SuKK0T1uVSgKCuAROlKEPY=
 go.opentelemetry.io/proto/otlp v0.7.0/go.mod h1:PqfVotwruBrMGOCsRd/89rSnXhoiJIqeYNgFYFoEGnI=
 golang.org/x/crypto v0.0.0-20180904163835-0709b304e793/go.mod h1:6SG95UA2DQfeDnfUPMdvaQW0Q7yPrPDi9nlGo2tz2b4=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
@@ -267,6 +266,7 @@ golang.org/x/crypto v0.0.0-20200728195943-123391ffb6de/go.mod h1:LzIPMQfyMNhhGPh
 golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a/go.mod h1:LzIPMQfyMNhhGPhUkYOs5KpL4U8rLKemX1yGLhDgUto=
 golang.org/x/crypto v0.0.0-20201001193750-eb9a90e9f9cb/go.mod h1:LzIPMQfyMNhhGPhUkYOs5KpL4U8rLKemX1yGLhDgUto=
 golang.org/x/crypto v0.0.0-20201016220609-9e8e0b390897/go.mod h1:LzIPMQfyMNhhGPhUkYOs5KpL4U8rLKemX1yGLhDgUto=
+golang.org/x/crypto v0.0.0-20201216223049-8b5274cf687f/go.mod h1:jdWPYTVW3xRLrWPugEBEK3UY2ZEsg3UU495nc5E+M+I=
 golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2/go.mod h1:T9bdIzuCu7OtxOm1hfPfRQxPLYneinmdGuTeoZ9dtd4=
 golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97 h1:/UOmuWzQfxxo9UtlXMwuQU8CMgg1eZXqTRwkSQJWKOI=
 golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97/go.mod h1:GvvjBRRGRdwPK5ydBHafDWAxML/pGHZbMvKqRZ5+Abc=
@@ -313,6 +313,7 @@ golang.org/x/sys v0.0.0-20190419153524-e8e3143a4f4a/go.mod h1:h1NjWce9XRLGQEsW7w
 golang.org/x/sys v0.0.0-20190422165155-953cdadca894/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20190531175056-4c3a928424d2/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20190813064441-fde4db37ae7a/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
+golang.org/x/sys v0.0.0-20191026070338-33540a1f6037/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20200116001909-b77594299b42/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20200323222414-85ca7c5b95cd/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20200519105757-fe76b779f299/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
@@ -326,6 +327,7 @@ golang.org/x/sys v0.0.0-20210330210617-4fbd30eecc44/go.mod h1:h1NjWce9XRLGQEsW7w
 golang.org/x/sys v0.0.0-20210510120138-977fb7262007/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.0.0-20210615035016-665e8c7367d1 h1:SrN+KX8Art/Sf4HNj6Zcz06G7VEz+7w9tdXTPOZ7+l4=
 golang.org/x/sys v0.0.0-20210615035016-665e8c7367d1/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
+golang.org/x/term v0.0.0-20201117132131-f5c789dd3221/go.mod h1:Nr5EML6q2oocZ2LXRh80K7BxOlk5/8JxuGnuhpl+muw=
 golang.org/x/term v0.0.0-20201126162022-7de9c90e9dd1/go.mod h1:bj7SfCRtBDWHUb9snDiAeCFNEtKQo2Wmx5Cou7ajbmo=
 golang.org/x/text v0.0.0-20170915032832-14c0d48ead0c/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
 golang.org/x/text v0.3.0/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
