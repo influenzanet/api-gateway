@@ -32,7 +32,7 @@ func initConfig() {
 	conf.MaxMsgSize = models.DefaultGRPCMaxMsgSize
 	ms, err := strconv.Atoi(os.Getenv(models.ENV_GRPC_MAX_MSG_SIZE))
 	if err != nil {
-		// logger.Info.Printf("using default max gRPC message size: %d", models.DefaultGRPCMaxMsgSize)
+		logger.Info.Printf("using default max gRPC message size: %d", models.DefaultGRPCMaxMsgSize)
 	} else {
 		conf.MaxMsgSize = ms
 	}
