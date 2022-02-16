@@ -26,6 +26,8 @@ func initConfig() {
 	conf.ServiceURLs.StudyService = os.Getenv("ADDR_STUDY_SERVICE")
 	conf.AllowOrigins = strings.Split(os.Getenv("CORS_ALLOW_ORIGINS"), ",")
 
+	conf.MaxMsgSize = models.DefaultGRPCMaxMsgSize
+
 	conf.UseEndpoints.DeleteParticipantData = os.Getenv("USE_DELETE_PARTICIPANT_DATA_ENDPOINT") == "true"
 	conf.UseEndpoints.SignupWithEmail = !(os.Getenv("DISABLE_SIGNUP_WITH_EMAIL_ENDPOINT") == "true")
 }
@@ -45,9 +47,9 @@ func healthCheckHandle(c *gin.Context) {
 }
 
 func main() {
-	umClient, userManagementClose := gc.ConnectToUserManagement(conf.ServiceURLs.UserManagement)
+	umClient, userManagementClose := gc.ConnectToUserManagement(conf.ServiceURLs.UserManagement, conf.MaxMsgSize)
 	defer userManagementClose()
-	studyClient, studyServiceClose := gc.ConnectToStudyService(conf.ServiceURLs.StudyService)
+	studyClient, studyServiceClose := gc.ConnectToStudyService(conf.ServiceURLs.StudyService, conf.MaxMsgSize)
 	defer studyServiceClose()
 
 	grpcClients.UserManagement = umClient

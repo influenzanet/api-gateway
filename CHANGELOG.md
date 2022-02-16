@@ -1,5 +1,12 @@
 # Changelog
 
+## [v0.15.2] - 2022-02-16
+
+### Changed
+
+- Add option to set max grpc message size through environment variable
+
+
 ## [v0.15.1] - 2021-07-28
 
 - Update dependency for messaging service, to use recent API.

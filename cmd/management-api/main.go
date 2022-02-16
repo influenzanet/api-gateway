@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -26,6 +27,14 @@ func initConfig() {
 	conf.ServiceURLs.StudyService = os.Getenv("ADDR_STUDY_SERVICE")
 	conf.ServiceURLs.MessagingService = os.Getenv("ADDR_MESSAGING_SERVICE")
 	conf.AllowOrigins = strings.Split(os.Getenv("CORS_ALLOW_ORIGINS"), ",")
+
+	conf.MaxMsgSize = models.DefaultGRPCMaxMsgSize
+	ms, err := strconv.Atoi(os.Getenv(models.ENV_GRPC_MAX_MSG_SIZE))
+	if err != nil {
+		// logger.Info.Printf("using default max gRPC message size: %d", models.DefaultGRPCMaxMsgSize)
+	} else {
+		conf.MaxMsgSize = ms
+	}
 
 	conf.UseEndpoints.DeleteParticipantData = os.Getenv("USE_DELETE_PARTICIPANT_DATA_ENDPOINT") == "true"
 
@@ -63,11 +72,11 @@ func healthCheckHandle(c *gin.Context) {
 }
 
 func main() {
-	umClient, userManagementClose := gc.ConnectToUserManagement(conf.ServiceURLs.UserManagement)
+	umClient, userManagementClose := gc.ConnectToUserManagement(conf.ServiceURLs.UserManagement, conf.MaxMsgSize)
 	defer userManagementClose()
-	studyClient, studyServiceClose := gc.ConnectToStudyService(conf.ServiceURLs.StudyService)
+	studyClient, studyServiceClose := gc.ConnectToStudyService(conf.ServiceURLs.StudyService, conf.MaxMsgSize)
 	defer studyServiceClose()
-	messagingClient, messagingServiceClose := gc.ConnectToMessagingService(conf.ServiceURLs.MessagingService)
+	messagingClient, messagingServiceClose := gc.ConnectToMessagingService(conf.ServiceURLs.MessagingService, conf.MaxMsgSize)
 	defer messagingServiceClose()
 
 	grpcClients.UserManagement = umClient

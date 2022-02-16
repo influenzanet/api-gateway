@@ -9,25 +9,28 @@ import (
 	"google.golang.org/grpc"
 )
 
-func connectToGRPCServer(addr string) *grpc.ClientConn {
-	conn, err := grpc.Dial(addr, grpc.WithInsecure())
+func connectToGRPCServer(addr string, maxMsgSize int) *grpc.ClientConn {
+	conn, err := grpc.Dial(addr, grpc.WithInsecure(), grpc.WithDefaultCallOptions(
+		grpc.MaxCallRecvMsgSize(maxMsgSize),
+		grpc.MaxCallSendMsgSize(maxMsgSize),
+	))
 	if err != nil {
 		log.Fatalf("failed to connect to %s: %v", addr, err)
 	}
 	return conn
 }
 
-func ConnectToUserManagement(addr string) (client umAPI.UserManagementApiClient, close func() error) {
-	serverConn := connectToGRPCServer(addr)
+func ConnectToUserManagement(addr string, maxMsgSize int) (client umAPI.UserManagementApiClient, close func() error) {
+	serverConn := connectToGRPCServer(addr, maxMsgSize)
 	return umAPI.NewUserManagementApiClient(serverConn), serverConn.Close
 }
 
-func ConnectToStudyService(addr string) (client studyAPI.StudyServiceApiClient, close func() error) {
-	serverConn := connectToGRPCServer(addr)
+func ConnectToStudyService(addr string, maxMsgSize int) (client studyAPI.StudyServiceApiClient, close func() error) {
+	serverConn := connectToGRPCServer(addr, maxMsgSize)
 	return studyAPI.NewStudyServiceApiClient(serverConn), serverConn.Close
 }
 
-func ConnectToMessagingService(addr string) (client messageAPI.MessagingServiceApiClient, close func() error) {
-	serverConn := connectToGRPCServer(addr)
+func ConnectToMessagingService(addr string, maxMsgSize int) (client messageAPI.MessagingServiceApiClient, close func() error) {
+	serverConn := connectToGRPCServer(addr, maxMsgSize)
 	return messageAPI.NewMessagingServiceApiClient(serverConn), serverConn.Close
 }
