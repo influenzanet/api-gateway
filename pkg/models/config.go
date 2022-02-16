@@ -13,6 +13,7 @@ type Config struct {
 	AllowOrigins []string
 	Port         string
 	UseEndpoints UseEndpoints
+	MaxMsgSize   int
 	ServiceURLs  struct {
 		UserManagement   string `yaml:"user_management"`
 		StudyService     string `yaml:"study_service"`
