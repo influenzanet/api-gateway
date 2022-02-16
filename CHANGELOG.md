@@ -7,6 +7,7 @@
 - New endpoints for temporary participants.
 - New endpoint to be able to download response export in a JSON format.
 - New endpoints for handling confidential responses (remove for profiles/researcher access).
+- New endpoint for uploading participant file.
 
 ### Changed
 

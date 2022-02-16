@@ -8,6 +8,7 @@ require (
 	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-gonic/gin v1.7.7
 	github.com/golang/protobuf v1.5.2
+	github.com/h2non/filetype v1.1.3
 	github.com/influenzanet/go-utils v0.2.10
 	github.com/influenzanet/messaging-service v0.9.3
 	github.com/influenzanet/study-service v1.0.0-beta.3.0.20220205114907-ba49c57f42f7

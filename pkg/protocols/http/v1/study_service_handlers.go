@@ -5,12 +5,14 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
 
 	"github.com/coneno/logger"
 	"github.com/gin-gonic/gin"
+	"github.com/h2non/filetype"
 	"github.com/influenzanet/api-gateway/pkg/utils"
 	"github.com/influenzanet/go-utils/pkg/api_types"
 	"github.com/influenzanet/study-service/pkg/api"
@@ -996,4 +998,108 @@ func (h *HttpEndpoints) getSurveyInfoPreviewCSV(c *gin.Context) {
 	}
 
 	c.DataFromReader(http.StatusOK, contentLength, contentType, reader, extraHeaders)
+}
+
+const chunkSize = 64 * 1024 // 64 KiB
+
+func (h *HttpEndpoints) uploadParticipantFileReq(c *gin.Context) {
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
+	studyKey := c.Param("studyKey")
+
+	file, err := c.FormFile("file")
+	// file, header, err := c.Request.FormFile("file")
+	if err != nil {
+		logger.Error.Println(err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	logger.Debug.Printf("Uploading file '%s' with size '%d'", file.Filename, file.Size)
+
+	// Open file
+	f, err := file.Open()
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	defer f.Close()
+
+	// Get bytes
+	buf := bytes.NewBuffer(nil)
+	if _, err := io.Copy(buf, f); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	content := buf.Bytes()
+
+	stream, err := h.clients.StudyService.UploadParticipantFile(context.Background())
+	if err != nil {
+		logger.Error.Printf("cannot upload image: %v", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	kind, _ := filetype.Match(content)
+
+	// Send infos
+	req := &studyAPI.UploadParticipantFileReq{
+		Data: &studyAPI.UploadParticipantFileReq_Info_{
+			Info: &studyAPI.UploadParticipantFileReq_Info{
+				Token:                token,
+				StudyKey:             studyKey,
+				VisibleToParticipant: true,
+				FileType: &studyAPI.FileType{
+					Type:    kind.MIME.Type,
+					Subtype: kind.MIME.Subtype,
+					Value:   kind.MIME.Value,
+				},
+				Participant: &studyAPI.UploadParticipantFileReq_Info_ProfileId{
+					ProfileId: token.ProfilId,
+				},
+			},
+		},
+	}
+
+	err = stream.Send(req)
+	if err != nil {
+		st := status.Convert(err)
+		logger.Error.Println(st.Message())
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+
+	}
+
+	for currentByte := 0; currentByte < len(content); currentByte += chunkSize {
+		var currentChnk []byte
+		if currentByte+chunkSize > len(content) {
+			currentChnk = content[currentByte:]
+		} else {
+			currentChnk = content[currentByte : currentByte+chunkSize]
+		}
+		req = &studyAPI.UploadParticipantFileReq{
+			Data: &studyAPI.UploadParticipantFileReq_Chunk{
+				Chunk: currentChnk,
+			},
+		}
+
+		if err := stream.Send(req); err != nil {
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+				return
+			}
+		}
+	}
+	reply, err := stream.CloseAndRecv()
+	if err != nil {
+		st := status.Convert(err)
+		logger.Error.Println(st.Message())
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+
+	h.SendProtoAsJSON(c, http.StatusOK, reply)
 }

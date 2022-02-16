@@ -45,7 +45,7 @@ func (h *HttpEndpoints) AddStudyServiceParticipantAPI(rg *gin.RouterGroup) {
 		studyGroup.GET("/:studyKey/survey/:surveyKey", h.getAssignedSurveyHandl)
 		studyGroup.POST("/:studyKey/submit-response", mw.RequirePayload(), h.submitSurveyResponseHandl)
 		studyGroup.POST("/:studyKey/leave", mw.RequirePayload(), h.leaveStudyHandl)
-
+		studyGroup.POST("/:studyKey/file-upload", mw.RequirePayload(), h.uploadParticipantFileReq)
 		studyGroup.POST("/:studyKey/assume-temp-participant", mw.RequirePayload(), h.convertTempToActiveParticipant)
 	}
 }
