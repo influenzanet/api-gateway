@@ -98,6 +98,24 @@ func (h *HttpEndpoints) removeSurveyFromStudyHandl(c *gin.Context) {
 	h.SendProtoAsJSON(c, http.StatusOK, resp)
 }
 
+func (h *HttpEndpoints) deleteParticipantFilesReq(c *gin.Context) {
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
+	var req studyAPI.DeleteParticipantFilesReq
+	if err := h.JsonToProto(c, &req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	req.Token = token
+
+	resp, err := h.clients.StudyService.DeleteParticipantFiles(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+	h.SendProtoAsJSON(c, http.StatusOK, resp)
+}
+
 func (h *HttpEndpoints) registerTempParticipant(c *gin.Context) {
 	var req studyAPI.RegisterTempParticipantReq
 
@@ -740,6 +758,98 @@ func (h *HttpEndpoints) getReportsForStudy(c *gin.Context) {
 
 	}
 	h.SendProtoAsJSON(c, http.StatusOK, resps)
+}
+
+func (h *HttpEndpoints) getFileInfosForStudy(c *gin.Context) {
+	// ?fileType=todo&from=time1&until=time2&participant=todo
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
+
+	var req studyAPI.FileInfoQuery
+	studyKey := c.Param("studyKey")
+	req.StudyKey = studyKey
+	req.FileType = c.DefaultQuery("fileType", "")
+	req.ParticipantId = c.DefaultQuery("participant", "")
+
+	from := c.DefaultQuery("from", "")
+	if len(from) > 0 {
+		n, err := strconv.ParseInt(from, 10, 64)
+		if err == nil {
+			req.From = n
+		}
+	}
+	until := c.DefaultQuery("until", "")
+	if len(until) > 0 {
+		n, err := strconv.ParseInt(until, 10, 64)
+		if err == nil {
+			req.Until = n
+		}
+	}
+
+	req.Token = token
+	stream, err := h.clients.StudyService.StreamParticipantFileInfos(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+
+	resps := &api.FileInfos{
+		FileInfos: []*api.FileInfo{},
+	}
+	for {
+		r, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			logger.Error.Printf("unexpected error during stream: %v", err)
+			break
+		}
+		resps.FileInfos = append(resps.FileInfos, r)
+
+	}
+	h.SendProtoAsJSON(c, http.StatusOK, resps)
+}
+
+func (h *HttpEndpoints) getParticipantFile(c *gin.Context) {
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
+	var req studyAPI.GetParticipantFileReq
+	studyKey := c.Param("studyKey")
+	req.StudyKey = studyKey
+	req.FileId = c.DefaultQuery("id", "")
+	req.Token = token
+
+	stream, err := h.clients.StudyService.GetParticipantFile(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+
+	content := []byte{}
+	for {
+		chnk, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			st := status.Convert(err)
+			c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+			return
+		}
+		content = append(content, chnk.Chunk...)
+	}
+
+	kind, _ := filetype.Match(content)
+	reader := bytes.NewReader(content)
+	contentLength := int64(len(content))
+	contentType := kind.MIME.Value
+
+	extraHeaders := map[string]string{
+		"Content-Disposition": `attachment; filename=` + fmt.Sprintf("%s.%s", req.FileId, kind.Extension),
+	}
+
+	c.DataFromReader(http.StatusOK, contentLength, contentType, reader, extraHeaders)
 }
 
 func (h *HttpEndpoints) getResponseWideFormatCSV(c *gin.Context) {

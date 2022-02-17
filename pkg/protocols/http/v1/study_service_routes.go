@@ -46,6 +46,7 @@ func (h *HttpEndpoints) AddStudyServiceParticipantAPI(rg *gin.RouterGroup) {
 		studyGroup.POST("/:studyKey/submit-response", mw.RequirePayload(), h.submitSurveyResponseHandl)
 		studyGroup.POST("/:studyKey/leave", mw.RequirePayload(), h.leaveStudyHandl)
 		studyGroup.POST("/:studyKey/file-upload", mw.RequirePayload(), h.uploadParticipantFileReq)
+		studyGroup.POST("/:studyKey/delete-files", mw.RequirePayload(), h.deleteParticipantFilesReq)
 		studyGroup.POST("/:studyKey/assume-temp-participant", mw.RequirePayload(), h.convertTempToActiveParticipant)
 	}
 }
@@ -88,7 +89,10 @@ func (h *HttpEndpoints) AddStudyServiceAdminAPI(rg *gin.RouterGroup) {
 	{
 		responsesGroup.GET("/statistics", h.getSurveyResponseStatisticsHandl)
 		responsesGroup.GET("/participants", h.getParticipantStatesForStudy) // ?&status=active(opt)
-		responsesGroup.GET("/reports", h.getReportsForStudy)                // ?reportKey=todo&from=time1&until=time2&participant=todo
+		responsesGroup.GET("/file-infos", h.getFileInfosForStudy)           // ?fileType=todo&from=time1&until=time2&participant=todo
+		responsesGroup.GET("/file", h.getParticipantFile)                   // ?id=todo
+		responsesGroup.POST("/delete-files", mw.RequirePayload(), h.deleteParticipantFilesReq)
+		responsesGroup.GET("/reports", h.getReportsForStudy) // ?reportKey=todo&from=time1&until=time2&participant=todo
 		responsesGroup.GET("/responses", h.getSurveyResponsesHandl)
 		responsesGroup.POST("/fetch-confidential-responses", h.getConfidentialResponsesHandl)
 
