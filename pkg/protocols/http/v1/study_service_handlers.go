@@ -106,6 +106,7 @@ func (h *HttpEndpoints) deleteParticipantFilesReq(c *gin.Context) {
 		return
 	}
 	req.Token = token
+	req.StudyKey = c.Param("studyKey")
 
 	resp, err := h.clients.StudyService.DeleteParticipantFiles(context.Background(), &req)
 	if err != nil {
