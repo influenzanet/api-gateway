@@ -244,6 +244,16 @@ func (h *HttpEndpoints) deleteAccountHandl(c *gin.Context) {
 		return
 	}
 	req.Token = token
+
+	// Start with deleting confidential data:
+	if _, err := h.clients.StudyService.RemoveConfidentialResponsesForProfiles(context.Background(), &studyAPI.RemoveConfidentialResponsesForProfilesReq{
+		Token: token,
+	}); err != nil {
+		logger.Error.Println(err)
+	} else {
+		logger.Debug.Println("confidential data is deleted before deleting account")
+	}
+
 	resp, err := h.clients.UserManagement.DeleteAccount(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
@@ -287,6 +297,16 @@ func (h *HttpEndpoints) removeProfileHandl(c *gin.Context) {
 		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
 		return
 	}
+
+	// Remove confidential data when deleting a profile
+	if _, err := h.clients.StudyService.RemoveConfidentialResponsesForProfiles(context.Background(), &studyAPI.RemoveConfidentialResponsesForProfilesReq{
+		Token:       token,
+		ForProfiles: []string{req.Profile.Id},
+	}); err != nil {
+		logger.Error.Println(err)
+	}
+	logger.Debug.Println("profile and its confidential data is deleted.")
+
 	h.SendProtoAsJSON(c, http.StatusOK, resp)
 }
 
