@@ -154,6 +154,8 @@ github.com/influenzanet/study-service v1.0.0-beta.4.0.20220219071010-7fc3ec5fc6e
 github.com/influenzanet/study-service v1.0.0-beta.4.0.20220219071010-7fc3ec5fc6e4/go.mod h1:mj4jfETF7D/mu8ef4hVe7/fFdtxfLFYX/0IvkphYepc=
 github.com/influenzanet/study-service v1.0.0-beta.6 h1:Bv9agosgpIVDTqitBFTP9Ooz2DUR2jdeRpj93vq1LJA=
 github.com/influenzanet/study-service v1.0.0-beta.6/go.mod h1:mj4jfETF7D/mu8ef4hVe7/fFdtxfLFYX/0IvkphYepc=
+github.com/influenzanet/study-service v1.0.0-beta.8.0.20220301191242-4a642ef2ff5f h1:YPKgGFru2ubxyVb8mgmJuNA22nw6xOB7q3oQIumwkXk=
+github.com/influenzanet/study-service v1.0.0-beta.8.0.20220301191242-4a642ef2ff5f/go.mod h1:mj4jfETF7D/mu8ef4hVe7/fFdtxfLFYX/0IvkphYepc=
 github.com/influenzanet/user-management-service v0.4.0-alpha/go.mod h1:hzpAlj0vcpZByruRB5IQmjiuiYuAAy2E7tkr9sc1B64=
 github.com/influenzanet/user-management-service v0.7.0/go.mod h1:0z88Izqm7YWEUFUTC7dHrN9XVG2CevyWXyNeoTkRWvk=
 github.com/influenzanet/user-management-service v0.10.0/go.mod h1:Qn1E8bFezQ1peyaC+P5dAo0PqH3G8/UNV5pnShfuwGI=

@@ -33,7 +33,7 @@ func (h *HttpEndpoints) AddStudyServiceParticipantAPI(rg *gin.RouterGroup) {
 		mw.ExtractToken(),
 		mw.ValidateToken(h.clients.UserManagement),
 		mw.CheckAccountConfirmed(),
-		h.getReportsForParticipant) // ?studies=todo1,todo2&profileIds=todo1,todo2&from=time1&until=time2&reportKey=todo3
+		h.getReportsForParticipant) // ?studies=todo1,todo2&profileIds=todo1,todo2&from=time1&until=time2&reportKey=todo3&ignoreReports=todo1,todo2
 
 	studyGroup := rg.Group("/study")
 	studyGroup.Use(mw.ExtractToken())

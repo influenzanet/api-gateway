@@ -397,6 +397,10 @@ func (h *HttpEndpoints) getReportsForParticipant(c *gin.Context) {
 			req.Until = n
 		}
 	}
+	ignoreReports := c.DefaultQuery("ignoreReports", "")
+	if len(profileIds) > 0 {
+		req.IgnoreReports = strings.Split(ignoreReports, ",")
+	}
 
 	resp, err := h.clients.StudyService.GetReportsForUser(context.Background(), &req)
 	if err != nil {
