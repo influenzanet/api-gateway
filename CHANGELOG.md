@@ -13,6 +13,7 @@
 ### Changed
 
 - To allow workflows where registration is triggered from a survey, study flow methods don't require the account to be confirmed yet.
+- Profile creation does not require verified emails - needed for entry flow through surveys.
 
 ## [v0.15.2] - 2022-02-16
 

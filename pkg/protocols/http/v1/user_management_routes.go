@@ -31,7 +31,7 @@ func (h *HttpEndpoints) AddUserManagementParticipantAPI(rg *gin.RouterGroup) {
 		user.POST("/set-language", mw.RequirePayload(), h.userSetPreferredLanguageHandl)
 		user.POST("/delete", mw.RequirePayload(), h.deleteAccountHandl)
 
-		user.POST("/profile/save", mw.CheckAccountConfirmed(), mw.RequirePayload(), h.saveProfileHandl)
+		user.POST("/profile/save", mw.RequirePayload(), h.saveProfileHandl)
 		user.POST("/profile/remove", mw.RequirePayload(), h.removeProfileHandl)
 
 		user.POST("/resend-verification-message", mw.RequirePayload(), h.resendContanctVerificationEmailHandl)
