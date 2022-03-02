@@ -123,6 +123,13 @@ func (h *HttpEndpoints) signupWithEmailHandlV3(c *gin.Context) {
 			if err := h.JsonToProto(c, &req); err != nil {
 				return nil, status.Error(codes.InvalidArgument, err.Error())
 			}
+
+			if len(req.InfoCheck) > 0 {
+				req.Password = ""
+				logger.Error.Printf("honeypot value filled with request: %v", &req)
+				return nil, status.Error(codes.InvalidArgument, "invalid request")
+			}
+
 			return h.clients.UserManagement.SignupWithEmail(context.Background(), &req)
 		},
 	)
