@@ -1,6 +1,6 @@
 # Changelog
 
-## [v1.0.0] - ??
+## [v1.0.0] - 2022-03-08
 
 ### Added
 
@@ -14,6 +14,7 @@
 
 - To allow workflows where registration is triggered from a survey, study flow methods don't require the account to be confirmed yet.
 - Profile creation does not require verified emails - needed for entry flow through surveys.
+- Migration endpoint extended to be able to create reports as well.
 
 ## [v0.15.2] - 2022-02-16
 

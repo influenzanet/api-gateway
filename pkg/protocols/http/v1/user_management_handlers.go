@@ -390,13 +390,16 @@ func (h *HttpEndpoints) createUserHandl(c *gin.Context) {
 }
 
 type MigrateUserReq struct {
-	AccountID         string   `json:"accountId"`
-	OldParticipantIDs []string `json:"oldParticipantIDs"` // per profile
-	ProfileNames      []string `json:"profileNames"`      // per profile
-	InitialPassword   string   `json:"initialPassword"`
-	PreferredLanguage string   `json:"preferredLanguage"`
-	Studies           []string `json:"studies"`
-	Use2FA            bool     `json:"use2FA"`
+	AccountID          string             `json:"accountId"`
+	OldParticipantIDs  []string           `json:"oldParticipantIDs"` // per profile
+	ProfileNames       []string           `json:"profileNames"`      // per profile
+	InitialPassword    string             `json:"initialPassword"`
+	PreferredLanguage  string             `json:"preferredLanguage"`
+	Studies            []string           `json:"studies"`
+	Use2FA             bool               `json:"use2FA"`
+	AccountConfirmedAt int64              `json:"accountConfirmedAt"` // if account should not be removed automatically
+	CreatedAt          int64              `json:"createdAt"`          // to override when account was created
+	Reports            []*studyAPI.Report `json:"reports"`            // create these reports for the user as well
 }
 
 func (h *HttpEndpoints) migrateUserHandl(c *gin.Context) {
@@ -415,13 +418,15 @@ func (h *HttpEndpoints) migrateUserHandl(c *gin.Context) {
 
 	// Create user
 	cuReq := umAPI.CreateUserReq{
-		AccountId:         req.AccountID,
-		InitialPassword:   req.InitialPassword,
-		PreferredLanguage: req.PreferredLanguage,
-		Roles:             []string{constants.USER_ROLE_PARTICIPANT},
-		Token:             token,
-		Use_2Fa:           req.Use2FA,
-		ProfileNames:      req.ProfileNames,
+		AccountId:          req.AccountID,
+		InitialPassword:    req.InitialPassword,
+		PreferredLanguage:  req.PreferredLanguage,
+		Roles:              []string{constants.USER_ROLE_PARTICIPANT},
+		Token:              token,
+		Use_2Fa:            req.Use2FA,
+		ProfileNames:       req.ProfileNames,
+		AccountConfirmedAt: req.AccountConfirmedAt,
+		CreatedAt:          req.CreatedAt,
 	}
 	newUser, err := h.clients.UserManagement.CreateUser(context.Background(), &cuReq)
 	if err != nil {
@@ -473,6 +478,23 @@ func (h *HttpEndpoints) migrateUserHandl(c *gin.Context) {
 				st := status.Convert(err)
 				c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
 				return
+			}
+
+			// Create reports:
+			for _, report := range req.Reports {
+				logger.Debug.Println(report)
+				if report.ProfileId != req.OldParticipantIDs[pIndex] {
+					continue
+				}
+				_, err = h.clients.StudyService.CreateReport(context.TODO(), &studyAPI.CreateReportReq{
+					Token:     newUserToken,
+					StudyKey:  report.StudyKey,
+					ProfileId: profile.Id,
+					Report:    report,
+				})
+				if err != nil {
+					logger.Error.Printf("unexpected error: %v", err.Error())
+				}
 			}
 		}
 	}
