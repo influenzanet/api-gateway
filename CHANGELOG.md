@@ -1,5 +1,11 @@
 # Changelog
 
+## [v1.0.2] - 2022-03-??
+
+### Changed
+
+- Fix bug in report fetching endpoint
+
 ## [v1.0.1] - 2022-03-15
 
 ### Changed

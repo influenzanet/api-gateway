@@ -398,7 +398,7 @@ func (h *HttpEndpoints) getReportsForParticipant(c *gin.Context) {
 		}
 	}
 	ignoreReports := c.DefaultQuery("ignoreReports", "")
-	if len(profileIds) > 0 {
+	if len(ignoreReports) > 0 {
 		req.IgnoreReports = strings.Split(ignoreReports, ",")
 	}
 
