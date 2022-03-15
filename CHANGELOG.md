@@ -1,5 +1,11 @@
 # Changelog
 
+## [v1.0.1] - 2022-03-15
+
+### Changed
+
+- Updated study-service api
+
 ## [v1.0.0] - 2022-03-08
 
 ### Added
@@ -28,33 +34,30 @@
 
 ## [v0.15.0] - 2021-07-07
 
-### New:
+### New
 
 - Added new form of authentication for management-api: the service can be connected with a SAML based identity provider. Upon successful authentication, it calls the user-management-service's new endpoint for logging in with external identity provider and display the token provided by the that.
 In this current concept, this workflow is set up to work with the Python scripts by copy pasting that token string into the terminal. Documentation about how to configure this new SAML interface can be found at [docs/saml-config.md](docs/saml-config.md).
 
-
 ## [v0.14.1] - 2021-06-03
 
-### Changed:
+### Changed
 
 - Migration endpoint can receive a list of profile names, that will be used to create profiles for the user, and submit a migration survey for each of the new profiles. Profile names can be defined through the optional attribute `profileNames`, which is expected to be a string array.
 Also `oldParticipantID` is renamed to `oldParticipantIDs` and expects a string array.
 If `profileNames` is populated, `oldParticipantIDs` must contain at least the same number of entries (and any values without matching profile name, will be ignored.)
 
-
 ## [v0.14.0] - 2021-05-28
 
-### Added:
+### Added
 
 - New endpoints for data export in CSV formats
 
-
 ## [v0.13.1] - 2021-05-24
 
-### Added:
-- New route to the management-api of the study-service to run custom study rules
+### Added
 
+- New route to the management-api of the study-service to run custom study rules
 
 ## [v0.13.0]
 
@@ -69,6 +72,6 @@ For more infos, see [here](docs/recaptcha-config.md)
 Change is backwards compatible, previous env variables should still work.
 
 - Updated dependencies (reflected in go.mod). Relevant internal changes:
-    - Auto Email has label attribute.
+  - Auto Email has label attribute.
 
 - Small code improvements how endpoints handle for singup is implemented.
