@@ -1,5 +1,11 @@
 # Changelog
 
+## [v1.1.0] - 2022-04-??
+
+### Added
+
+- New endpoints for managing researcher notification subscriptions.
+
 ## [v1.0.2] - 2022-03-06
 
 ### Changed
