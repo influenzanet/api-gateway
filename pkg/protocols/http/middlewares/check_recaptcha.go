@@ -3,12 +3,12 @@ package middlewares
 import (
 	"encoding/json"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 	"os"
 	"strings"
 
+	"github.com/coneno/logger"
 	"github.com/gin-gonic/gin"
 )
 
@@ -84,7 +84,7 @@ func CheckRecaptcha() gin.HandlerFunc {
 			"response": {token},
 		})
 		if err != nil {
-			log.Printf("unexpected error during recaptcha validation: %v", err)
+			logger.Error.Printf("unexpected error during recaptcha validation: %v", err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "unexpected error during recaptcha validation"})
 			c.Abort()
 			return
@@ -93,7 +93,7 @@ func CheckRecaptcha() gin.HandlerFunc {
 
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			log.Printf("unexpected error during recaptcha validation: %v", err)
+			logger.Error.Printf("unexpected error during recaptcha validation: %v", err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "unexpected error during recaptcha validation"})
 			c.Abort()
 			return
@@ -102,14 +102,14 @@ func CheckRecaptcha() gin.HandlerFunc {
 		var parsedResp RecaptchaValidationResp
 		err = json.Unmarshal(body, &parsedResp)
 		if err != nil {
-			log.Printf("unexpected error during recaptcha validation: %v", err)
+			logger.Error.Printf("unexpected error during recaptcha validation: %v", err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "unexpected error during recaptcha validation"})
 			c.Abort()
 			return
 		}
 
 		if !parsedResp.Success {
-			log.Printf("recaptcha validation failed: %v", parsedResp)
+			logger.Error.Printf("recaptcha validation failed: %v", parsedResp)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "unexpected error during recaptcha validation"})
 			c.Abort()
 			return

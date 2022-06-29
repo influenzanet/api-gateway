@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -1187,7 +1186,7 @@ func (h *HttpEndpoints) uploadParticipantFileReq(c *gin.Context) {
 	// Open file
 	f, err := file.Open()
 	if err != nil {
-		log.Println(err)
+		logger.Error.Println(err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}

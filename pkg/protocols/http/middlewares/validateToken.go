@@ -2,9 +2,9 @@ package middlewares
 
 import (
 	"context"
-	"log"
 	"net/http"
 
+	"github.com/coneno/logger"
 	"github.com/gin-gonic/gin"
 	umAPI "github.com/influenzanet/user-management-service/pkg/api"
 	"google.golang.org/grpc/status"
@@ -19,7 +19,7 @@ func ValidateToken(authClient umAPI.UserManagementApiClient) gin.HandlerFunc {
 		})
 		if err != nil {
 			st := status.Convert(err)
-			log.Println(st.Message())
+			logger.Error.Println(st.Message())
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "error during token validation"})
 			c.Abort()
 			return

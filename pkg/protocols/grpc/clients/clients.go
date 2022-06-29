@@ -1,8 +1,7 @@
 package clients
 
 import (
-	"log"
-
+	"github.com/coneno/logger"
 	messageAPI "github.com/influenzanet/messaging-service/pkg/api/messaging_service"
 	studyAPI "github.com/influenzanet/study-service/pkg/api"
 	umAPI "github.com/influenzanet/user-management-service/pkg/api"
@@ -15,7 +14,7 @@ func connectToGRPCServer(addr string, maxMsgSize int) *grpc.ClientConn {
 		grpc.MaxCallSendMsgSize(maxMsgSize),
 	))
 	if err != nil {
-		log.Fatalf("failed to connect to %s: %v", addr, err)
+		logger.Error.Fatalf("failed to connect to %s: %v", addr, err)
 	}
 	return conn
 }
