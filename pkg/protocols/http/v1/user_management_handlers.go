@@ -685,7 +685,7 @@ func parseSAMLgroupInfo(groups []string) []GroupInfo {
 
 func checkPermission(samlGroupInfos []GroupInfo, instanceID string, role string) (bool, *GroupInfo) {
 	for _, g := range samlGroupInfos {
-		if g.InstanceID == instanceID && role == g.Role {
+		if strings.EqualFold(g.InstanceID, instanceID) && strings.EqualFold(role, g.Role) {
 			return true, &g
 		}
 	}

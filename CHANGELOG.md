@@ -1,5 +1,12 @@
 # Changelog
 
+## [v1.1.1] - 2022-06-30
+
+### Changed
+
+- Replacing remaining standard logger with custom logger to standardise log output across projects.
+- When logging in through SAML protocol, role and instance ID checks are now case insensitive to make process less error prone.
+
 ## [v1.1.0] - 2022-06-03
 
 ### Added
