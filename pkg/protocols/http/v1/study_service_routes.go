@@ -68,10 +68,15 @@ func (h *HttpEndpoints) AddStudyServiceAdminAPI(rg *gin.RouterGroup) {
 	studyGroup.Use(mw.CheckAccountConfirmed())
 	{
 		studyGroup.GET("/:studyKey", h.getStudyHandl)
+
 		studyGroup.GET("/:studyKey/surveys", h.getStudySurveyInfosHandl)
+		studyGroup.GET("/:studyKey/survey-keys", h.getStudySurveySurveyKeysHandl)
 		studyGroup.POST("/:studyKey/surveys", mw.RequirePayload(), h.saveSurveyToStudyHandl)
+		studyGroup.GET("/:studyKey/survey/:surveyKey/versions", h.getSurveyVersionInfosHandl)
 		studyGroup.GET("/:studyKey/survey/:surveyKey", h.getSurveyDefForStudyHandl)
-		studyGroup.DELETE("/:studyKey/survey/:surveyKey", h.removeSurveyFromStudyHandl)
+		studyGroup.GET("/:studyKey/survey/:surveyKey/:versionID", h.getSurveyDefForStudyHandl)
+		studyGroup.DELETE("/:studyKey/survey/:surveyKey", h.unpublishSurveyHandl)
+		studyGroup.DELETE("/:studyKey/survey/:surveyKey/:versionID", h.removeSurveyVersionHandl)
 
 		studyGroup.POST("/:studyKey/save-member", mw.RequirePayload(), h.studySaveMemberHandl)
 		studyGroup.POST("/:studyKey/remove-member", mw.RequirePayload(), h.studyRemoveMemberHandl)
