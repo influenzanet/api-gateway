@@ -11,7 +11,7 @@ require (
 	github.com/h2non/filetype v1.1.3
 	github.com/influenzanet/go-utils v0.2.10
 	github.com/influenzanet/messaging-service v1.0.0
-	github.com/influenzanet/study-service v1.1.0
+	github.com/influenzanet/study-service v1.1.0-staging
 	github.com/influenzanet/user-management-service v1.0.0
 	google.golang.org/grpc v1.47.0
 	google.golang.org/protobuf v1.28.0
