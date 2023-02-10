@@ -433,6 +433,15 @@ func (h *HttpEndpoints) getReportsForParticipant(c *gin.Context) {
 			req.Until = n
 		}
 	}
+
+	limit := c.DefaultQuery("limit", "")
+	if len(limit) > 0 {
+		n, err := strconv.ParseInt(limit, 10, 64)
+		if err == nil {
+			req.Limit = n
+		}
+	}
+
 	ignoreReports := c.DefaultQuery("ignoreReports", "")
 	if len(ignoreReports) > 0 {
 		req.IgnoreReports = strings.Split(ignoreReports, ",")
