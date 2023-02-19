@@ -5,7 +5,7 @@
 ### BREAKING CHANGE
 
 - Changes in the survey management API to apply the survey history model changes.
-  - This version requires the study-service with minumum of 1.3.0 version
+  - This version requires the study-service with minimum of 1.3.0 version
 
 ### Changed
 
