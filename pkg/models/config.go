@@ -20,6 +20,7 @@ type Config struct {
 		MessagingService string `yaml:"messaging_service"`
 	} `yaml:"service_urls"`
 	SAMLConfig *SAMLConfig `yaml:"saml_config"`
+	TLSPaths   TLSPaths    `yaml:"tls_paths"`
 }
 
 type UseEndpoints struct {
@@ -36,6 +37,13 @@ type SAMLConfig struct {
 	SessionCertPath          string `yaml:"session_cert"`
 	SessionKeyPath           string `yaml:"session_key"`
 	TemplatePathLoginSuccess string `yaml:"templates_login_success"`
+}
+
+type TLSPaths struct {
+	ServerCertPath string
+	ServerKeyPath  string
+	CACertPath     string
+	ClientCertPath string
 }
 
 func GetLogLevel() logger.LogLevel {
