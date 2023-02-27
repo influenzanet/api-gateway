@@ -1,5 +1,11 @@
 # Changelog
 
+## [v1.2.1] - 2023-02-27
+
+### Changed
+
+- Updated project dependencies, especially relevant the messaging service to the latest version (to include the "until" flag).
+
 ## [v1.2.0] - 2022-11-02
 
 ### BREAKING CHANGE
