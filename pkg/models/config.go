@@ -43,7 +43,6 @@ type TLSPaths struct {
 	ServerCertPath string
 	ServerKeyPath  string
 	CACertPath     string
-	ClientCertPath string
 }
 
 func GetLogLevel() logger.LogLevel {

@@ -65,7 +65,6 @@ func initConfig() {
 		ServerCertPath: os.Getenv(models.ENV_MUTUAL_TLS_SERVER_CERT),
 		ServerKeyPath:  os.Getenv(models.ENV_MUTUAL_TLS_SERVER_KEY),
 		CACertPath:     os.Getenv(models.ENV_MUTUAL_TLS_CA_CERT),
-		ClientCertPath: os.Getenv(models.ENV_MUTUAL_TLS_CLIENT_CERT),
 	}
 }
 
@@ -128,6 +127,7 @@ func main() {
 		Handler:   router,
 		TLSConfig: tlsConfig,
 	}
+
 	err = server.ListenAndServeTLS(conf.TLSPaths.ServerCertPath, conf.TLSPaths.ServerKeyPath)
 	if err != nil {
 		logger.Error.Fatal(err)
