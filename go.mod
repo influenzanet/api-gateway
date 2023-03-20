@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/coneno/logger v1.2.2
-	github.com/crewjam/saml v0.4.8
+	github.com/crewjam/saml v0.4.9
 	github.com/gin-contrib/cors v1.4.0
 	github.com/gin-gonic/gin v1.9.0
 	github.com/golang/protobuf v1.5.2
