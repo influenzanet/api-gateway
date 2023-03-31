@@ -1,5 +1,13 @@
 # Changelog
 
+## [v1.3.0] - 2023-03-20
+
+### Changed
+
+- Update dependency for study-service
+- Send info about profile and account deletion to the study-service, so this can be handled in the study rules.
+- During user migration, set timestamps to the middle of the day to improve privacy.
+
 ## [v1.2.1] - 2023-02-27
 
 ### Changed
