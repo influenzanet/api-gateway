@@ -61,6 +61,7 @@ func initConfig() {
 	}
 
 	// Mutual TLS configs
+	conf.UseMTLS = os.Getenv(models.ENV_REQUIRE_MUTUAL_TLS) == "true"
 	conf.TLSPaths = models.TLSPaths{
 		ServerCertPath: os.Getenv(models.ENV_MUTUAL_TLS_SERVER_CERT),
 		ServerKeyPath:  os.Getenv(models.ENV_MUTUAL_TLS_SERVER_KEY),
@@ -116,21 +117,27 @@ func main() {
 
 	logger.Info.Printf("gateway listening on port %s", conf.Port)
 
-	// Create tls config for mutual TLS
-	tlsConfig, err := getTLSConfig(conf.TLSPaths)
-	if err != nil {
-		logger.Error.Fatal(err)
-	}
+	if !conf.UseMTLS {
+		logger.Info.Println("starting server without mutual TLS")
+		logger.Error.Fatal(router.Run(":" + conf.Port))
+		return
+	} else {
+		// Create tls config for mutual TLS
+		tlsConfig, err := getTLSConfig(conf.TLSPaths)
+		if err != nil {
+			logger.Error.Fatal(err)
+		}
 
-	server := &http.Server{
-		Addr:      ":" + conf.Port,
-		Handler:   router,
-		TLSConfig: tlsConfig,
-	}
+		server := &http.Server{
+			Addr:      ":" + conf.Port,
+			Handler:   router,
+			TLSConfig: tlsConfig,
+		}
 
-	err = server.ListenAndServeTLS(conf.TLSPaths.ServerCertPath, conf.TLSPaths.ServerKeyPath)
-	if err != nil {
-		logger.Error.Fatal(err)
+		err = server.ListenAndServeTLS(conf.TLSPaths.ServerCertPath, conf.TLSPaths.ServerKeyPath)
+		if err != nil {
+			logger.Error.Fatal(err)
+		}
 	}
 }
 

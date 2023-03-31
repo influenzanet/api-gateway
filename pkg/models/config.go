@@ -20,6 +20,7 @@ type Config struct {
 		MessagingService string `yaml:"messaging_service"`
 	} `yaml:"service_urls"`
 	SAMLConfig *SAMLConfig `yaml:"saml_config"`
+	UseMTLS    bool        `yaml:"use_mtls"`
 	TLSPaths   TLSPaths    `yaml:"tls_paths"`
 }
 
