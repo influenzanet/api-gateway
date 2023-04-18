@@ -79,7 +79,7 @@ func (h *HttpEndpoints) saveSurveyToStudyHandl(c *gin.Context) {
 	h.SendProtoAsJSON(c, http.StatusOK, resp)
 }
 
-func (h *HttpEndpoints) removeSurveyFromStudyHandl(c *gin.Context) {
+func (h *HttpEndpoints) unpublishSurveyHandl(c *gin.Context) {
 	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req studyAPI.SurveyReferenceRequest
@@ -87,7 +87,26 @@ func (h *HttpEndpoints) removeSurveyFromStudyHandl(c *gin.Context) {
 	req.StudyKey = c.Param("studyKey")
 	req.SurveyKey = c.Param("surveyKey")
 
-	resp, err := h.clients.StudyService.RemoveSurveyFromStudy(context.Background(), &req)
+	resp, err := h.clients.StudyService.UnpublishSurvey(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+
+	h.SendProtoAsJSON(c, http.StatusOK, resp)
+}
+
+func (h *HttpEndpoints) removeSurveyVersionHandl(c *gin.Context) {
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
+
+	var req studyAPI.SurveyVersionReferenceRequest
+	req.Token = token
+	req.StudyKey = c.Param("studyKey")
+	req.SurveyKey = c.Param("surveyKey")
+	req.VersionId = c.Param("versionID")
+
+	resp, err := h.clients.StudyService.RemoveSurveyVersion(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
 		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
@@ -353,6 +372,22 @@ func (h *HttpEndpoints) getStudySurveyInfosHandl(c *gin.Context) {
 	h.SendProtoAsJSON(c, http.StatusOK, resp)
 }
 
+func (h *HttpEndpoints) getStudySurveySurveyKeysHandl(c *gin.Context) {
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
+
+	var req studyAPI.GetSurveyKeysRequest
+	req.Token = token
+	req.StudyKey = c.Param("studyKey")
+	resp, err := h.clients.StudyService.GetSurveyKeys(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+
+	h.SendProtoAsJSON(c, http.StatusOK, resp)
+}
+
 func (h *HttpEndpoints) getAllStudiesHandl(c *gin.Context) {
 	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
@@ -435,13 +470,31 @@ func (h *HttpEndpoints) getStudyHandl(c *gin.Context) {
 	h.SendProtoAsJSON(c, http.StatusOK, resp)
 }
 
-func (h *HttpEndpoints) getSurveyDefForStudyHandl(c *gin.Context) {
+func (h *HttpEndpoints) getSurveyVersionInfosHandl(c *gin.Context) {
 	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req studyAPI.SurveyReferenceRequest
 	req.Token = token
 	req.StudyKey = c.Param("studyKey")
 	req.SurveyKey = c.Param("surveyKey")
+	resp, err := h.clients.StudyService.GetSurveyVersionInfos(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+
+	h.SendProtoAsJSON(c, http.StatusOK, resp)
+}
+
+func (h *HttpEndpoints) getSurveyDefForStudyHandl(c *gin.Context) {
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
+
+	var req studyAPI.SurveyVersionReferenceRequest
+	req.Token = token
+	req.StudyKey = c.Param("studyKey")
+	req.SurveyKey = c.Param("surveyKey")
+	req.VersionId = c.Param("versionID")
 	resp, err := h.clients.StudyService.GetSurveyDefForStudy(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
@@ -941,7 +994,6 @@ func (h *HttpEndpoints) getResponseWideFormatCSV(c *gin.Context) {
 	}
 	req.IncludeMeta = &studyAPI.ResponseExportQuery_IncludeMeta{
 		Position:       c.DefaultQuery("withPositions", "false") == "true",
-		ItemVersion:    c.DefaultQuery("withItemVersions", "false") == "true",
 		InitTimes:      c.DefaultQuery("withInitTimes", "false") == "true",
 		DisplayedTimes: c.DefaultQuery("withDisplayTimes", "false") == "true",
 		ResponsedTimes: c.DefaultQuery("withResponseTimes", "false") == "true",
@@ -1006,7 +1058,6 @@ func (h *HttpEndpoints) getResponseLongFormatCSV(c *gin.Context) {
 	}
 	req.IncludeMeta = &studyAPI.ResponseExportQuery_IncludeMeta{
 		Position:       c.DefaultQuery("withPositions", "false") == "true",
-		ItemVersion:    c.DefaultQuery("withItemVersions", "false") == "true",
 		InitTimes:      c.DefaultQuery("withInitTimes", "false") == "true",
 		DisplayedTimes: c.DefaultQuery("withDisplayTimes", "false") == "true",
 		ResponsedTimes: c.DefaultQuery("withResponseTimes", "false") == "true",
@@ -1071,7 +1122,6 @@ func (h *HttpEndpoints) getResponseFlatJSON(c *gin.Context) {
 	}
 	req.IncludeMeta = &studyAPI.ResponseExportQuery_IncludeMeta{
 		Position:       c.DefaultQuery("withPositions", "false") == "true",
-		ItemVersion:    c.DefaultQuery("withItemVersions", "false") == "true",
 		InitTimes:      c.DefaultQuery("withInitTimes", "false") == "true",
 		DisplayedTimes: c.DefaultQuery("withDisplayTimes", "false") == "true",
 		ResponsedTimes: c.DefaultQuery("withResponseTimes", "false") == "true",

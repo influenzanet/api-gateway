@@ -1,5 +1,17 @@
 # Changelog
 
+## [v1.2.0] - 2022-11-02
+
+### BREAKING CHANGE
+
+- Changes in the survey management API to apply the survey history model changes.
+  - This version requires the study-service with minumum of 1.3.0 version
+
+### Changed
+
+- Updating go version to minimum of 1.17
+- Updating project dependencies
+
 ## [v1.1.1] - 2022-06-30
 
 ### Changed
