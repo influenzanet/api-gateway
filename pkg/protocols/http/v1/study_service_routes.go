@@ -103,6 +103,7 @@ func (h *HttpEndpoints) AddStudyServiceAdminAPI(rg *gin.RouterGroup) {
 		responsesGroup.GET("/reports", h.getReportsForStudy) // ?reportKey=todo&from=time1&until=time2&participant=todo
 		responsesGroup.GET("/responses", h.getSurveyResponsesHandl)
 		responsesGroup.POST("/fetch-confidential-responses", h.getConfidentialResponsesHandl)
+		responsesGroup.GET("/participant", h.getParticipantStateByID)
 
 		surveyResponsesGroup := responsesGroup.Group("/survey/:surveyKey")
 		{

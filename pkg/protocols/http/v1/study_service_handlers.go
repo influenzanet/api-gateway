@@ -1320,3 +1320,22 @@ func (h *HttpEndpoints) uploadParticipantFileReq(c *gin.Context) {
 
 	h.SendProtoAsJSON(c, http.StatusOK, reply)
 }
+
+func (h *HttpEndpoints) getParticipantStateByID(c *gin.Context) {
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
+
+	var req studyAPI.ParticipantStateByIDQuery
+	studyKey := c.Param("studyKey")
+	req.StudyKey = studyKey
+	req.ParticipantId = c.DefaultQuery("participantID", "") //param or query
+
+	req.Token = token
+	state, err := h.clients.StudyService.GetParticipantStateByID(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+
+	h.SendProtoAsJSON(c, http.StatusOK, state)
+}
