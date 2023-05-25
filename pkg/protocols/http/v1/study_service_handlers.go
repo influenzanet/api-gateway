@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 
@@ -1327,10 +1328,52 @@ func (h *HttpEndpoints) getParticipantStateByID(c *gin.Context) {
 	var req studyAPI.ParticipantStateByIDQuery
 	studyKey := c.Param("studyKey")
 	req.StudyKey = studyKey
-	req.ParticipantId = c.DefaultQuery("participantID", "") //param or query
+	req.ParticipantId = c.DefaultQuery("participantID", "")
 
 	req.Token = token
 	state, err := h.clients.StudyService.GetParticipantStateByID(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+
+	h.SendProtoAsJSON(c, http.StatusOK, state)
+}
+
+func (h *HttpEndpoints) getParticipantStatesWithPagination(c *gin.Context) {
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
+
+	var req studyAPI.GetPStatesWithPaginationQuery
+	studyKey := c.Param("studyKey")
+	req.StudyKey = studyKey
+	page, err := strconv.Atoi(c.DefaultQuery("pageNumber", "1"))
+	if err != nil {
+		logger.Error.Println("Could not read page parameter")
+		req.Page = 0
+	}
+	req.Page = int32(page)
+	pageSize, err := strconv.Atoi(c.DefaultQuery("pageSize", "0"))
+	if err != nil {
+		logger.Error.Println("Could not read page size parameter")
+		req.PageSize = 0
+	}
+	req.PageSize = int32(pageSize)
+
+	queryParam := c.DefaultQuery("query", "")
+	decodedQP, err := url.QueryUnescape(queryParam)
+	if err != nil {
+		logger.Error.Printf("Failed to decode query parameter: %v", err)
+		//TODO error handling?
+	}
+
+	req.Query = decodedQP
+	logger.Info.Println(c.Request.URL.Path)
+	logger.Info.Println(queryParam)
+	logger.Info.Println(req.Query, req.Page, req.Page)
+
+	req.Token = token
+	state, err := h.clients.StudyService.GetParticipantStatesWithPagination(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
 		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
