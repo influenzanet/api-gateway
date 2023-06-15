@@ -96,15 +96,15 @@ func (h *HttpEndpoints) AddStudyServiceAdminAPI(rg *gin.RouterGroup) {
 	responsesGroup.Use(mw.CheckAccountConfirmed())
 	{
 		responsesGroup.GET("/statistics", h.getSurveyResponseStatisticsHandl)
-		responsesGroup.GET("/participants", h.getParticipantStatesForStudy) // ?&status=active(opt)
-		responsesGroup.GET("/file-infos", h.getFileInfosForStudy)           // ?fileType=todo&from=time1&until=time2&participant=todo
-		responsesGroup.GET("/file", h.getParticipantFile)                   // ?id=todo
+		responsesGroup.GET("/participants/all", h.getParticipantStatesForStudy) // ?&status=active(opt)
+		responsesGroup.GET("/file-infos", h.getFileInfosForStudy)               // ?fileType=todo&from=time1&until=time2&participant=todo
+		responsesGroup.GET("/file", h.getParticipantFile)                       // ?id=todo
 		responsesGroup.POST("/delete-files", mw.RequirePayload(), h.deleteParticipantFilesReq)
 		responsesGroup.GET("/reports", h.getReportsForStudy) // ?reportKey=todo&from=time1&until=time2&participant=todo
 		responsesGroup.GET("/responses", h.getSurveyResponsesHandl)
 		responsesGroup.POST("/fetch-confidential-responses", h.getConfidentialResponsesHandl)
 		responsesGroup.GET("/participant", h.getParticipantStateByID)
-		responsesGroup.GET("/participants-with-pagination", h.getParticipantStatesWithPagination)
+		responsesGroup.GET("/participants", h.getParticipantStatesWithPagination)
 
 		surveyResponsesGroup := responsesGroup.Group("/survey/:surveyKey")
 		{
