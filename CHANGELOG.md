@@ -1,5 +1,16 @@
 # Changelog
 
+## ????
+
+### BREAKING CHANGE
+
+- Changed URL for getting participant states for study by status.
+
+### Added
+
+- New endpoint for getting participant state by ID.
+- New endpoint for getting participant states by query with pagination and sorting option.
+
 ## [v1.3.0] - 2023-03-20
 
 ### Changed
