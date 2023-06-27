@@ -3,9 +3,11 @@ package v1
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 
@@ -1319,4 +1321,75 @@ func (h *HttpEndpoints) uploadParticipantFileReq(c *gin.Context) {
 	}
 
 	h.SendProtoAsJSON(c, http.StatusOK, reply)
+}
+
+func (h *HttpEndpoints) getParticipantStateByID(c *gin.Context) {
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
+
+	var req studyAPI.ParticipantStateByIDQuery
+	studyKey := c.Param("studyKey")
+	req.StudyKey = studyKey
+	req.ParticipantId = c.DefaultQuery("participantID", "")
+
+	req.Token = token
+	state, err := h.clients.StudyService.GetParticipantStateByID(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+
+	h.SendProtoAsJSON(c, http.StatusOK, state)
+}
+
+func (h *HttpEndpoints) getParticipantStatesWithPagination(c *gin.Context) {
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
+
+	var req studyAPI.GetPStatesWithPaginationQuery
+	req.StudyKey = c.Param("studyKey")
+	page, err := strconv.Atoi(c.DefaultQuery("pageNumber", "1"))
+	if err != nil {
+		logger.Error.Println("Could not read page parameter")
+		req.Page = 1
+	}
+	if page < 1 {
+		req.Page = 1
+	} else {
+		req.Page = int32(page)
+	}
+	pageSize, err := strconv.Atoi(c.DefaultQuery("pageSize", "0"))
+	if err != nil {
+		logger.Error.Println("Could not read page size parameter")
+		req.PageSize = 0
+	}
+	req.PageSize = int32(pageSize)
+
+	queryParam := c.DefaultQuery("query", "")
+	decodedQP, err := url.QueryUnescape(queryParam)
+	if err != nil {
+		logger.Error.Printf("Failed to decode query parameter: %v", err)
+		decodedQP = ""
+	}
+	req.Query = decodedQP
+
+	sortParam := c.DefaultQuery("sortBy", "")
+	decodedSP, err := url.QueryUnescape(sortParam)
+	if err != nil {
+		logger.Error.Printf("Failed to decode sort parameter: %v", err)
+		decodedSP = ""
+	}
+	err = json.Unmarshal([]byte(decodedSP), &req.SortBy)
+	if err != nil {
+		logger.Error.Printf("Failed to parse sort parameter: %v", err)
+	}
+
+	req.Token = token
+	state, err := h.clients.StudyService.GetParticipantStatesWithPagination(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+
+	h.SendProtoAsJSON(c, http.StatusOK, state)
 }
