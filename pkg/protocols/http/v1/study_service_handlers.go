@@ -1393,3 +1393,21 @@ func (h *HttpEndpoints) getParticipantStatesWithPagination(c *gin.Context) {
 
 	h.SendProtoAsJSON(c, http.StatusOK, state)
 }
+
+func (h *HttpEndpoints) getCurrentStudyRules(c *gin.Context) {
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
+
+	var req studyAPI.StudyReferenceReq
+	studyKey := c.Param("studyKey")
+	req.StudyKey = studyKey
+	req.Token = token
+
+	studyRules, err := h.clients.StudyService.GetCurrentStudyRules(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+
+	h.SendProtoAsJSON(c, http.StatusOK, studyRules)
+}
