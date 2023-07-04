@@ -1323,7 +1323,7 @@ func (h *HttpEndpoints) uploadParticipantFileReq(c *gin.Context) {
 	h.SendProtoAsJSON(c, http.StatusOK, reply)
 }
 
-func (h *HttpEndpoints) getParticipantStateByID(c *gin.Context) {
+func (h *HttpEndpoints) getParticipantStateByIDHandl(c *gin.Context) {
 	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req studyAPI.ParticipantStateByIDQuery
@@ -1342,7 +1342,7 @@ func (h *HttpEndpoints) getParticipantStateByID(c *gin.Context) {
 	h.SendProtoAsJSON(c, http.StatusOK, state)
 }
 
-func (h *HttpEndpoints) getParticipantStatesWithPagination(c *gin.Context) {
+func (h *HttpEndpoints) getParticipantStatesWithPaginationHandl(c *gin.Context) {
 	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req studyAPI.GetPStatesWithPaginationQuery
@@ -1394,7 +1394,7 @@ func (h *HttpEndpoints) getParticipantStatesWithPagination(c *gin.Context) {
 	h.SendProtoAsJSON(c, http.StatusOK, state)
 }
 
-func (h *HttpEndpoints) getCurrentStudyRules(c *gin.Context) {
+func (h *HttpEndpoints) getCurrentStudyRulesHandl(c *gin.Context) {
 	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req studyAPI.StudyReferenceReq
@@ -1403,6 +1403,68 @@ func (h *HttpEndpoints) getCurrentStudyRules(c *gin.Context) {
 	req.Token = token
 
 	studyRules, err := h.clients.StudyService.GetCurrentStudyRules(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+
+	h.SendProtoAsJSON(c, http.StatusOK, studyRules)
+}
+
+func (h *HttpEndpoints) getStudyRulesHistoryHandl(c *gin.Context) {
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
+
+	var req studyAPI.StudyRulesHistoryReq
+	req.StudyKey = c.Param("studyKey")
+	req.Token = token
+	page, err := strconv.Atoi(c.DefaultQuery("pageNumber", "1"))
+	if err != nil {
+		logger.Error.Println("Could not read page parameter")
+		req.Page = 1
+	}
+	if page < 1 {
+		req.Page = 1
+	} else {
+		req.Page = int32(page)
+	}
+	pageSize, err := strconv.Atoi(c.DefaultQuery("pageSize", "0"))
+	if err != nil {
+		logger.Error.Println("Could not read page size parameter")
+		req.PageSize = 0
+	}
+	req.PageSize = int32(pageSize)
+	descending, err := strconv.ParseBool(c.DefaultQuery("descending", "FALSE"))
+	if err != nil {
+		logger.Warning.Println("Could not read order parameter")
+		descending = false
+	}
+	req.Descending = descending
+
+	since, err := strconv.Atoi(c.DefaultQuery("since", "0"))
+	if err != nil {
+		logger.Error.Println("Could not start date parameter")
+		req.Since = 0
+	}
+	if since < 0 {
+		logger.Warning.Println("Invalid start date parameter")
+		req.Since = 0
+	} else {
+		req.Since = int64(since)
+	}
+	until, err := strconv.Atoi(c.DefaultQuery("until", "0"))
+	if err != nil {
+		logger.Error.Println("Could not read end date parameter")
+		req.Until = 0
+	}
+	if until < 0 {
+		logger.Warning.Println("Invalid end date parameter")
+		req.Until = 0
+	} else {
+		req.Until = int64(until)
+	}
+
+	studyRules, err := h.clients.StudyService.GetStudyRulesHistory(context.Background(), &req)
 	if err != nil {
 		st := status.Convert(err)
 		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
