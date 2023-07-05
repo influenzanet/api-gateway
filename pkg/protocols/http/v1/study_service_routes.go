@@ -88,6 +88,9 @@ func (h *HttpEndpoints) AddStudyServiceAdminAPI(rg *gin.RouterGroup) {
 		studyGroup.GET("/:studyKey/notification-subscriptions", h.getStudyNotificationSubscriptionsHandl)
 		studyGroup.POST("/:studyKey/notification-subscriptions", mw.RequirePayload(), h.saveStudyNotificationSubscriptionsHandl)
 		studyGroup.DELETE("/:studyKey", mw.RequirePayload(), h.deleteStudyHandl)
+		studyGroup.GET("/:studyKey/rules", h.getCurrentStudyRulesHandl)
+		studyGroup.GET("/:studyKey/rules/versions", h.getStudyRulesHistoryHandl)
+		studyGroup.DELETE("/:studyKey/rules/:versionID", h.removeStudyRulesVersionHandl)
 	}
 
 	responsesGroup := rg.Group("/data/:studyKey")
@@ -105,8 +108,6 @@ func (h *HttpEndpoints) AddStudyServiceAdminAPI(rg *gin.RouterGroup) {
 		responsesGroup.POST("/fetch-confidential-responses", h.getConfidentialResponsesHandl)
 		responsesGroup.GET("/participant", h.getParticipantStateByIDHandl)
 		responsesGroup.GET("/participants", h.getParticipantStatesWithPaginationHandl)
-		responsesGroup.GET("/rules", h.getCurrentStudyRulesHandl)
-		responsesGroup.GET("/rules/versions", h.getStudyRulesHistoryHandl)
 
 		surveyResponsesGroup := responsesGroup.Group("/survey/:surveyKey")
 		{
