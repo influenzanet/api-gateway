@@ -670,10 +670,6 @@ func (h *HttpEndpoints) deleteStudyHandl(c *gin.Context) {
 	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req studyAPI.StudyReferenceReq
-	if err := h.JsonToProto(c, &req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
 	req.Token = token
 	req.StudyKey = c.Param("studyKey")
 	resp, err := h.clients.StudyService.DeleteStudy(context.Background(), &req)
@@ -1443,7 +1439,7 @@ func (h *HttpEndpoints) getStudyRulesHistoryHandl(c *gin.Context) {
 
 	since, err := strconv.Atoi(c.DefaultQuery("since", "0"))
 	if err != nil {
-		logger.Error.Println("Could not start date parameter")
+		logger.Error.Println("Could not start upload date parameter")
 		req.Since = 0
 	}
 	if since < 0 {
@@ -1454,7 +1450,7 @@ func (h *HttpEndpoints) getStudyRulesHistoryHandl(c *gin.Context) {
 	}
 	until, err := strconv.Atoi(c.DefaultQuery("until", "0"))
 	if err != nil {
-		logger.Error.Println("Could not read end date parameter")
+		logger.Error.Println("Could not read end upload date parameter")
 		req.Until = 0
 	}
 	if until < 0 {
@@ -1472,4 +1468,21 @@ func (h *HttpEndpoints) getStudyRulesHistoryHandl(c *gin.Context) {
 	}
 
 	h.SendProtoAsJSON(c, http.StatusOK, studyRules)
+}
+
+func (h *HttpEndpoints) removeStudyRulesVersionHandl(c *gin.Context) {
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
+
+	var req studyAPI.StudyRulesVersionReferenceReq
+	req.Token = token
+	req.Id = c.Param("ID")
+
+	resp, err := h.clients.StudyService.RemoveStudyRulesVersion(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+
+	h.SendProtoAsJSON(c, http.StatusOK, resp)
 }

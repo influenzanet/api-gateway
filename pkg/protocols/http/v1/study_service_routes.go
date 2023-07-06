@@ -87,7 +87,7 @@ func (h *HttpEndpoints) AddStudyServiceAdminAPI(rg *gin.RouterGroup) {
 		studyGroup.POST("/:studyKey/props", mw.RequirePayload(), h.saveStudyPropsHandl)
 		studyGroup.GET("/:studyKey/notification-subscriptions", h.getStudyNotificationSubscriptionsHandl)
 		studyGroup.POST("/:studyKey/notification-subscriptions", mw.RequirePayload(), h.saveStudyNotificationSubscriptionsHandl)
-		studyGroup.DELETE("/:studyKey", mw.RequirePayload(), h.deleteStudyHandl)
+		studyGroup.DELETE("/:studyKey", h.deleteStudyHandl)
 		studyGroup.GET("/:studyKey/rules", h.getCurrentStudyRulesHandl)
 		studyGroup.GET("/:studyKey/rules/versions", h.getStudyRulesHistoryHandl)
 		studyGroup.DELETE("/:studyKey/rules/:versionID", h.removeStudyRulesVersionHandl)
