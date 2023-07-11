@@ -90,7 +90,7 @@ func (h *HttpEndpoints) AddStudyServiceAdminAPI(rg *gin.RouterGroup) {
 		studyGroup.DELETE("/:studyKey", h.deleteStudyHandl)
 		studyGroup.GET("/:studyKey/rules", h.getCurrentStudyRulesHandl)
 		studyGroup.GET("/:studyKey/rules/versions", h.getStudyRulesHistoryHandl)
-		studyGroup.DELETE("/:studyKey/rules/:versionID", h.removeStudyRulesVersionHandl)
+		studyGroup.DELETE("/:studyKey/rules/:ID", h.removeStudyRulesVersionHandl)
 	}
 
 	responsesGroup := rg.Group("/data/:studyKey")
