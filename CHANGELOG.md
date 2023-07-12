@@ -1,15 +1,20 @@
 # Changelog
 
-## ????
+## [v1.4.0] - 2023-07-12
 
 ### BREAKING CHANGE
 
-- Changed URL for getting participant states for study by status.
+- Changed URL for getting all participant states for a study by status, because previous url is used now with pagination and sorting option. To get all participant states (optionally filtered by study status) use the new endpoint `/v1/data/{studyKey}/participants/all`.
 
 ### Added
 
 - New endpoint for getting participant state by ID.
 - New endpoint for getting participant states by query with pagination and sorting option.
+
+### Changed
+
+- Add the possibility for the management-api to require mutual TLS authetication from the clients. This is done by setting the environment variable `REQUIRE_MUTUAL_TLS` with `true` and providing the path to the certificate and key files in the environment variables `MUTUAL_TLS_SERVER_CERT` and `MUTUAL_TLS_SERVER_KEY` as well as the `MUTUAL_TLS_CA_CERT` for the CA certificate. The client certificate must be signed by the same CA as the server certificate.
+- The renew token endpoint is also exposed by the management-api. This endpoint can be used to renew the access token of a user.
 
 ## [v1.3.0] - 2023-03-20
 

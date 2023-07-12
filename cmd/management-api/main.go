@@ -1,6 +1,8 @@
 package main
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"net/http"
 	"os"
 	"strconv"
@@ -57,6 +59,14 @@ func initConfig() {
 			conf.AllowOrigins = append(conf.AllowOrigins, conf.SAMLConfig.IDPUrl)
 		}
 	}
+
+	// Mutual TLS configs
+	conf.UseMTLS = os.Getenv(models.ENV_REQUIRE_MUTUAL_TLS) == "true"
+	conf.TLSPaths = models.TLSPaths{
+		ServerCertPath: os.Getenv(models.ENV_MUTUAL_TLS_SERVER_CERT),
+		ServerKeyPath:  os.Getenv(models.ENV_MUTUAL_TLS_SERVER_KEY),
+		CACertPath:     os.Getenv(models.ENV_MUTUAL_TLS_CA_CERT),
+	}
 }
 
 func init() {
@@ -106,5 +116,48 @@ func main() {
 	v1APIHandlers.AddMessagingServiceAdminAPI(v1Root)
 
 	logger.Info.Printf("gateway listening on port %s", conf.Port)
-	logger.Error.Fatal(router.Run(":" + conf.Port))
+
+	if !conf.UseMTLS {
+		logger.Info.Println("starting server without mutual TLS")
+		logger.Error.Fatal(router.Run(":" + conf.Port))
+		return
+	} else {
+		// Create tls config for mutual TLS
+		tlsConfig, err := getTLSConfig(conf.TLSPaths)
+		if err != nil {
+			logger.Error.Fatal(err)
+		}
+
+		server := &http.Server{
+			Addr:      ":" + conf.Port,
+			Handler:   router,
+			TLSConfig: tlsConfig,
+		}
+
+		err = server.ListenAndServeTLS(conf.TLSPaths.ServerCertPath, conf.TLSPaths.ServerKeyPath)
+		if err != nil {
+			logger.Error.Fatal(err)
+		}
+	}
+}
+
+func getTLSConfig(paths models.TLSPaths) (*tls.Config, error) {
+	serverCert, err := tls.LoadX509KeyPair(paths.ServerCertPath, paths.ServerKeyPath)
+	if err != nil {
+		return nil, err
+	}
+
+	caCert, err := os.ReadFile(paths.CACertPath)
+	if err != nil {
+		return nil, err
+	}
+
+	caCertPool := x509.NewCertPool()
+	caCertPool.AppendCertsFromPEM(caCert)
+
+	return &tls.Config{
+		Certificates: []tls.Certificate{serverCert},
+		ClientAuth:   tls.RequireAndVerifyClientCert,
+		ClientCAs:    caCertPool,
+	}, nil
 }

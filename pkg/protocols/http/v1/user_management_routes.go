@@ -54,6 +54,7 @@ func (h *HttpEndpoints) AddUserManagementParticipantAPI(rg *gin.RouterGroup) {
 func (h *HttpEndpoints) AddUserManagementAdminAPI(rg *gin.RouterGroup) {
 	auth := rg.Group("/auth")
 	auth.POST("/login-with-email", mw.RequirePayload(), h.loginWithEmailForManagementHandl)
+	auth.POST("/renew-token", mw.ExtractToken(), mw.RequirePayload(), h.tokenRenewHandl)
 
 	// SAML endpoints
 	if h.useEndpoints.LoginWithExternalIDP {
