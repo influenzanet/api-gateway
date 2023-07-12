@@ -982,6 +982,20 @@ func (h *HttpEndpoints) getResponseWideFormatCSV(c *gin.Context) {
 			req.Until = n
 		}
 	}
+	pageSize := c.DefaultQuery("pageSize", "")
+	if len(pageSize) > 0 {
+		n, err := strconv.ParseInt(pageSize, 10, 32)
+		if err == nil {
+			req.PageSize = int32(n)
+		}
+	}
+	pageNumber := c.DefaultQuery("pageNumber", "")
+	if len(pageNumber) > 0 {
+		n, err := strconv.ParseInt(pageNumber, 10, 32)
+		if err == nil {
+			req.Page = int32(n)
+		}
+	}
 	req.IncludeMeta = &studyAPI.ResponseExportQuery_IncludeMeta{
 		Position:       c.DefaultQuery("withPositions", "false") == "true",
 		InitTimes:      c.DefaultQuery("withInitTimes", "false") == "true",
@@ -1046,6 +1060,20 @@ func (h *HttpEndpoints) getResponseLongFormatCSV(c *gin.Context) {
 			req.Until = n
 		}
 	}
+	pageSize := c.DefaultQuery("pageSize", "")
+	if len(pageSize) > 0 {
+		n, err := strconv.ParseInt(pageSize, 10, 32)
+		if err == nil {
+			req.PageSize = int32(n)
+		}
+	}
+	pageNumber := c.DefaultQuery("pageNumber", "")
+	if len(pageNumber) > 0 {
+		n, err := strconv.ParseInt(pageNumber, 10, 32)
+		if err == nil {
+			req.Page = int32(n)
+		}
+	}
 	req.IncludeMeta = &studyAPI.ResponseExportQuery_IncludeMeta{
 		Position:       c.DefaultQuery("withPositions", "false") == "true",
 		InitTimes:      c.DefaultQuery("withInitTimes", "false") == "true",
@@ -1108,6 +1136,20 @@ func (h *HttpEndpoints) getResponseFlatJSON(c *gin.Context) {
 		n, err := strconv.ParseInt(until, 10, 64)
 		if err == nil {
 			req.Until = n
+		}
+	}
+	pageSize := c.DefaultQuery("pageSize", "")
+	if len(pageSize) > 0 {
+		n, err := strconv.ParseInt(pageSize, 10, 32)
+		if err == nil {
+			req.PageSize = int32(n)
+		}
+	}
+	pageNumber := c.DefaultQuery("pageNumber", "")
+	if len(pageNumber) > 0 {
+		n, err := strconv.ParseInt(pageNumber, 10, 32)
+		if err == nil {
+			req.Page = int32(n)
 		}
 	}
 	req.IncludeMeta = &studyAPI.ResponseExportQuery_IncludeMeta{
