@@ -1347,40 +1347,41 @@ func (h *HttpEndpoints) getParticipantStatesWithPagination(c *gin.Context) {
 
 	var req studyAPI.GetPStatesWithPaginationQuery
 	req.StudyKey = c.Param("studyKey")
-	page, err := strconv.Atoi(c.DefaultQuery("pageNumber", "1"))
+	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
 	if err != nil {
 		logger.Error.Println("Could not read page parameter")
-		req.Page = 1
+		page = 1
 	}
-	if page < 1 {
-		req.Page = 1
-	} else {
-		req.Page = int32(page)
-	}
-	pageSize, err := strconv.Atoi(c.DefaultQuery("pageSize", "0"))
+	req.Page = int32(page)
+
+	pageSize, err := strconv.Atoi(c.DefaultQuery("pageSize", "50"))
 	if err != nil {
 		logger.Error.Println("Could not read page size parameter")
-		req.PageSize = 0
+		pageSize = 50
 	}
 	req.PageSize = int32(pageSize)
 
 	queryParam := c.DefaultQuery("query", "")
-	decodedQP, err := url.QueryUnescape(queryParam)
-	if err != nil {
-		logger.Error.Printf("Failed to decode query parameter: %v", err)
-		decodedQP = ""
+	if len(queryParam) > 0 {
+		decodedQP, err := url.QueryUnescape(queryParam)
+		if err != nil {
+			logger.Error.Printf("Failed to decode query parameter: %v", err)
+			decodedQP = ""
+		}
+		req.Query = decodedQP
 	}
-	req.Query = decodedQP
 
 	sortParam := c.DefaultQuery("sortBy", "")
-	decodedSP, err := url.QueryUnescape(sortParam)
-	if err != nil {
-		logger.Error.Printf("Failed to decode sort parameter: %v", err)
-		decodedSP = ""
-	}
-	err = json.Unmarshal([]byte(decodedSP), &req.SortBy)
-	if err != nil {
-		logger.Error.Printf("Failed to parse sort parameter: %v", err)
+	if len(sortParam) > 0 {
+		decodedSP, err := url.QueryUnescape(sortParam)
+		if err != nil {
+			logger.Error.Printf("Failed to decode sort parameter: %v", err)
+			decodedSP = ""
+		}
+		err = json.Unmarshal([]byte(decodedSP), &req.SortBy)
+		if err != nil {
+			logger.Error.Printf("Failed to parse sort parameter: %v", err)
+		}
 	}
 
 	req.Token = token
