@@ -1,6 +1,15 @@
 # Changelog
 
-## [v1.4.0] - 2023-04-06
+## [v1.4.0] - 2023-07-12
+
+### BREAKING CHANGE
+
+- Changed URL for getting all participant states for a study by status, because previous url is used now with pagination and sorting option. To get all participant states (optionally filtered by study status) use the new endpoint `/v1/data/{studyKey}/participants/all`.
+
+### Added
+
+- New endpoint for getting participant state by ID.
+- New endpoint for getting participant states by query with pagination and sorting option.
 
 ### Changed
 
