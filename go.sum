@@ -656,6 +656,8 @@ github.com/influenzanet/user-management-service v0.19.2/go.mod h1:/gcCE9/vLSXgJQ
 github.com/influenzanet/user-management-service v1.0.0/go.mod h1:QH2nLTPoqLfGTR+ebblYQTwZCxefEohpM6ixtm9h4N0=
 github.com/influenzanet/user-management-service v1.1.1 h1:IJOrmdRBH5RGKUeV8k7uaBU/IWcKmEsFHRVbCsrjx9M=
 github.com/influenzanet/user-management-service v1.1.1/go.mod h1:bi5IVL0pjfaq9wMMJObjj16duoagQIjE26S7FBr0OnM=
+github.com/influenzanet/user-management-service v1.1.2-0.20230704125712-383f9451459c h1:OeT8/Eb7Zp85D9UHon0KBEiQWbqt0TqWo8rW/MffV4k=
+github.com/influenzanet/user-management-service v1.1.2-0.20230704125712-383f9451459c/go.mod h1:bi5IVL0pjfaq9wMMJObjj16duoagQIjE26S7FBr0OnM=
 github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af/go.mod h1:Nht3zPeWKUH0NzdCt2Blrr5ys8VGpn0CEB0cQHVjt7k=
 github.com/jmespath/go-jmespath v0.4.0/go.mod h1:T8mJZnbsbmF+m6zOOFylbeCJqk5+pHWvzYPziyZiYoo=
 github.com/jmespath/go-jmespath/internal/testify v1.5.1/go.mod h1:L3OGu8Wl2/fWfCI6z80xFu9LTZmf1ZRjMHUOPmWr69U=
