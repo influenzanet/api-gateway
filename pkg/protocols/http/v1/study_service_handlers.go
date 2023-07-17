@@ -989,9 +989,9 @@ func (h *HttpEndpoints) getResponseWideFormatCSV(c *gin.Context) {
 			req.PageSize = int32(n)
 		}
 	}
-	pageNumber := c.DefaultQuery("pageNumber", "")
-	if len(pageNumber) > 0 {
-		n, err := strconv.ParseInt(pageNumber, 10, 32)
+	page := c.DefaultQuery("page", "")
+	if len(page) > 0 {
+		n, err := strconv.ParseInt(page, 10, 32)
 		if err == nil {
 			req.Page = int32(n)
 		}
@@ -1067,9 +1067,9 @@ func (h *HttpEndpoints) getResponseLongFormatCSV(c *gin.Context) {
 			req.PageSize = int32(n)
 		}
 	}
-	pageNumber := c.DefaultQuery("pageNumber", "")
-	if len(pageNumber) > 0 {
-		n, err := strconv.ParseInt(pageNumber, 10, 32)
+	page := c.DefaultQuery("page", "")
+	if len(page) > 0 {
+		n, err := strconv.ParseInt(page, 10, 32)
 		if err == nil {
 			req.Page = int32(n)
 		}
@@ -1145,9 +1145,9 @@ func (h *HttpEndpoints) getResponseFlatJSON(c *gin.Context) {
 			req.PageSize = int32(n)
 		}
 	}
-	pageNumber := c.DefaultQuery("pageNumber", "")
-	if len(pageNumber) > 0 {
-		n, err := strconv.ParseInt(pageNumber, 10, 32)
+	page := c.DefaultQuery("page", "")
+	if len(page) > 0 {
+		n, err := strconv.ParseInt(page, 10, 32)
 		if err == nil {
 			req.Page = int32(n)
 		}
@@ -1457,7 +1457,7 @@ func (h *HttpEndpoints) getStudyRulesHistoryHandl(c *gin.Context) {
 	var req studyAPI.StudyRulesHistoryReq
 	req.StudyKey = c.Param("studyKey")
 	req.Token = token
-	page, err := strconv.Atoi(c.DefaultQuery("pageNumber", "1"))
+	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
 	if err != nil {
 		logger.Error.Println("Could not read page parameter")
 		req.Page = 1
