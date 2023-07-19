@@ -989,7 +989,7 @@ func (h *HttpEndpoints) getResponseWideFormatCSV(c *gin.Context) {
 			req.PageSize = int32(n)
 		}
 	}
-	page := c.DefaultQuery("page", "")
+	page := c.DefaultQuery("page", "1")
 	if len(page) > 0 {
 		n, err := strconv.ParseInt(page, 10, 32)
 		if err == nil {
@@ -1067,7 +1067,7 @@ func (h *HttpEndpoints) getResponseLongFormatCSV(c *gin.Context) {
 			req.PageSize = int32(n)
 		}
 	}
-	page := c.DefaultQuery("page", "")
+	page := c.DefaultQuery("page", "1")
 	if len(page) > 0 {
 		n, err := strconv.ParseInt(page, 10, 32)
 		if err == nil {
@@ -1138,18 +1138,22 @@ func (h *HttpEndpoints) getResponseFlatJSON(c *gin.Context) {
 			req.Until = n
 		}
 	}
-	pageSize := c.DefaultQuery("pageSize", "")
+	pageSize := c.DefaultQuery("pageSize", "50")
 	if len(pageSize) > 0 {
 		n, err := strconv.ParseInt(pageSize, 10, 32)
 		if err == nil {
 			req.PageSize = int32(n)
+		} else {
+			req.PageSize = 50
 		}
 	}
-	page := c.DefaultQuery("page", "")
+	page := c.DefaultQuery("page", "1")
 	if len(page) > 0 {
 		n, err := strconv.ParseInt(page, 10, 32)
 		if err == nil {
 			req.Page = int32(n)
+		} else {
+			req.Page = 1
 		}
 	}
 	req.IncludeMeta = &studyAPI.ResponseExportQuery_IncludeMeta{
@@ -1460,17 +1464,13 @@ func (h *HttpEndpoints) getStudyRulesHistoryHandl(c *gin.Context) {
 	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
 	if err != nil {
 		logger.Error.Println("Could not read page parameter")
-		req.Page = 1
+		page = 1
 	}
-	if page < 1 {
-		req.Page = 1
-	} else {
-		req.Page = int32(page)
-	}
-	pageSize, err := strconv.Atoi(c.DefaultQuery("pageSize", "0"))
+	req.Page = int32(page)
+	pageSize, err := strconv.Atoi(c.DefaultQuery("pageSize", "50"))
 	if err != nil {
 		logger.Error.Println("Could not read page size parameter")
-		req.PageSize = 0
+		req.PageSize = 50
 	}
 	req.PageSize = int32(pageSize)
 	descending, err := strconv.ParseBool(c.DefaultQuery("descending", "FALSE"))
@@ -1482,7 +1482,7 @@ func (h *HttpEndpoints) getStudyRulesHistoryHandl(c *gin.Context) {
 
 	since, err := strconv.Atoi(c.DefaultQuery("since", "0"))
 	if err != nil {
-		logger.Error.Println("Could not start upload date parameter")
+		logger.Error.Println("Could not read start upload date parameter")
 		req.Since = 0
 	}
 	if since < 0 {
