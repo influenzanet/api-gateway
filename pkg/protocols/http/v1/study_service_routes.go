@@ -114,6 +114,7 @@ func (h *HttpEndpoints) AddStudyServiceAdminAPI(rg *gin.RouterGroup) {
 			surveyResponsesGroup.GET("/response", h.getResponseWideFormatCSV)
 			surveyResponsesGroup.GET("/response/long-format", h.getResponseLongFormatCSV)
 			surveyResponsesGroup.GET("/response/json", h.getResponseFlatJSON)
+			surveyResponsesGroup.GET("/response-with-pagination/json", h.getResponsesFlatJSONWithPagination)
 			surveyResponsesGroup.GET("/survey-info", h.getSurveyInfoPreview)
 			surveyResponsesGroup.GET("/survey-info/csv", h.getSurveyInfoPreviewCSV)
 		}
