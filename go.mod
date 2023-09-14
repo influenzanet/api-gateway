@@ -9,9 +9,9 @@ require (
 	github.com/gin-gonic/gin v1.9.0
 	github.com/golang/protobuf v1.5.3
 	github.com/h2non/filetype v1.1.3
-	github.com/influenzanet/go-utils v0.2.12
+	github.com/influenzanet/go-utils v0.2.13
 	github.com/influenzanet/messaging-service v1.3.2
-	github.com/influenzanet/study-service v1.6.3-0.20230727101541-a05e6c075cfd
+	github.com/influenzanet/study-service v1.6.3-0.20230913081458-b5db86db0765
 	github.com/influenzanet/user-management-service v1.1.2-0.20230704125712-383f9451459c
 	google.golang.org/grpc v1.55.0
 	google.golang.org/protobuf v1.30.0
