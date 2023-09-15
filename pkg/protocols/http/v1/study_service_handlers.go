@@ -670,10 +670,6 @@ func (h *HttpEndpoints) deleteStudyHandl(c *gin.Context) {
 	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req studyAPI.StudyReferenceReq
-	if err := h.JsonToProto(c, &req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
 	req.Token = token
 	req.StudyKey = c.Param("studyKey")
 	resp, err := h.clients.StudyService.DeleteStudy(context.Background(), &req)
@@ -986,6 +982,20 @@ func (h *HttpEndpoints) getResponseWideFormatCSV(c *gin.Context) {
 			req.Until = n
 		}
 	}
+	pageSize := c.DefaultQuery("pageSize", "")
+	if len(pageSize) > 0 {
+		n, err := strconv.ParseInt(pageSize, 10, 32)
+		if err == nil {
+			req.PageSize = int32(n)
+		}
+	}
+	page := c.DefaultQuery("page", "1")
+	if len(page) > 0 {
+		n, err := strconv.ParseInt(page, 10, 32)
+		if err == nil {
+			req.Page = int32(n)
+		}
+	}
 	req.IncludeMeta = &studyAPI.ResponseExportQuery_IncludeMeta{
 		Position:       c.DefaultQuery("withPositions", "false") == "true",
 		InitTimes:      c.DefaultQuery("withInitTimes", "false") == "true",
@@ -1048,6 +1058,20 @@ func (h *HttpEndpoints) getResponseLongFormatCSV(c *gin.Context) {
 		n, err := strconv.ParseInt(until, 10, 64)
 		if err == nil {
 			req.Until = n
+		}
+	}
+	pageSize := c.DefaultQuery("pageSize", "")
+	if len(pageSize) > 0 {
+		n, err := strconv.ParseInt(pageSize, 10, 32)
+		if err == nil {
+			req.PageSize = int32(n)
+		}
+	}
+	page := c.DefaultQuery("page", "1")
+	if len(page) > 0 {
+		n, err := strconv.ParseInt(page, 10, 32)
+		if err == nil {
+			req.Page = int32(n)
 		}
 	}
 	req.IncludeMeta = &studyAPI.ResponseExportQuery_IncludeMeta{
@@ -1114,6 +1138,24 @@ func (h *HttpEndpoints) getResponseFlatJSON(c *gin.Context) {
 			req.Until = n
 		}
 	}
+	pageSize := c.DefaultQuery("pageSize", "50")
+	if len(pageSize) > 0 {
+		n, err := strconv.ParseInt(pageSize, 10, 32)
+		if err == nil {
+			req.PageSize = int32(n)
+		} else {
+			req.PageSize = 50
+		}
+	}
+	page := c.DefaultQuery("page", "1")
+	if len(page) > 0 {
+		n, err := strconv.ParseInt(page, 10, 32)
+		if err == nil {
+			req.Page = int32(n)
+		} else {
+			req.Page = 1
+		}
+	}
 	req.IncludeMeta = &studyAPI.ResponseExportQuery_IncludeMeta{
 		Position:       c.DefaultQuery("withPositions", "false") == "true",
 		InitTimes:      c.DefaultQuery("withInitTimes", "false") == "true",
@@ -1143,6 +1185,98 @@ func (h *HttpEndpoints) getResponseFlatJSON(c *gin.Context) {
 			return
 		}
 		content = append(content, chnk.Chunk...)
+	}
+
+	reader := bytes.NewReader(content)
+	contentLength := int64(len(content))
+	contentType := "application/json"
+
+	extraHeaders := map[string]string{
+		"Content-Disposition": `attachment; filename=` + fmt.Sprintf("%s_%s.json", studyKey, surveyKey),
+	}
+
+	c.DataFromReader(http.StatusOK, contentLength, contentType, reader, extraHeaders)
+}
+
+func (h *HttpEndpoints) getResponsesFlatJSONWithPagination(c *gin.Context) {
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
+	var req studyAPI.ResponseExportQuery
+	studyKey := c.Param("studyKey")
+	req.StudyKey = studyKey
+	surveyKey := c.Param("surveyKey")
+	req.SurveyKey = surveyKey
+
+	from := c.DefaultQuery("from", "")
+	if len(from) > 0 {
+		n, err := strconv.ParseInt(from, 10, 64)
+		if err == nil {
+			req.From = n
+		}
+	}
+	until := c.DefaultQuery("until", "")
+	if len(until) > 0 {
+		n, err := strconv.ParseInt(until, 10, 64)
+		if err == nil {
+			req.Until = n
+		}
+	}
+	pageSize := c.DefaultQuery("pageSize", "50")
+	if len(pageSize) > 0 {
+		n, err := strconv.ParseInt(pageSize, 10, 32)
+		if err == nil {
+			req.PageSize = int32(n)
+		} else {
+			req.PageSize = 50
+		}
+	}
+	page := c.DefaultQuery("page", "1")
+	if len(page) > 0 {
+		n, err := strconv.ParseInt(page, 10, 32)
+		if err == nil {
+			req.Page = int32(n)
+		} else {
+			req.Page = 1
+		}
+	}
+	req.IncludeMeta = &studyAPI.ResponseExportQuery_IncludeMeta{
+		Position:       c.DefaultQuery("withPositions", "false") == "true",
+		InitTimes:      c.DefaultQuery("withInitTimes", "false") == "true",
+		DisplayedTimes: c.DefaultQuery("withDisplayTimes", "false") == "true",
+		ResponsedTimes: c.DefaultQuery("withResponseTimes", "false") == "true",
+	}
+	req.Separator = c.DefaultQuery("sep", "-")
+	req.ShortQuestionKeys = c.DefaultQuery("shortKeys", "true") == "true"
+	req.Token = token
+
+	stream, err := h.clients.StudyService.GetResponsesFlatJSONWithPagination(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+
+	chnk, err := stream.Recv()
+	info := chnk.GetInfo()
+	if info == nil {
+		logger.Error.Println("missing argument")
+		//return
+	}
+
+	content := []byte{}
+	b, err := json.Marshal(info)
+	content = b
+
+	for {
+		chnk, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			st := status.Convert(err)
+			c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+			return
+		}
+		content = append(content, chnk.GetChunk()...)
 	}
 
 	reader := bytes.NewReader(content)
@@ -1323,7 +1457,7 @@ func (h *HttpEndpoints) uploadParticipantFileReq(c *gin.Context) {
 	h.SendProtoAsJSON(c, http.StatusOK, reply)
 }
 
-func (h *HttpEndpoints) getParticipantStateByID(c *gin.Context) {
+func (h *HttpEndpoints) getParticipantStateByIDHandl(c *gin.Context) {
 	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req studyAPI.ParticipantStateByIDQuery
@@ -1342,7 +1476,7 @@ func (h *HttpEndpoints) getParticipantStateByID(c *gin.Context) {
 	h.SendProtoAsJSON(c, http.StatusOK, state)
 }
 
-func (h *HttpEndpoints) getParticipantStatesWithPagination(c *gin.Context) {
+func (h *HttpEndpoints) getParticipantStatesWithPaginationHandl(c *gin.Context) {
 	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 	var req studyAPI.GetPStatesWithPaginationQuery
@@ -1393,4 +1527,97 @@ func (h *HttpEndpoints) getParticipantStatesWithPagination(c *gin.Context) {
 	}
 
 	h.SendProtoAsJSON(c, http.StatusOK, state)
+}
+
+func (h *HttpEndpoints) getCurrentStudyRulesHandl(c *gin.Context) {
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
+
+	var req studyAPI.StudyReferenceReq
+	studyKey := c.Param("studyKey")
+	req.StudyKey = studyKey
+	req.Token = token
+
+	studyRules, err := h.clients.StudyService.GetCurrentStudyRules(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+
+	h.SendProtoAsJSON(c, http.StatusOK, studyRules)
+}
+
+func (h *HttpEndpoints) getStudyRulesHistoryHandl(c *gin.Context) {
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
+
+	var req studyAPI.StudyRulesHistoryReq
+	req.StudyKey = c.Param("studyKey")
+	req.Token = token
+	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
+	if err != nil {
+		logger.Error.Println("Could not read page parameter")
+		page = 1
+	}
+	req.Page = int32(page)
+	pageSize, err := strconv.Atoi(c.DefaultQuery("pageSize", "50"))
+	if err != nil {
+		logger.Error.Println("Could not read page size parameter")
+		req.PageSize = 50
+	}
+	req.PageSize = int32(pageSize)
+	descending, err := strconv.ParseBool(c.DefaultQuery("descending", "FALSE"))
+	if err != nil {
+		logger.Warning.Println("Could not read order parameter")
+		descending = false
+	}
+	req.Descending = descending
+
+	since, err := strconv.Atoi(c.DefaultQuery("since", "0"))
+	if err != nil {
+		logger.Error.Println("Could not read start upload date parameter")
+		req.Since = 0
+	}
+	if since < 0 {
+		logger.Warning.Println("Invalid start date parameter")
+		req.Since = 0
+	} else {
+		req.Since = int64(since)
+	}
+	until, err := strconv.Atoi(c.DefaultQuery("until", "0"))
+	if err != nil {
+		logger.Error.Println("Could not read end upload date parameter")
+		req.Until = 0
+	}
+	if until < 0 {
+		logger.Warning.Println("Invalid end date parameter")
+		req.Until = 0
+	} else {
+		req.Until = int64(until)
+	}
+
+	studyRules, err := h.clients.StudyService.GetStudyRulesHistory(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+
+	h.SendProtoAsJSON(c, http.StatusOK, studyRules)
+}
+
+func (h *HttpEndpoints) removeStudyRulesVersionHandl(c *gin.Context) {
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
+
+	var req studyAPI.StudyRulesVersionReferenceReq
+	req.Token = token
+	req.Id = c.Param("ID")
+
+	resp, err := h.clients.StudyService.RemoveStudyRulesVersion(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+
+	h.SendProtoAsJSON(c, http.StatusOK, resp)
 }

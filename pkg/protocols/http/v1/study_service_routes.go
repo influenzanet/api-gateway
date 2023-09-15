@@ -87,7 +87,10 @@ func (h *HttpEndpoints) AddStudyServiceAdminAPI(rg *gin.RouterGroup) {
 		studyGroup.POST("/:studyKey/props", mw.RequirePayload(), h.saveStudyPropsHandl)
 		studyGroup.GET("/:studyKey/notification-subscriptions", h.getStudyNotificationSubscriptionsHandl)
 		studyGroup.POST("/:studyKey/notification-subscriptions", mw.RequirePayload(), h.saveStudyNotificationSubscriptionsHandl)
-		studyGroup.DELETE("/:studyKey", mw.RequirePayload(), h.deleteStudyHandl)
+		studyGroup.DELETE("/:studyKey", h.deleteStudyHandl)
+		studyGroup.GET("/:studyKey/rules", h.getCurrentStudyRulesHandl)
+		studyGroup.GET("/:studyKey/rules/versions", h.getStudyRulesHistoryHandl)
+		studyGroup.DELETE("/:studyKey/rules/:ID", h.removeStudyRulesVersionHandl)
 	}
 
 	responsesGroup := rg.Group("/data/:studyKey")
@@ -103,14 +106,15 @@ func (h *HttpEndpoints) AddStudyServiceAdminAPI(rg *gin.RouterGroup) {
 		responsesGroup.GET("/reports", h.getReportsForStudy) // ?reportKey=todo&from=time1&until=time2&participant=todo
 		responsesGroup.GET("/responses", h.getSurveyResponsesHandl)
 		responsesGroup.POST("/fetch-confidential-responses", h.getConfidentialResponsesHandl)
-		responsesGroup.GET("/participant", h.getParticipantStateByID)
-		responsesGroup.GET("/participants", h.getParticipantStatesWithPagination)
+		responsesGroup.GET("/participant", h.getParticipantStateByIDHandl)
+		responsesGroup.GET("/participants", h.getParticipantStatesWithPaginationHandl)
 
 		surveyResponsesGroup := responsesGroup.Group("/survey/:surveyKey")
 		{
 			surveyResponsesGroup.GET("/response", h.getResponseWideFormatCSV)
 			surveyResponsesGroup.GET("/response/long-format", h.getResponseLongFormatCSV)
 			surveyResponsesGroup.GET("/response/json", h.getResponseFlatJSON)
+			surveyResponsesGroup.GET("/response-with-pagination/json", h.getResponsesFlatJSONWithPagination)
 			surveyResponsesGroup.GET("/survey-info", h.getSurveyInfoPreview)
 			surveyResponsesGroup.GET("/survey-info/csv", h.getSurveyInfoPreviewCSV)
 		}

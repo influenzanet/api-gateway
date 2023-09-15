@@ -1,5 +1,17 @@
 # Changelog
 
+## ??? - 2023-08-02
+
+### Added
+
+- New endpoint for getting responses in JSON Format including pagination infos.
+- For existing endpoints of getting responses (CSV/JSON/wide/long) pagination option can be set by parameter.
+- New endpoints for
+  - save study rules
+  - delete study rules
+  - get current study rules
+  - get history of study rules with options of time filter and pagination.
+
 ## [v1.4.0] - 2023-07-14
 
 ### BREAKING CHANGE
