@@ -612,11 +612,17 @@ func (h *HttpEndpoints) runCustomStudyRulesForPreviousResponsesHandl(c *gin.Cont
 	}
 	participantIds := c.DefaultQuery("participantIds", "")
 	if len(participantIds) > 0 {
-		filter.ParticipantIds = strings.Split(strings.TrimSpace(participantIds), ",") //TODO: remove whitespace
+		filter.ParticipantIds = strings.Split(participantIds, ",")
 	}
-	participantStatus := c.DefaultQuery("participantStatus", "")
+	for i, ele := range filter.ParticipantIds {
+		filter.ParticipantIds[i] = strings.TrimSpace(ele)
+	}
+	participantStatus := c.DefaultQuery("participantStatus", "active")
 	if len(participantStatus) > 0 {
 		filter.ParticipantStatus = strings.Split(participantStatus, ",")
+	}
+	for i := range filter.ParticipantStatus {
+		filter.ParticipantStatus[i] = strings.TrimSpace(filter.ParticipantStatus[i])
 	}
 	from := c.DefaultQuery("from", "")
 	if len(from) > 0 {
