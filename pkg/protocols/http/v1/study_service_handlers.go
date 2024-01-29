@@ -16,7 +16,6 @@ import (
 	"github.com/h2non/filetype"
 	"github.com/influenzanet/api-gateway/pkg/utils"
 	"github.com/influenzanet/go-utils/pkg/api_types"
-	"github.com/influenzanet/study-service/pkg/api"
 	studyAPI "github.com/influenzanet/study-service/pkg/api"
 	"google.golang.org/grpc/status"
 )
@@ -742,8 +741,8 @@ func (h *HttpEndpoints) getSurveyResponsesHandl(c *gin.Context) {
 		return
 	}
 
-	resps := &api.SurveyResponses{
-		Responses: []*api.SurveyResponse{},
+	resps := &studyAPI.SurveyResponses{
+		Responses: []*studyAPI.SurveyResponse{},
 	}
 	for {
 		r, err := stream.Recv()
@@ -850,8 +849,8 @@ func (h *HttpEndpoints) getReportsForStudy(c *gin.Context) {
 		return
 	}
 
-	resps := &api.ReportHistory{
-		Reports: []*api.Report{},
+	resps := &studyAPI.ReportHistory{
+		Reports: []*studyAPI.Report{},
 	}
 	for {
 		r, err := stream.Recv()
@@ -901,8 +900,8 @@ func (h *HttpEndpoints) getFileInfosForStudy(c *gin.Context) {
 		return
 	}
 
-	resps := &api.FileInfos{
-		FileInfos: []*api.FileInfo{},
+	resps := &studyAPI.FileInfos{
+		FileInfos: []*studyAPI.FileInfo{},
 	}
 	for {
 		r, err := stream.Recv()
