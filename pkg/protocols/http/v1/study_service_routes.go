@@ -83,6 +83,7 @@ func (h *HttpEndpoints) AddStudyServiceAdminAPI(rg *gin.RouterGroup) {
 		studyGroup.POST("/:studyKey/rules", mw.RequirePayload(), h.saveStudyRulesHandl)
 		studyGroup.POST("/:studyKey/run-rules", mw.RequirePayload(), h.runCustomStudyRulesHandl)
 		studyGroup.POST("/:studyKey/run-rules-for-single-participant", mw.RequirePayload(), h.runCustomStudyRulesForSingleParticipantHandl)
+		studyGroup.POST("/:studyKey/run-rules-for-previous-responses", mw.RequirePayload(), h.runCustomStudyRulesForPreviousResponsesHandl)
 		studyGroup.POST("/:studyKey/status", mw.RequirePayload(), h.saveStudyStatusHandl)
 		studyGroup.POST("/:studyKey/props", mw.RequirePayload(), h.saveStudyPropsHandl)
 		studyGroup.GET("/:studyKey/notification-subscriptions", h.getStudyNotificationSubscriptionsHandl)

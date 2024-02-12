@@ -1,5 +1,13 @@
 # Changelog
 
+
+## ??? - 2024-01-23
+
+### Added
+
+- New endpoint for running custom study rules retrospectively on previous responses. Optional filter parameters are participantIDs, participant status, survey keys and range parameters for submission time of responses.
+
+
 ## ??? - 2023-08-02
 
 ### Added

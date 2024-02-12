@@ -602,6 +602,62 @@ func (h *HttpEndpoints) runCustomStudyRulesForSingleParticipantHandl(c *gin.Cont
 	h.SendProtoAsJSON(c, http.StatusOK, resp)
 }
 
+func (h *HttpEndpoints) runCustomStudyRulesForPreviousResponsesHandl(c *gin.Context) {
+	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
+
+	var req studyAPI.RunRulesForPreviousResponsesReq
+	if err := h.JsonToProto(c, &req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	var filter studyAPI.RunRulesForPreviousResponsesReq_ResponseFilter
+	req.Token = token
+	req.StudyKey = c.Param("studyKey")
+	surveyKeys := c.DefaultQuery("surveyKeys", "")
+	if len(surveyKeys) > 0 {
+		filter.SurveyKeys = strings.Split(surveyKeys, ",")
+	}
+	participantIds := c.DefaultQuery("participantIds", "")
+	if len(participantIds) > 0 {
+		filter.ParticipantIds = strings.Split(participantIds, ",")
+	}
+	for i, ele := range filter.ParticipantIds {
+		filter.ParticipantIds[i] = strings.TrimSpace(ele)
+	}
+	participantStatus := c.DefaultQuery("participantStatus", "active")
+	if len(participantStatus) > 0 {
+		filter.ParticipantStatus = strings.Split(participantStatus, ",")
+	}
+	for i := range filter.ParticipantStatus {
+		filter.ParticipantStatus[i] = strings.TrimSpace(filter.ParticipantStatus[i])
+	}
+	from := c.DefaultQuery("from", "")
+	if len(from) > 0 {
+		n, err := strconv.ParseInt(from, 10, 64)
+		if err == nil {
+			filter.From = n
+		}
+	}
+	until := c.DefaultQuery("until", "")
+	if len(until) > 0 {
+		n, err := strconv.ParseInt(until, 10, 64)
+		if err == nil {
+			filter.Until = n
+		}
+	}
+
+	req.Filter = &filter
+
+	resp, err := h.clients.StudyService.RunRulesForPreviousResponses(context.Background(), &req)
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+	h.SendProtoAsJSON(c, http.StatusOK, resp)
+}
+
 func (h *HttpEndpoints) saveStudyStatusHandl(c *gin.Context) {
 	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
