@@ -87,6 +87,7 @@ github.com/influenzanet/study-service v1.7.3 h1:lh24srEEqrtCG2cbIeHs+b07RMvFESy+
 github.com/influenzanet/study-service v1.7.3/go.mod h1:k1kPZeXSH3cUjzStovmRewJtYrcHct9BrNa688vmW4g=
 github.com/influenzanet/user-management-service v1.3.0-influenzanet-policy-change.1 h1:5sgjEbmgl4wsKvmI1+WJb9vg20vZbuWsN5XmVIHgwx8=
 github.com/influenzanet/user-management-service v1.3.0-influenzanet-policy-change.1/go.mod h1:qQkNKPyIVULnqwg0NsSPQG+vIlm8tIsz6Mky3yYlZRg=
+github.com/influenzanet/user-management-service v1.3.0-influenzanet-policy-change.2/go.mod h1:qQkNKPyIVULnqwg0NsSPQG+vIlm8tIsz6Mky3yYlZRg=
 github.com/jonboulle/clockwork v0.2.2/go.mod h1:Pkfl5aHPm1nk2H9h0bjmnJD/BcgbGXUBGnn1kMkgxc8=
 github.com/jonboulle/clockwork v0.4.0 h1:p4Cf1aMWXnXAUh8lVfewRBx1zaTSYKrKMF2g3ST4RZ4=
 github.com/jonboulle/clockwork v0.4.0/go.mod h1:xgRqUGwRcjKCO1vbZUEtSLrqKoPSsUpK7fnezOII0kc=
