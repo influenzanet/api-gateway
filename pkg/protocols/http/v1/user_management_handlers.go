@@ -135,6 +135,21 @@ func (h *HttpEndpoints) signupWithEmailHandlV3(c *gin.Context) {
 	)
 }
 
+func (h *HttpEndpoints) deletePhoneNumber(c *gin.Context) {
+	h.grpcCallHandler(
+		c,
+		func(c *gin.Context) (protoreflect.ProtoMessage, error) {
+			token := c.MustGet("validatedToken").(*api_types.TokenInfos)
+
+			_, err := h.clients.UserManagement.DeletePhoneNumber(context.Background(), token)
+			if err != nil {
+				return nil, status.Error(codes.Internal, err.Error())
+			}
+			return nil, nil
+		},
+	)
+}
+
 func (h *HttpEndpoints) grpcCallHandler(c *gin.Context, customMethod customHandlerMethod) {
 	resp, err := customMethod(c)
 	h.handleGRPCResponse(c, resp, err)
