@@ -135,6 +135,19 @@ func (h *HttpEndpoints) signupWithEmailHandlV3(c *gin.Context) {
 	)
 }
 
+func (h *HttpEndpoints) addPhoneNumber(c *gin.Context) {
+	h.grpcCallHandler(
+		c,
+		func(c *gin.Context) (protoreflect.ProtoMessage, error) {
+			var req umAPI.ContactInfoMsg
+			if err := h.JsonToProto(c, &req); err != nil {
+				return nil, status.Error(codes.InvalidArgument, err.Error())
+			}
+			return h.clients.UserManagement.AddPhoneNumber(context.Background(), &req)
+		},
+	)
+}
+
 func (h *HttpEndpoints) grpcCallHandler(c *gin.Context, customMethod customHandlerMethod) {
 	resp, err := customMethod(c)
 	h.handleGRPCResponse(c, resp, err)
