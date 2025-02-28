@@ -4,6 +4,7 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
+<<<<<<< HEAD
     <list default="true" id="c81ae96d-1018-4b4b-abc2-b9c3f39ca94c" name="Changes" comment="">
 <<<<<<< HEAD
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
@@ -15,6 +16,9 @@
       <change beforePath="$PROJECT_DIR$/pkg/protocols/http/v1/user_management_handlers.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/protocols/http/v1/user_management_handlers.go" afterDir="false" />
 >>>>>>> a6a4d9a (chore: change addphonenumber input object)
     </list>
+=======
+    <list default="true" id="c81ae96d-1018-4b4b-abc2-b9c3f39ca94c" name="Changes" comment="" />
+>>>>>>> b59dca5 (feat: create route for add phone number)
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -25,6 +29,7 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
 <<<<<<< HEAD
+<<<<<<< HEAD
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 6
 }</component>
@@ -33,12 +38,18 @@
   "associatedIndex": 6
 }]]></component>
 >>>>>>> a6a4d9a (chore: change addphonenumber input object)
+=======
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 6
+}</component>
+>>>>>>> b59dca5 (feat: create route for add phone number)
   <component name="ProjectId" id="2tWovsdO2DslHJDJzj6rj5wixLP" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
     <option name="showMembers" value="true" />
   </component>
+<<<<<<< HEAD
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
 <<<<<<< HEAD
@@ -101,6 +112,24 @@
   </component>
 =======
 >>>>>>> a6a4d9a (chore: change addphonenumber input object)
+=======
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.migrated.go.modules.settings&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.modules.go.list.on.any.changes.was.set&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;feat/57-insert-phone&quot;,
+    &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
+    &quot;go.sdk.automatically.set&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/andrea.casaluci/Documents/Orbyta/Projects/influenzanet/influenza-workspace/api-gateway&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;
+  }
+}</component>
+>>>>>>> b59dca5 (feat: create route for add phone number)
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
