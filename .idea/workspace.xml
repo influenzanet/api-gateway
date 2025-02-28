@@ -5,9 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c81ae96d-1018-4b4b-abc2-b9c3f39ca94c" name="Changes" comment="">
+<<<<<<< HEAD
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
+=======
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/protocols/http/v1/user_management_handlers.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/protocols/http/v1/user_management_handlers.go" afterDir="false" />
+>>>>>>> a6a4d9a (chore: change addphonenumber input object)
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -18,9 +24,15 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+<<<<<<< HEAD
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 6
 }</component>
+=======
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 6
+}]]></component>
+>>>>>>> a6a4d9a (chore: change addphonenumber input object)
   <component name="ProjectId" id="2tWovsdO2DslHJDJzj6rj5wixLP" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -29,8 +41,11 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+<<<<<<< HEAD
     "Go Build.go build github.com/influenzanet/api-gateway.executor": "Debug",
     "Go Build.go build github.com/influenzanet/api-gateway/cmd/management-api.executor": "Run",
+=======
+>>>>>>> a6a4d9a (chore: change addphonenumber input object)
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.go.formatter.settings.were.checked": "true",
@@ -45,6 +60,7 @@
     "nodejs_package_manager_path": "npm"
   }
 }]]></component>
+<<<<<<< HEAD
   <component name="RunManager" selected="Go Build.go build github.com/influenzanet/api-gateway">
     <configuration name="go build github.com/influenzanet/api-gateway" type="GoApplicationRunConfiguration" factoryName="Go Application" nameIsGenerated="true">
       <module name="api-gateway" />
@@ -83,6 +99,8 @@
       </list>
     </recent_temporary>
   </component>
+=======
+>>>>>>> a6a4d9a (chore: change addphonenumber input object)
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -95,6 +113,7 @@
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+<<<<<<< HEAD
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
       <map>
@@ -106,6 +125,8 @@
       </map>
     </option>
   </component>
+=======
+>>>>>>> a6a4d9a (chore: change addphonenumber input object)
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>
   </component>

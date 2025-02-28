@@ -141,7 +141,7 @@ func (h *HttpEndpoints) addPhoneNumber(c *gin.Context) {
 		c,
 		func(c *gin.Context) (protoreflect.ProtoMessage, error) {
 			token := c.MustGet("validatedToken").(*api_types.TokenInfos)
-			var req umAPI.PhoneMsg
+			var req umAPI.ContactInfoMsg
 			if err := h.JsonToProto(c, &req); err != nil {
 				return nil, status.Error(codes.InvalidArgument, err.Error())
 			}
@@ -156,7 +156,7 @@ func (h *HttpEndpoints) editPhoneNumber(c *gin.Context) {
 		c,
 		func(c *gin.Context) (protoreflect.ProtoMessage, error) {
 			token := c.MustGet("validatedToken").(*api_types.TokenInfos)
-			var req umAPI.PhoneMsg
+			var req umAPI.ContactInfoMsg
 			if err := h.JsonToProto(c, &req); err != nil {
 				return nil, status.Error(codes.InvalidArgument, err.Error())
 			}
@@ -173,7 +173,9 @@ func (h *HttpEndpoints) deletePhoneNumber(c *gin.Context) {
 			token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
 			return h.clients.UserManagement.DeletePhoneNumber(context.Background(), token)
-
+		},
+	)
+}
 		},
 	)
 }
