@@ -141,11 +141,8 @@ func (h *HttpEndpoints) deletePhoneNumber(c *gin.Context) {
 		func(c *gin.Context) (protoreflect.ProtoMessage, error) {
 			token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 
-			_, err := h.clients.UserManagement.DeletePhoneNumber(context.Background(), token)
-			if err != nil {
-				return nil, status.Error(codes.Internal, err.Error())
-			}
-			return nil, nil
+			return h.clients.UserManagement.DeletePhoneNumber(context.Background(), token)
+
 		},
 	)
 }
