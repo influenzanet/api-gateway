@@ -139,7 +139,9 @@ func (h *HttpEndpoints) addPhoneNumber(c *gin.Context) {
 	h.grpcCallHandler(
 		c,
 		func(c *gin.Context) (protoreflect.ProtoMessage, error) {
-			var req umAPI.ContactInfoMsg
+			var req umAPI.PhoneMsg
+			token := c.MustGet("validatedToken").(*api_types.TokenInfos)
+			req.Token = token
 			if err := h.JsonToProto(c, &req); err != nil {
 				return nil, status.Error(codes.InvalidArgument, err.Error())
 			}
