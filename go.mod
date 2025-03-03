@@ -1,6 +1,7 @@
 module github.com/influenzanet/api-gateway
 
 go 1.17
+
 require (
 	github.com/coneno/logger v1.2.2
 	github.com/crewjam/saml v0.4.13
@@ -46,7 +47,6 @@ require (
 	golang.org/x/sys v0.16.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	google.golang.org/genproto v0.0.0-20240108191215-35c7eff3a6b1 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20240108191215-35c7eff3a6b1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-replace github.com/influenzanet/user-management-service => ../user-management-service
