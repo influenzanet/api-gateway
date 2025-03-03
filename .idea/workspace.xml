@@ -7,6 +7,7 @@
 <<<<<<< HEAD
     <list default="true" id="c81ae96d-1018-4b4b-abc2-b9c3f39ca94c" name="Changes" comment="">
 <<<<<<< HEAD
+<<<<<<< HEAD
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
@@ -15,6 +16,11 @@
       <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pkg/protocols/http/v1/user_management_handlers.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/protocols/http/v1/user_management_handlers.go" afterDir="false" />
 >>>>>>> a6a4d9a (chore: change addphonenumber input object)
+=======
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
+>>>>>>> 9aa26b2 (fix: token injection in add phone number api)
     </list>
 =======
     <list default="true" id="c81ae96d-1018-4b4b-abc2-b9c3f39ca94c" name="Changes" comment="" />
@@ -53,6 +59,9 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 9aa26b2 (fix: token injection in add phone number api)
     "Go Build.go build github.com/influenzanet/api-gateway.executor": "Debug",
     "Go Build.go build github.com/influenzanet/api-gateway/cmd/management-api.executor": "Run",
 =======
@@ -143,6 +152,9 @@
     <option name="version" value="3" />
   </component>
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 9aa26b2 (fix: token injection in add phone number api)
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
       <map>
@@ -154,8 +166,11 @@
       </map>
     </option>
   </component>
+<<<<<<< HEAD
 =======
 >>>>>>> a6a4d9a (chore: change addphonenumber input object)
+=======
+>>>>>>> 9aa26b2 (fix: token injection in add phone number api)
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>
   </component>
