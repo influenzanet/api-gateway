@@ -3,3 +3,7 @@
 .DS_Store
 secret
 vendor
+.env
+.idea
+.vscode
+.idea/workspace.xml

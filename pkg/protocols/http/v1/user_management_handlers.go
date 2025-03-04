@@ -135,6 +135,36 @@ func (h *HttpEndpoints) signupWithEmailHandlV3(c *gin.Context) {
 	)
 }
 
+func (h *HttpEndpoints) addPhoneNumber(c *gin.Context) {
+	h.grpcCallHandler(
+		c,
+		func(c *gin.Context) (protoreflect.ProtoMessage, error) {
+			token := c.MustGet("validatedToken").(*api_types.TokenInfos)
+			var req umAPI.PhoneMsg
+			if err := h.JsonToProto(c, &req); err != nil {
+				return nil, status.Error(codes.InvalidArgument, err.Error())
+			}
+			req.Token = token
+			return h.clients.UserManagement.AddPhoneNumber(context.Background(), &req)
+		},
+	)
+}
+
+func (h *HttpEndpoints) editPhoneNumber(c *gin.Context) {
+	h.grpcCallHandler(
+		c,
+		func(c *gin.Context) (protoreflect.ProtoMessage, error) {
+			token := c.MustGet("validatedToken").(*api_types.TokenInfos)
+			var req umAPI.PhoneMsg
+			if err := h.JsonToProto(c, &req); err != nil {
+				return nil, status.Error(codes.InvalidArgument, err.Error())
+			}
+			req.Token = token
+			return h.clients.UserManagement.EditPhoneNumber(context.Background(), &req)
+		},
+	)
+}
+
 func (h *HttpEndpoints) deletePhoneNumber(c *gin.Context) {
 	h.grpcCallHandler(
 		c,
