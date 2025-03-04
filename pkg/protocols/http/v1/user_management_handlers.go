@@ -150,16 +150,29 @@ func (h *HttpEndpoints) addPhoneNumber(c *gin.Context) {
 	)
 }
 
+<<<<<<< HEAD
 func (h *HttpEndpoints) deletePhoneNumber(c *gin.Context) {
+=======
+func (h *HttpEndpoints) editPhoneNumber(c *gin.Context) {
+>>>>>>> 6c15b7e (feat: edit phone api endpoint)
 	h.grpcCallHandler(
 		c,
 		func(c *gin.Context) (protoreflect.ProtoMessage, error) {
 			token := c.MustGet("validatedToken").(*api_types.TokenInfos)
+<<<<<<< HEAD
 
 			return h.clients.UserManagement.DeletePhoneNumber(context.Background(), token)
 		},
 	)
 }
+=======
+			var req umAPI.PhoneMsg
+			if err := h.JsonToProto(c, &req); err != nil {
+				return nil, status.Error(codes.InvalidArgument, err.Error())
+			}
+			req.Token = token
+			return h.clients.UserManagement.EditPhoneNumber(context.Background(), &req)
+>>>>>>> 6c15b7e (feat: edit phone api endpoint)
 		},
 	)
 }
