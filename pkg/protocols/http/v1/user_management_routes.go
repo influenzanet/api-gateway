@@ -40,6 +40,7 @@ func (h *HttpEndpoints) AddUserManagementParticipantAPI(rg *gin.RouterGroup) {
 		user.POST("/contact/remove-email", mw.RequirePayload(), h.userRemoveEmailHandl)
 		user.POST("/contact/add-phone", mw.CheckAccountConfirmed(), mw.RequirePayload(), h.addPhoneNumber)
 		user.POST("/contact/edit-phone", mw.CheckAccountConfirmed(), mw.RequirePayload(), h.editPhoneNumber)
+		user.DELETE("/contact/delete-phone", h.deletePhoneNumber)
 	}
 
 	unAuthUser := rg.Group("/user")
@@ -50,6 +51,7 @@ func (h *HttpEndpoints) AddUserManagementParticipantAPI(rg *gin.RouterGroup) {
 
 		unAuthUser.POST("/contact-verification", mw.RequirePayload(), h.verifyUserContactHandl)
 		unAuthUser.GET("/unsubscribe-newsletter", h.unsubscribeNewsletterHandl)
+
 	}
 }
 

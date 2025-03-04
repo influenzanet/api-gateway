@@ -165,6 +165,18 @@ func (h *HttpEndpoints) editPhoneNumber(c *gin.Context) {
 	)
 }
 
+func (h *HttpEndpoints) deletePhoneNumber(c *gin.Context) {
+	h.grpcCallHandler(
+		c,
+		func(c *gin.Context) (protoreflect.ProtoMessage, error) {
+			token := c.MustGet("validatedToken").(*api_types.TokenInfos)
+
+			return h.clients.UserManagement.DeletePhoneNumber(context.Background(), token)
+
+		},
+	)
+}
+
 func (h *HttpEndpoints) grpcCallHandler(c *gin.Context, customMethod customHandlerMethod) {
 	resp, err := customMethod(c)
 	h.handleGRPCResponse(c, resp, err)
