@@ -176,9 +176,6 @@ func (h *HttpEndpoints) deletePhoneNumber(c *gin.Context) {
 		},
 	)
 }
-		},
-	)
-}
 
 func (h *HttpEndpoints) verifyWhatsAppCode(c *gin.Context) {
 	h.grpcCallHandler(
