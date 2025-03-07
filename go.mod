@@ -50,7 +50,3 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240108191215-35c7eff3a6b1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-replace (
-	github.com/influenzanet/user-management-service v1.1.2-0.20230704125712-383f9451459c => ../user-management-service
-)
