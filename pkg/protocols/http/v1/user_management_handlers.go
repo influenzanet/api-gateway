@@ -177,6 +177,21 @@ func (h *HttpEndpoints) deletePhoneNumber(c *gin.Context) {
 	)
 }
 
+func (h *HttpEndpoints) verifyWhatsAppCode(c *gin.Context) {
+	h.grpcCallHandler(
+		c,
+		func(c *gin.Context) (protoreflect.ProtoMessage, error) {
+			token := c.MustGet("validatedToken").(*api_types.TokenInfos)
+			var req umAPI.VerifyWhatsAppCodeReq
+			if err := h.JsonToProto(c, &req); err != nil {
+				return nil, status.Error(codes.InvalidArgument, err.Error())
+			}
+			req.Token = token
+			return h.clients.UserManagement.VerifyWhatsAppCode(context.Background(), &req)
+		},
+	)
+}
+
 func (h *HttpEndpoints) grpcCallHandler(c *gin.Context, customMethod customHandlerMethod) {
 	resp, err := customMethod(c)
 	h.handleGRPCResponse(c, resp, err)
@@ -439,8 +454,8 @@ func (h *HttpEndpoints) createUserHandl(c *gin.Context) {
 
 type MigrateUserReq struct {
 	AccountID          string             `json:"accountId"`
-	OldParticipantIDs  []string           `json:"oldParticipantIDs"` // per profile
-	ProfileNames       []string           `json:"profileNames"`      // per profile
+	OldParticipantIDs  []string           `json:"oldParticipantIDs"` // for profile
+	ProfileNames       []string           `json:"profileNames"`      // for profile
 	InitialPassword    string             `json:"initialPassword"`
 	PreferredLanguage  string             `json:"preferredLanguage"`
 	Studies            []string           `json:"studies"`
