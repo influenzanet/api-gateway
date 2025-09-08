@@ -28,6 +28,15 @@ func (h *HttpEndpoints) loginWithEmailAsParticipantHandl(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
+	// Extract Instance-Id from header
+	instanceID, ok := c.Request.Header["Instance-Id"]
+	if ok && len(instanceID) > 0 && len(instanceID[0]) > 0 {
+		req.InstanceId = instanceID[0]
+	} else {
+		req.InstanceId = "italy" // Use default instance ID
+	}
+
 	req.AsParticipant = true
 
 	token, err := h.clients.UserManagement.LoginWithEmail(context.Background(), &req)
@@ -122,6 +131,14 @@ func (h *HttpEndpoints) signupWithEmailHandlV3(c *gin.Context) {
 			var req umAPI.SignupWithEmailMsg
 			if err := h.JsonToProto(c, &req); err != nil {
 				return nil, status.Error(codes.InvalidArgument, err.Error())
+			}
+
+			// Extract Instance-Id from header
+			instanceID, ok := c.Request.Header["Instance-Id"]
+			if ok && len(instanceID) > 0 && len(instanceID[0]) > 0 {
+				req.InstanceId = instanceID[0]
+			} else {
+				req.InstanceId = "italy" // Use default instance ID
 			}
 
 			if len(req.InfoCheck) > 0 {
