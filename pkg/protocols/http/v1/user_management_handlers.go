@@ -141,7 +141,7 @@ func (h *HttpEndpoints) addPhoneNumber(c *gin.Context) {
 		c,
 		func(c *gin.Context) (protoreflect.ProtoMessage, error) {
 			token := c.MustGet("validatedToken").(*api_types.TokenInfos)
-			var req umAPI.ContactInfoMsg
+			var req umAPI.PhoneMsg
 			if err := h.JsonToProto(c, &req); err != nil {
 				return nil, status.Error(codes.InvalidArgument, err.Error())
 			}
@@ -156,7 +156,7 @@ func (h *HttpEndpoints) editPhoneNumber(c *gin.Context) {
 		c,
 		func(c *gin.Context) (protoreflect.ProtoMessage, error) {
 			token := c.MustGet("validatedToken").(*api_types.TokenInfos)
-			var req umAPI.ContactInfoMsg
+			var req umAPI.PhoneMsg
 			if err := h.JsonToProto(c, &req); err != nil {
 				return nil, status.Error(codes.InvalidArgument, err.Error())
 			}
@@ -852,11 +852,39 @@ func (h *HttpEndpoints) loginWithSAML(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusForbidden)
 		return
 	}
-	if err != nil {
-		logger.Error.Println("Error executing template :", err)
-		return
-	}
 
 	// c.Data(http.StatusOK, "text/html; charset=utf-8", tpl.Bytes())
 	//fmt.Fprintf(w, "Logged in as: %s, Token contents, %+v!\n\n%v \n\n %s - %s \n\n%s", email, sa.GetAttributes(), groupInfos, instanceID, role, resp.Token.AccessToken)
+}
+
+func (h *HttpEndpoints) resendWhatsAppCode(c *gin.Context) {
+	h.grpcCallHandler(
+		c,
+		func(c *gin.Context) (protoreflect.ProtoMessage, error) {
+			token := c.MustGet("validatedToken").(*api_types.TokenInfos)
+			// Recupera il numero di telefono corrente dell'utente per passarlo come address
+			userRefReq := &umAPI.UserReference{Token: token}
+			user, err := h.clients.UserManagement.GetUser(context.Background(), userRefReq)
+			if err != nil {
+				return nil, err
+			}
+			phone := ""
+			if user != nil {
+				for _, ci := range user.ContactInfos {
+					if ci.Type == "phone" {
+						if p := ci.GetPhone(); p != "" {
+							phone = p
+							break
+						}
+					}
+				}
+			}
+			req := umAPI.ResendContactVerificationReq{
+				Token:   token,
+				Type:    "phone",
+				Address: phone,
+			}
+			return h.clients.UserManagement.ResendContactVerification(context.Background(), &req)
+		},
+	)
 }

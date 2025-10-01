@@ -42,6 +42,7 @@ func (h *HttpEndpoints) AddUserManagementParticipantAPI(rg *gin.RouterGroup) {
 		user.POST("/contact/change-phone", mw.CheckAccountConfirmed(), mw.RequirePayload(), h.editPhoneNumber)
 		user.DELETE("/contact/delete-phone", h.deletePhoneNumber)
 		user.POST("/contact/verify-whatsapp-code", mw.CheckAccountConfirmed(), mw.RequirePayload(), h.verifyWhatsAppCode)
+		user.POST("/contact/resend-whatsapp-code", mw.CheckAccountConfirmed(), h.resendWhatsAppCode)
 	}
 
 	unAuthUser := rg.Group("/user")
