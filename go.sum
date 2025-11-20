@@ -85,8 +85,8 @@ github.com/influenzanet/messaging-service v1.5.5-staging.1 h1:e+lyZmrJNGPpwk8bLQ
 github.com/influenzanet/messaging-service v1.5.5-staging.1/go.mod h1:VBRrHB+FKGlCSbhj4Q0iWcV4sNdDy6jN2Vv2TAPRZkI=
 github.com/influenzanet/study-service v1.7.3 h1:lh24srEEqrtCG2cbIeHs+b07RMvFESy+Q5ftDwm8fI8=
 github.com/influenzanet/study-service v1.7.3/go.mod h1:k1kPZeXSH3cUjzStovmRewJtYrcHct9BrNa688vmW4g=
-github.com/influenzanet/user-management-service v1.1.2 h1:l+3gR5q6BAjfAgPvip4+HJsgtJlIgrMqF/u1Wxbbr+Y=
-github.com/influenzanet/user-management-service v1.1.2/go.mod h1:umeDAgI88Dy+Dj6mRwIvd0ChIu+h0c2UxPt7wcQMV3w=
+github.com/influenzanet/user-management-service v1.1.4-staging h1:Ya0hV9nRtH6ZuNTyZiFrKOJqLMDCkr+6rj02oiyP1uM=
+github.com/influenzanet/user-management-service v1.1.4-staging/go.mod h1:umeDAgI88Dy+Dj6mRwIvd0ChIu+h0c2UxPt7wcQMV3w=
 github.com/jonboulle/clockwork v0.2.2/go.mod h1:Pkfl5aHPm1nk2H9h0bjmnJD/BcgbGXUBGnn1kMkgxc8=
 github.com/jonboulle/clockwork v0.4.0 h1:p4Cf1aMWXnXAUh8lVfewRBx1zaTSYKrKMF2g3ST4RZ4=
 github.com/jonboulle/clockwork v0.4.0/go.mod h1:xgRqUGwRcjKCO1vbZUEtSLrqKoPSsUpK7fnezOII0kc=
