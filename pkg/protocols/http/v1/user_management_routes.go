@@ -40,7 +40,7 @@ func (h *HttpEndpoints) AddUserManagementParticipantAPI(rg *gin.RouterGroup) {
 		user.POST("/contact/remove-email", mw.RequirePayload(), h.userRemoveEmailHandl)
 		user.POST("/contact/add-phone", mw.CheckAccountConfirmed(), mw.RequirePayload(), h.addPhoneNumber)
 		user.POST("/contact/change-phone", mw.CheckAccountConfirmed(), mw.RequirePayload(), h.editPhoneNumber)
-		user.DELETE("/contact/delete-phone", h.deletePhoneNumber)
+		user.DELETE("/contact/delete-phone", mw.CheckAccountConfirmed(), h.deletePhoneNumber)
 		user.POST("/contact/verify-whatsapp-code", mw.CheckAccountConfirmed(), mw.RequirePayload(), h.verifyWhatsAppCode)
 		user.POST("/contact/resend-whatsapp-code", mw.CheckAccountConfirmed(), h.resendWhatsAppCode)
 	}
