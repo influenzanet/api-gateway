@@ -862,7 +862,7 @@ func (h *HttpEndpoints) resendWhatsAppCode(c *gin.Context) {
 		c,
 		func(c *gin.Context) (protoreflect.ProtoMessage, error) {
 			token := c.MustGet("validatedToken").(*api_types.TokenInfos)
-			// Recupera il numero di telefono corrente dell'utente per passarlo come address
+			// Fetch current phone number from user to pass as address
 			userRefReq := &umAPI.UserReference{Token: token}
 			user, err := h.clients.UserManagement.GetUser(context.Background(), userRefReq)
 			if err != nil {
