@@ -7,3 +7,8 @@ vendor
 .idea
 .vscode
 .idea/workspace.xml
+
+# Compiled binaries
+management-api
+participant-api
+__debug_bin*
