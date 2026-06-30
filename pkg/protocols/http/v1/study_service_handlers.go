@@ -968,6 +968,84 @@ func (h *HttpEndpoints) getParticipantFile(c *gin.Context) {
 	c.DataFromReader(http.StatusOK, contentLength, contentType, reader, extraHeaders)
 }
 
+// chunkReceiver is the common shape of the gRPC export streams (wide CSV, long
+// CSV, flat JSON). They all hand back a *studyAPI.Chunk per Recv.
+type chunkReceiver interface {
+	Recv() (*studyAPI.Chunk, error)
+}
+
+// streamChunksToClient relays a gRPC chunk stream to the HTTP client as a file
+// download, writing chunks as they arrive instead of buffering the whole export
+// in memory.
+//
+// The response headers (status, content-type, attachment filename) are written
+// exactly once, before the first byte; this also covers the empty-result case so
+// an export with no rows still comes back as a properly typed, named download.
+//
+// Error handling is asymmetric on purpose: an error received before any byte has
+// been written is reported as a normal HTTP/JSON error. Once the first chunk has
+// been flushed the 200 status line is already committed and cannot be changed, so
+// a later upstream error instead aborts the connection (see abortStreamedResponse)
+// to make the truncation detectable, rather than silently delivering a partial
+// file under a 200.
+func streamChunksToClient(c *gin.Context, stream chunkReceiver, contentType, filename string) {
+	wroteHeader := false
+	for {
+		chnk, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			logger.Error.Printf("error while streaming export %q: %v", filename, err)
+			if !wroteHeader {
+				st := status.Convert(err)
+				c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+			} else {
+				abortStreamedResponse(c)
+			}
+			return
+		}
+		if !wroteHeader {
+			c.Header("Content-Disposition", `attachment; filename=`+filename)
+			c.Header("Content-Type", contentType)
+			c.Status(http.StatusOK)
+			wroteHeader = true
+		}
+		if _, err := c.Writer.Write(chnk.Chunk); err != nil {
+			// Client most likely went away; stop pulling the upstream stream.
+			logger.Error.Printf("error writing export %q to client: %v", filename, err)
+			return
+		}
+		c.Writer.Flush()
+	}
+
+	// Empty result set: no chunks arrived, but the client still expects a
+	// (possibly empty) download carrying the right headers.
+	if !wroteHeader {
+		c.Header("Content-Disposition", `attachment; filename=`+filename)
+		c.Header("Content-Type", contentType)
+		c.Status(http.StatusOK)
+	}
+}
+
+// abortStreamedResponse drops the connection without writing the terminating
+// chunk of a chunked response, so a client that received a partial export sees a
+// failed transfer rather than a silently truncated 200. panic(http.ErrAbortHandler)
+// can't be used for this here because gin's Recovery middleware (installed via
+// gin.Default) swallows it and lets the request finish cleanly.
+func abortStreamedResponse(c *gin.Context) {
+	c.Writer.Flush()
+	hj, ok := c.Writer.(http.Hijacker)
+	if !ok {
+		return
+	}
+	conn, _, err := hj.Hijack()
+	if err != nil {
+		return
+	}
+	_ = conn.Close()
+}
+
 func (h *HttpEndpoints) getResponseWideFormatCSV(c *gin.Context) {
 	token := c.MustGet("validatedToken").(*api_types.TokenInfos)
 	var req studyAPI.ResponseExportQuery
@@ -1014,36 +1092,14 @@ func (h *HttpEndpoints) getResponseWideFormatCSV(c *gin.Context) {
 	req.ShortQuestionKeys = c.DefaultQuery("shortKeys", "true") == "true"
 	req.Token = token
 
-	stream, err := h.clients.StudyService.GetResponsesWideFormatCSV(context.Background(), &req)
+	stream, err := h.clients.StudyService.GetResponsesWideFormatCSV(c.Request.Context(), &req)
 	if err != nil {
 		st := status.Convert(err)
 		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
 		return
 	}
 
-	content := []byte{}
-	for {
-		chnk, err := stream.Recv()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			st := status.Convert(err)
-			c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
-			return
-		}
-		content = append(content, chnk.Chunk...)
-	}
-
-	reader := bytes.NewReader(content)
-	contentLength := int64(len(content))
-	contentType := "text/csv"
-
-	extraHeaders := map[string]string{
-		"Content-Disposition": `attachment; filename=` + fmt.Sprintf("%s_%s.csv", studyKey, surveyKey),
-	}
-
-	c.DataFromReader(http.StatusOK, contentLength, contentType, reader, extraHeaders)
+	streamChunksToClient(c, stream, "text/csv", fmt.Sprintf("%s_%s.csv", studyKey, surveyKey))
 }
 
 func (h *HttpEndpoints) getResponseLongFormatCSV(c *gin.Context) {
@@ -1092,36 +1148,14 @@ func (h *HttpEndpoints) getResponseLongFormatCSV(c *gin.Context) {
 	req.ShortQuestionKeys = c.DefaultQuery("shortKeys", "true") == "true"
 	req.Token = token
 
-	stream, err := h.clients.StudyService.GetResponsesLongFormatCSV(context.Background(), &req)
+	stream, err := h.clients.StudyService.GetResponsesLongFormatCSV(c.Request.Context(), &req)
 	if err != nil {
 		st := status.Convert(err)
 		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
 		return
 	}
 
-	content := []byte{}
-	for {
-		chnk, err := stream.Recv()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			st := status.Convert(err)
-			c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
-			return
-		}
-		content = append(content, chnk.Chunk...)
-	}
-
-	reader := bytes.NewReader(content)
-	contentLength := int64(len(content))
-	contentType := "text/csv"
-
-	extraHeaders := map[string]string{
-		"Content-Disposition": `attachment; filename=` + fmt.Sprintf("%s_%s.csv", studyKey, surveyKey),
-	}
-
-	c.DataFromReader(http.StatusOK, contentLength, contentType, reader, extraHeaders)
+	streamChunksToClient(c, stream, "text/csv", fmt.Sprintf("%s_%s.csv", studyKey, surveyKey))
 }
 
 func (h *HttpEndpoints) getResponseFlatJSON(c *gin.Context) {
@@ -1174,36 +1208,14 @@ func (h *HttpEndpoints) getResponseFlatJSON(c *gin.Context) {
 	req.ShortQuestionKeys = c.DefaultQuery("shortKeys", "true") == "true"
 	req.Token = token
 
-	stream, err := h.clients.StudyService.GetResponsesFlatJSON(context.Background(), &req)
+	stream, err := h.clients.StudyService.GetResponsesFlatJSON(c.Request.Context(), &req)
 	if err != nil {
 		st := status.Convert(err)
 		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
 		return
 	}
 
-	content := []byte{}
-	for {
-		chnk, err := stream.Recv()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			st := status.Convert(err)
-			c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
-			return
-		}
-		content = append(content, chnk.Chunk...)
-	}
-
-	reader := bytes.NewReader(content)
-	contentLength := int64(len(content))
-	contentType := "application/json"
-
-	extraHeaders := map[string]string{
-		"Content-Disposition": `attachment; filename=` + fmt.Sprintf("%s_%s.json", studyKey, surveyKey),
-	}
-
-	c.DataFromReader(http.StatusOK, contentLength, contentType, reader, extraHeaders)
+	streamChunksToClient(c, stream, "application/json", fmt.Sprintf("%s_%s.json", studyKey, surveyKey))
 }
 
 func (h *HttpEndpoints) getResponsesFlatJSONWithPagination(c *gin.Context) {

@@ -1,5 +1,13 @@
 # Changelog
 
+## [v1.6.0] - 2026-07-06
+
+### BREAKING CHANGE
+
+- Response export endpoints (`/response`, `/response/long-format`, `/response/json`) now stream the response to the client instead of buffering the full export in memory. As a consequence:
+  - Responses are sent using chunked transfer encoding and no longer include a `Content-Length` header.
+  - If the upstream export fails after streaming has started, the status code is already committed (`200`), so the connection is aborted instead. Clients receive a truncated/failed transfer rather than a silently partial file, and should treat an incomplete download as an error.
+
 ## [v1.5.0] - 2024-02-12
 
 ### Added
