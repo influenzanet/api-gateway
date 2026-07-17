@@ -18,6 +18,8 @@ func GRPCStatusToHTTP(status codes.Code) int {
 		return http.StatusUnauthorized
 	case codes.Unimplemented:
 		return http.StatusNotImplemented
+	case codes.ResourceExhausted:
+		return http.StatusTooManyRequests
 	}
 	return http.StatusInternalServerError
 }
