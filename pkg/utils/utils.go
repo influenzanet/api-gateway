@@ -20,6 +20,8 @@ func GRPCStatusToHTTP(status codes.Code) int {
 		return http.StatusNotImplemented
 	case codes.ResourceExhausted:
 		return http.StatusTooManyRequests
+	case codes.FailedPrecondition:
+		return http.StatusUnprocessableEntity
 	}
 	return http.StatusInternalServerError
 }

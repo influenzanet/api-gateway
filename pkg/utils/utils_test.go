@@ -18,6 +18,7 @@ func TestGRPCStatusToHTTP(t *testing.T) {
 		{codes.PermissionDenied, http.StatusUnauthorized},
 		{codes.Unimplemented, http.StatusNotImplemented},
 		{codes.ResourceExhausted, http.StatusTooManyRequests},
+		{codes.FailedPrecondition, http.StatusUnprocessableEntity},
 		{codes.Internal, http.StatusInternalServerError},
 		{codes.Unknown, http.StatusInternalServerError},
 	}
