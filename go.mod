@@ -12,7 +12,7 @@ require (
 	github.com/golang/protobuf v1.5.3
 	github.com/h2non/filetype v1.1.3
 	github.com/influenzanet/go-utils v0.2.14
-	github.com/influenzanet/messaging-service v1.7.4-staging
+	github.com/influenzanet/messaging-service v1.7.5-staging
 	github.com/influenzanet/study-service v1.7.3
 	github.com/influenzanet/user-management-service v1.2.1-staging
 	google.golang.org/grpc v1.60.1
