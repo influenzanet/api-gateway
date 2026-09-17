@@ -1,0 +1,36 @@
+name: Tests
+
+on:
+  pull_request:
+  push:
+    branches:
+      - dev-orbyta
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.23"
+
+      - name: Build
+        run: go build ./...
+
+      - name: Vet
+        run: go vet ./...
+
+      # Reported for information only: a few inherited files are not
+      # gofmt-clean, so formatting is not enforced yet and nothing is
+      # reformatted here.
+      - name: Gofmt (report only)
+        continue-on-error: true
+        run: gofmt -l .
+
+      # The api-gateway suite is self-contained: the gRPC clients it talks to
+      # are faked in the tests, so it needs no database and no other service.
+      - name: Test
+        run: go test -race ./...
