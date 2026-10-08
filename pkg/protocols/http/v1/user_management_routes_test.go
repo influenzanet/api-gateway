@@ -163,10 +163,13 @@ func (r routeExpectation) String() string {
 // enforces it in both directions), plus the signup and unsubscribe routes as
 // unauthenticated controls.
 var routeMiddlewareMatrix = []routeExpectation{
-	// The WhatsApp / phone routes: authenticated and confirmed-account only.
+	// The WhatsApp / phone routes: authenticated and confirmed-account only
+	// (except delete-phone, below).
 	{http.MethodPost, "/v1/user/contact/add-phone", `{"newPhone":"+393331234567"}`, "AddPhoneNumber", true, true},
 	{http.MethodPost, "/v1/user/contact/change-phone", `{"newPhone":"+393337654321"}`, "EditPhoneNumber", true, true},
-	{http.MethodDelete, "/v1/user/contact/delete-phone", "", "DeletePhoneNumber", true, true},
+	// Deleting the phone is a privacy action: authenticated, but allowed before
+	// the account is confirmed, like remove-email and account deletion.
+	{http.MethodDelete, "/v1/user/contact/delete-phone", "", "DeletePhoneNumber", true, false},
 	{http.MethodPost, "/v1/user/contact/verify-whatsapp-code", `{"code":"123456"}`, "VerifyWhatsAppCode", true, true},
 	{http.MethodPost, "/v1/user/contact/resend-whatsapp-code", "", "GetUser", true, true},
 	// Email contact routes, same group.
@@ -250,8 +253,9 @@ func assertHandlerReached(t *testing.T, route routeExpectation, rec *httptest.Re
 }
 
 // TestParticipantRouteMiddlewareMatrix is the regression guard for M-1: every
-// phone / WhatsApp route must refuse an anonymous caller and an unconfirmed
-// account before the handler runs, and must serve a confirmed one.
+// phone / WhatsApp route must refuse an anonymous caller and, except
+// delete-phone, an unconfirmed account before the handler runs, and must serve
+// a confirmed one.
 func TestParticipantRouteMiddlewareMatrix(t *testing.T) {
 	// Keep the signup route's recaptcha middleware out of the picture.
 	t.Setenv("USE_RECAPTCHA", "false")
@@ -324,6 +328,36 @@ func TestContactRoutesAreAllInTheMatrix(t *testing.T) {
 	for key, covered := range expected {
 		if !covered {
 			t.Errorf("routeMiddlewareMatrix expects %s but no such route is registered: the path is stale or misspelled", key)
+		}
+	}
+}
+
+// TestDeletePhoneAllowedForUnconfirmedAccount: an account that is not confirmed
+// yet can remove its phone number, while adding, changing, verifying and
+// re-sending a code stay reserved to confirmed accounts.
+func TestDeletePhoneAllowedForUnconfirmedAccount(t *testing.T) {
+	deletePhone := routeExpectation{http.MethodDelete, "/v1/user/contact/delete-phone", "", "DeletePhoneNumber", true, false}
+
+	rec, fake := callRoute(deletePhone, unconfirmedAccountToken)
+	assertHandlerReached(t, deletePhone, rec, fake)
+
+	rec, fake = callRoute(deletePhone, "")
+	assertRefusedBeforeHandler(t, deletePhone, rec, fake, http.StatusBadRequest, msgNoToken)
+
+	rec, fake = callRoute(deletePhone, unknownToken)
+	assertRefusedBeforeHandler(t, deletePhone, rec, fake, http.StatusUnauthorized, msgInvalidToken)
+
+	for _, route := range routeMiddlewareMatrix {
+		switch route.path {
+		case "/v1/user/contact/add-phone",
+			"/v1/user/contact/change-phone",
+			"/v1/user/contact/verify-whatsapp-code",
+			"/v1/user/contact/resend-whatsapp-code":
+			if !route.requiresToken || !route.requiresConfirmedAccount {
+				t.Errorf("%s must stay reserved to confirmed accounts in the matrix", route)
+			}
+			rec, fake := callRoute(route, unconfirmedAccountToken)
+			assertRefusedBeforeHandler(t, route, rec, fake, http.StatusBadRequest, msgNotConfirmed)
 		}
 	}
 }
