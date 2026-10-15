@@ -19,6 +19,9 @@ func (h *HttpEndpoints) AddUserManagementParticipantAPI(rg *gin.RouterGroup) {
 	}
 	auth.POST("/renew-token", mw.ExtractToken(), mw.RequirePayload(), h.tokenRenewHandl)
 
+	// Public: read by the participant site before login to show or hide the WhatsApp UI.
+	rg.GET("/platform-config", h.getPlatformConfigHandl)
+
 	user := rg.Group("/user")
 	user.Use(mw.ExtractToken())
 	user.Use(mw.ValidateToken(h.clients.UserManagement))
