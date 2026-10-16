@@ -14,7 +14,7 @@ require (
 	github.com/influenzanet/go-utils v0.2.14
 	github.com/influenzanet/messaging-service v1.7.5-staging
 	github.com/influenzanet/study-service v1.7.3
-	github.com/influenzanet/user-management-service v1.2.1-staging
+	github.com/influenzanet/user-management-service v1.2.11-staging
 	google.golang.org/grpc v1.60.1
 	google.golang.org/protobuf v1.36.6
 )
@@ -47,7 +47,7 @@ require (
 	golang.org/x/crypto v0.18.0 // indirect
 	golang.org/x/net v0.20.0 // indirect
 	golang.org/x/sys v0.16.0 // indirect
-	golang.org/x/text v0.14.0 // indirect
+	golang.org/x/text v0.15.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240108191215-35c7eff3a6b1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
