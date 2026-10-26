@@ -15,6 +15,7 @@ import (
 
 	"github.com/influenzanet/api-gateway/pkg/models"
 	gc "github.com/influenzanet/api-gateway/pkg/protocols/grpc/clients"
+	mw "github.com/influenzanet/api-gateway/pkg/protocols/http/middlewares"
 	v1 "github.com/influenzanet/api-gateway/pkg/protocols/http/v1"
 )
 
@@ -96,7 +97,8 @@ func main() {
 	grpcClients.MessagingService = messagingClient
 
 	// Start webserver
-	router := gin.Default()
+	router := gin.New()
+	router.Use(mw.AbortFailedResponses(), gin.Logger(), gin.Recovery())
 	router.Use(cors.New(cors.Config{
 		// AllowAllOrigins: true,
 		AllowOrigins:     conf.AllowOrigins,

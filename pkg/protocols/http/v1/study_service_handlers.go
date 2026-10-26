@@ -1092,14 +1092,10 @@ func (h *HttpEndpoints) getResponseWideFormatCSV(c *gin.Context) {
 	req.ShortQuestionKeys = c.DefaultQuery("shortKeys", "true") == "true"
 	req.Token = token
 
-	stream, err := h.clients.StudyService.GetResponsesWideFormatCSV(c.Request.Context(), &req)
-	if err != nil {
-		st := status.Convert(err)
-		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
-		return
-	}
-
-	streamChunksToClient(c, stream, "text/csv", fmt.Sprintf("%s_%s.csv", studyKey, surveyKey))
+	serveResponseExport(c, "text/csv", fmt.Sprintf("%s_%s.csv", studyKey, surveyKey),
+		func(ctx context.Context) (responseExportStream, error) {
+			return h.clients.StudyService.GetResponsesWideFormatCSV(ctx, &req)
+		})
 }
 
 func (h *HttpEndpoints) getResponseLongFormatCSV(c *gin.Context) {
@@ -1148,14 +1144,10 @@ func (h *HttpEndpoints) getResponseLongFormatCSV(c *gin.Context) {
 	req.ShortQuestionKeys = c.DefaultQuery("shortKeys", "true") == "true"
 	req.Token = token
 
-	stream, err := h.clients.StudyService.GetResponsesLongFormatCSV(c.Request.Context(), &req)
-	if err != nil {
-		st := status.Convert(err)
-		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
-		return
-	}
-
-	streamChunksToClient(c, stream, "text/csv", fmt.Sprintf("%s_%s.csv", studyKey, surveyKey))
+	serveResponseExport(c, "text/csv", fmt.Sprintf("%s_%s.csv", studyKey, surveyKey),
+		func(ctx context.Context) (responseExportStream, error) {
+			return h.clients.StudyService.GetResponsesLongFormatCSV(ctx, &req)
+		})
 }
 
 func (h *HttpEndpoints) getResponseFlatJSON(c *gin.Context) {
@@ -1208,14 +1200,10 @@ func (h *HttpEndpoints) getResponseFlatJSON(c *gin.Context) {
 	req.ShortQuestionKeys = c.DefaultQuery("shortKeys", "true") == "true"
 	req.Token = token
 
-	stream, err := h.clients.StudyService.GetResponsesFlatJSON(c.Request.Context(), &req)
-	if err != nil {
-		st := status.Convert(err)
-		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
-		return
-	}
-
-	streamChunksToClient(c, stream, "application/json", fmt.Sprintf("%s_%s.json", studyKey, surveyKey))
+	serveResponseExport(c, "application/json", fmt.Sprintf("%s_%s.json", studyKey, surveyKey),
+		func(ctx context.Context) (responseExportStream, error) {
+			return h.clients.StudyService.GetResponsesFlatJSON(ctx, &req)
+		})
 }
 
 func (h *HttpEndpoints) getResponsesFlatJSONWithPagination(c *gin.Context) {
