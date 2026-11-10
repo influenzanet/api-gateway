@@ -27,6 +27,8 @@ An example to run your created docker image - with the set environment variables
 
 ## Settings
 
+Survey response exports can be streamed with `stream=true`, see [response exports](docs/response_exports.md).
+
 Turn endpoints on/off:
 
 ``` sh

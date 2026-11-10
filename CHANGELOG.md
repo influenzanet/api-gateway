@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- Survey response exports (CSV wide/long, flat JSON) accept `stream=true` to stream the download. A failure after the download started aborts the connection.
+
 ## [v1.5.0] - 2024-02-12
 
 ### Added
