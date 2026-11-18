@@ -7,6 +7,11 @@ CORS_ALLOW_ORIGINS=https://your-domain.tld,https://test-domain.tld
 ADDR_USER_MANAGEMENT_SERVICE=<user-m-addr>:<user-m-port>
 ADDR_STUDY_SERVICE=<study-addr>:<study-port>
 
+# WhatsApp webhook (/v1/webhooks/whatsapp): on only when all three are set
+ADDR_MESSAGING_SERVICE=<messaging-addr>:<messaging-port>
+WHATSAPP_APP_SECRET=<Meta app secret>
+WHATSAPP_WEBHOOK_VERIFY_TOKEN=<verify token set in the Meta app>
+
 USE_DELETE_PARTICIPANT_DATA_ENDPOINT=true
 DISABLE_SIGNUP_WITH_EMAIL_ENDPOINT=false
 

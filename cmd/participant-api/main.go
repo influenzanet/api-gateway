@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io"
 	"net/http"
 	"os"
 	"strings"
@@ -57,8 +58,28 @@ func main() {
 	grpcClients.UserManagement = umClient
 	grpcClients.StudyService = studyClient
 
-	// Start webserver
-	router := gin.Default()
+	webhook, webhookOn, missing := models.WhatsAppWebhookConfigFromEnv(os.Getenv)
+	switch {
+	case webhookOn:
+		messagingClient, messagingServiceClose := gc.ConnectToMessagingService(webhook.MessagingServiceAddr, conf.MaxMsgSize)
+		defer messagingServiceClose()
+		grpcClients.MessagingService = messagingClient
+		logger.Info.Printf("WhatsApp webhook on at /v1%s", v1.WhatsAppWebhookPath)
+	case len(missing) > 0:
+		logger.Error.Printf("WhatsApp webhook off: %s not set", strings.Join(missing, ", "))
+	}
+
+	router := newRouter(grpcClients, conf, webhook, webhookOn, gin.DefaultWriter)
+	logger.Info.Printf("gateway listening on port %s", conf.Port)
+	logger.Error.Fatal(router.Run(":" + conf.Port))
+}
+
+// newRouter builds the routes of the participant API. The request log leaves query strings out:
+// the WhatsApp subscription check carries the verify token there, and other links carry tokens
+// too. The WhatsApp webhook route exists only when webhookOn.
+func newRouter(clients *models.APIClients, conf models.Config, webhook models.WhatsAppWebhookConfig, webhookOn bool, logOutput io.Writer) *gin.Engine {
+	router := gin.New()
+	router.Use(gin.LoggerWithConfig(gin.LoggerConfig{Output: logOutput, SkipQueryString: true}), gin.Recovery())
 	router.Use(cors.New(cors.Config{
 		// AllowAllOrigins: true,
 		AllowOrigins:     conf.AllowOrigins,
@@ -71,11 +92,12 @@ func main() {
 	router.GET("/", healthCheckHandle)
 	v1Root := router.Group("/v1")
 
-	v1APIHandlers := v1.NewHTTPHandler(grpcClients, conf.UseEndpoints, nil)
+	v1APIHandlers := v1.NewHTTPHandler(clients, conf.UseEndpoints, nil)
 	v1APIHandlers.AddServiceStatusAPI(v1Root)
 	v1APIHandlers.AddUserManagementParticipantAPI(v1Root)
 	v1APIHandlers.AddStudyServiceParticipantAPI(v1Root)
-
-	logger.Info.Printf("gateway listening on port %s", conf.Port)
-	logger.Error.Fatal(router.Run(":" + conf.Port))
+	if webhookOn {
+		v1APIHandlers.AddWhatsAppWebhookAPI(v1Root, webhook)
+	}
+	return router
 }

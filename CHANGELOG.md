@@ -5,9 +5,11 @@
 ### Added
 
 - Survey response exports (CSV wide/long, flat JSON) accept `stream=true` to stream the download. A failure after the download started aborts the connection.
+- participant-api: WhatsApp webhook at `/v1/webhooks/whatsapp`, for Meta's delivery statuses and the replies participants send. `GET` answers Meta's subscription check (`hub.mode=subscribe`, `hub.verify_token`, `hub.challenge`: the challenge comes back as plain text when the token matches, 403 otherwise). `POST` checks `X-Hub-Signature-256` (HMAC-SHA256 of the raw body with the app secret) and answers 401 when it is missing or wrong, 413 above 3.5 MiB; a signed body is forwarded unchanged to messaging-service (`ProcessWhatsAppWebhook`), and the answer is 200 when it was processed or can never be, 503 when Meta should send it again. The route exists only when `WHATSAPP_APP_SECRET`, `WHATSAPP_WEBHOOK_VERIFY_TOKEN` and `ADDR_MESSAGING_SERVICE` are all set; with only some of them it stays off and an ERROR names the missing ones. Needs messaging-service with `ProcessWhatsAppWebhook`.
 
 ### Changed
 
+- participant-api: the request log no longer writes query strings, on every route. The webhook's subscription check carries the verify token there, and other links carry tokens too.
 - Two gRPC statuses get their own HTTP status on every route, instead of 500: `ResourceExhausted` → 429 and `FailedPrecondition` → 422. Among the backends, only user-management returns them, on the phone routes (a spent send or attempt budget; a number Meta does not deliver to); messaging-service and study-service (v1.7.3) never do. The gRPC library also uses `ResourceExhausted` for a message larger than `GRPC_MAX_MSG_SIZE` (default 4 MiB), so an oversized request or response, for instance a large survey or report through the management API, now answers 429 instead of 500. A client that retries on 429 would retry it in vain; `influenzanet.api` 1.3 and python-ifncli treat any status other than 200 as an error, and the participant web app reads 429 and 422 only on the phone routes.
 - `POST /v1/user/contact/resend-whatsapp-code` answers 400 "no phone number on this account" itself when the account has no phone number, without calling user-management. It was a 400 before too, with user-management's message.
 

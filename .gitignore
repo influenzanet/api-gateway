@@ -8,7 +8,9 @@ vendor
 .vscode
 .idea/workspace.xml
 
-# Compiled binaries
+# Compiled binaries; the cmd/ directories of the same name are not ignored
 management-api
 participant-api
+!management-api/
+!participant-api/
 __debug_bin*
