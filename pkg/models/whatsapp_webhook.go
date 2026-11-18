@@ -15,30 +15,31 @@ type WhatsAppWebhookConfig struct {
 }
 
 // WhatsAppWebhookConfigFromEnv reads WHATSAPP_APP_SECRET, WHATSAPP_WEBHOOK_VERIFY_TOKEN and
-// ADDR_MESSAGING_SERVICE. The route is on only when all three are set. With none of them it is
-// off and nothing is wrong (a deployment without WhatsApp); with only some, missing names the
-// others, so that a half-done configuration is reported instead of silently leaving the
-// webhook off.
+// ADDR_MESSAGING_SERVICE. The two secrets decide: with neither, the route is off and nothing is
+// wrong (a deployment without the webhook; the messaging address alone is common, deployments
+// set it for other reasons). With both, and the messaging address, the route is on. Anything in
+// between is a half-done configuration: the route stays off and missing names what is lacking,
+// so that it is reported instead of silently leaving the webhook off.
 func WhatsAppWebhookConfigFromEnv(getenv func(string) string) (cfg WhatsAppWebhookConfig, on bool, missing []string) {
-	values := []struct {
-		name  string
-		value *string
-	}{
-		{"WHATSAPP_APP_SECRET", &cfg.AppSecret},
-		{"WHATSAPP_WEBHOOK_VERIFY_TOKEN", &cfg.VerifyToken},
-		{"ADDR_MESSAGING_SERVICE", &cfg.MessagingServiceAddr},
+	cfg = WhatsAppWebhookConfig{
+		AppSecret:            strings.TrimSpace(getenv("WHATSAPP_APP_SECRET")),
+		VerifyToken:          strings.TrimSpace(getenv("WHATSAPP_WEBHOOK_VERIFY_TOKEN")),
+		MessagingServiceAddr: strings.TrimSpace(getenv("ADDR_MESSAGING_SERVICE")),
 	}
-	for _, v := range values {
-		*v.value = strings.TrimSpace(getenv(v.name))
-		if *v.value == "" {
+	if cfg.AppSecret == "" && cfg.VerifyToken == "" {
+		return WhatsAppWebhookConfig{}, false, nil
+	}
+	for _, v := range []struct{ name, value string }{
+		{"WHATSAPP_APP_SECRET", cfg.AppSecret},
+		{"WHATSAPP_WEBHOOK_VERIFY_TOKEN", cfg.VerifyToken},
+		{"ADDR_MESSAGING_SERVICE", cfg.MessagingServiceAddr},
+	} {
+		if v.value == "" {
 			missing = append(missing, v.name)
 		}
 	}
-	switch len(missing) {
-	case 0:
-		return cfg, true, nil
-	case len(values):
-		return WhatsAppWebhookConfig{}, false, nil
+	if len(missing) > 0 {
+		return WhatsAppWebhookConfig{}, false, missing
 	}
-	return WhatsAppWebhookConfig{}, false, missing
+	return cfg, true, nil
 }
