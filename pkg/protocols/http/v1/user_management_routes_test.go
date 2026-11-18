@@ -17,10 +17,10 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// F-57: the route -> middleware matrix of the participant API is only expressed
-// in AddUserManagementParticipantAPI. Nothing else stops a phone route from
-// being registered outside the authenticated group, or without
-// CheckAccountConfirmed, which is exactly the M-1 class of regression. These
+// The route -> middleware matrix of the participant API is only expressed in
+// AddUserManagementParticipantAPI. Nothing else stops a phone route from being
+// registered outside the authenticated group, or without CheckAccountConfirmed,
+// which would let anyone, or an unconfirmed account, send WhatsApp codes. These
 // tests drive the real router and assert, per route, who is refused and who
 // reaches the handler.
 
@@ -48,6 +48,12 @@ const (
 type fakeUserManagementClient struct {
 	umAPI.UserManagementApiClient
 	calls []string
+	// user is what GetUser answers; nil means a participant with a phone number.
+	user *umAPI.User
+	// getUserErr, when set, is what GetUser fails with.
+	getUserErr error
+	// resendAddresses lists the address of every ResendContactVerification request.
+	resendAddresses []string
 }
 
 func (f *fakeUserManagementClient) record(method string) {
@@ -99,11 +105,20 @@ func (f *fakeUserManagementClient) VerifyWhatsAppCode(ctx context.Context, in *u
 // call that proves the handler was reached.
 func (f *fakeUserManagementClient) GetUser(ctx context.Context, in *umAPI.UserReference, opts ...grpc.CallOption) (*umAPI.User, error) {
 	f.record("GetUser")
-	return &umAPI.User{}, nil
+	if f.getUserErr != nil {
+		return nil, f.getUserErr
+	}
+	if f.user != nil {
+		return f.user, nil
+	}
+	return &umAPI.User{ContactInfos: []*umAPI.ContactInfo{
+		{Type: "phone", Address: &umAPI.ContactInfo_Phone{Phone: "+393331234567"}},
+	}}, nil
 }
 
 func (f *fakeUserManagementClient) ResendContactVerification(ctx context.Context, in *umAPI.ResendContactVerificationReq, opts ...grpc.CallOption) (*umAPI.ServiceStatus, error) {
 	f.record("ResendContactVerification")
+	f.resendAddresses = append(f.resendAddresses, in.GetAddress())
 	return &umAPI.ServiceStatus{}, nil
 }
 
@@ -252,7 +267,7 @@ func assertHandlerReached(t *testing.T, route routeExpectation, rec *httptest.Re
 	}
 }
 
-// TestParticipantRouteMiddlewareMatrix is the regression guard for M-1: every
+// TestParticipantRouteMiddlewareMatrix guards the matrix above: every
 // phone / WhatsApp route must refuse an anonymous caller and, except
 // delete-phone, an unconfirmed account before the handler runs, and must serve
 // a confirmed one.

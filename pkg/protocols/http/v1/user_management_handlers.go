@@ -879,6 +879,11 @@ func (h *HttpEndpoints) resendWhatsAppCode(c *gin.Context) {
 					}
 				}
 			}
+			if phone == "" {
+				// Nothing to resend to: refuse here rather than ask user-management to send a
+				// code to an empty address.
+				return nil, status.Error(codes.InvalidArgument, "no phone number on this account")
+			}
 			req := umAPI.ResendContactVerificationReq{
 				Token:   token,
 				Type:    "phone",
