@@ -54,6 +54,10 @@ type fakeUserManagementClient struct {
 	getUserErr error
 	// resendAddresses lists the address of every ResendContactVerification request.
 	resendAddresses []string
+	// unsubscribeRequests lists every UnsubscribeWithToken request; unsubscribeErr, when set,
+	// is what it fails with.
+	unsubscribeRequests []*umAPI.UnsubscribeWithTokenReq
+	unsubscribeErr      error
 }
 
 func (f *fakeUserManagementClient) record(method string) {
@@ -147,6 +151,15 @@ func (f *fakeUserManagementClient) UseUnsubscribeToken(ctx context.Context, in *
 	return &umAPI.ServiceStatus{}, nil
 }
 
+func (f *fakeUserManagementClient) UnsubscribeWithToken(ctx context.Context, in *umAPI.UnsubscribeWithTokenReq, opts ...grpc.CallOption) (*umAPI.ServiceStatus, error) {
+	f.record("UnsubscribeWithToken")
+	f.unsubscribeRequests = append(f.unsubscribeRequests, in)
+	if f.unsubscribeErr != nil {
+		return nil, f.unsubscribeErr
+	}
+	return &umAPI.ServiceStatus{Msg: "unsubscribed"}, nil
+}
+
 func (f *fakeUserManagementClient) SignupWithEmail(ctx context.Context, in *umAPI.SignupWithEmailMsg, opts ...grpc.CallOption) (*umAPI.TokenResponse, error) {
 	f.record("SignupWithEmail")
 	return &umAPI.TokenResponse{}, nil
@@ -198,6 +211,7 @@ var routeMiddlewareMatrix = []routeExpectation{
 	{http.MethodPost, "/v1/user/contact-verification", `{"token":"one-time-token"}`, "VerifyContact", false, false},
 	// Controls outside the /v1/user/contact prefix.
 	{http.MethodGet, "/v1/user/unsubscribe-newsletter", "", "UseUnsubscribeToken", false, false},
+	{http.MethodGet, "/v1/user/unsubscribe-weekly", "", "UnsubscribeWithToken", false, false},
 	{http.MethodPost, "/v1/auth/signup-with-email", `{"email":"participant@example.it","password":"a-password","instanceId":"italy","preferredLanguage":"it"}`, "SignupWithEmail", false, false},
 }
 

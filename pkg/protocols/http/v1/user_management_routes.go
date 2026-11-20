@@ -56,6 +56,7 @@ func (h *HttpEndpoints) AddUserManagementParticipantAPI(rg *gin.RouterGroup) {
 
 		unAuthUser.POST("/contact-verification", mw.RequirePayload(), h.verifyUserContactHandl)
 		unAuthUser.GET("/unsubscribe-newsletter", h.unsubscribeNewsletterHandl)
+		unAuthUser.GET("/unsubscribe-weekly", h.unsubscribeWeeklyHandl)
 
 	}
 }

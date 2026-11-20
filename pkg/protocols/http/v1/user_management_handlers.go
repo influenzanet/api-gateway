@@ -721,6 +721,19 @@ func (h *HttpEndpoints) unsubscribeNewsletterHandl(c *gin.Context) {
 	h.SendProtoAsJSON(c, http.StatusOK, resp)
 }
 
+func (h *HttpEndpoints) unsubscribeWeeklyHandl(c *gin.Context) {
+	resp, err := h.clients.UserManagement.UnsubscribeWithToken(context.Background(), &umAPI.UnsubscribeWithTokenReq{
+		Token:        c.DefaultQuery("token", ""),
+		Subscription: umAPI.Subscription_SUBSCRIPTION_WEEKLY,
+	})
+	if err != nil {
+		st := status.Convert(err)
+		c.JSON(utils.GRPCStatusToHTTP(st.Code()), gin.H{"error": st.Message()})
+		return
+	}
+	h.SendProtoAsJSON(c, http.StatusOK, resp)
+}
+
 type GroupInfo struct {
 	Customer   string
 	Prefix     string

@@ -89,6 +89,8 @@ github.com/influenzanet/study-service v1.7.3 h1:lh24srEEqrtCG2cbIeHs+b07RMvFESy+
 github.com/influenzanet/study-service v1.7.3/go.mod h1:k1kPZeXSH3cUjzStovmRewJtYrcHct9BrNa688vmW4g=
 github.com/influenzanet/user-management-service v1.2.13-staging h1:dziMo8RPTbqDFlFflittJjXXURhZUzCBUhMdVh5Poks=
 github.com/influenzanet/user-management-service v1.2.13-staging/go.mod h1:jD4/bUaVk7PkRXZLg1YLWthKV29936EwUWL3Q2H542s=
+github.com/influenzanet/user-management-service v1.2.14-staging.1 h1:/HsbD9MHBA6zQ3GTBYKYCaa6pWWSkiFdV/4al0+IZo0=
+github.com/influenzanet/user-management-service v1.2.14-staging.1/go.mod h1:jD4/bUaVk7PkRXZLg1YLWthKV29936EwUWL3Q2H542s=
 github.com/jonboulle/clockwork v0.5.0 h1:Hyh9A8u51kptdkR+cqRpT1EebBwTn1oK9YfGYbdFz6I=
 github.com/jonboulle/clockwork v0.5.0/go.mod h1:3mZlmanh0g2NDKO5TWZVJAfofYk64M7XN3SzBPjZF60=
 github.com/json-iterator/go v1.1.12 h1:PV8peI4a0ysnczrg+LtxykD8LfKY9ML6u2jnxaEnrnM=
